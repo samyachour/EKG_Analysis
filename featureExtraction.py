@@ -14,24 +14,16 @@ def plotWave(y, title, xLab, folder = ""):
         plt.savefig(folder + title + ".png")
     plt.show()
 
-EKG = pd.read_csv("../MIT-BIH_Arrhythmia/100.csv", header=None, names=["time", "volts"])
+EKG = pd.read_csv("../MIT-BIH_Arrhythmia/100.csv", header=None)
 
-plotData = EKG[:500]
+plotData = EKG[2:500]
 
-x = np.asarray(plotData['time'])
-y = np.asarray(plotData['volts'])
+x = np.asarray(plotData[0])
+y = np.asarray(pd.to_numeric(plotData[1]))
 
-#x_smooth = np.linspace(x.min(), x.max(), 4000)
-#y_smooth = spline(x, y, x_smooth)
+# Wavelet transforms, using pywavelets
 
-plt.plot(x,y)
-plt.ylabel("mV")
-plt.xlabel("Time")
-plt.show()
-# ignore time values
-
-# Wavelet transforms, using 
-
+# Automated way to get graphs for different wavelet types and store the images in folders
 def getGraphs(waveletType):
     waveletType = waveletType
     w = pywt.Wavelet(waveletType)
@@ -73,9 +65,5 @@ plotWave(cD4, "cD4", "Index 5n * 0.003")
 plotWave(cA4, "cA4", "Index 5n * 0.003")
 
 # Imperatively grabbing features
-
-plotData['volts'].values.max()
-
-threshold = 0.4 * plotData['volts'].values.max()
 
 
