@@ -15,7 +15,7 @@ def plotWave(y, title, xLab, folder = ""):
 
 EKG = pd.read_csv("../MIT-BIH_Arrhythmia/100.csv", header=None)
 
-plotData = EKG[2:502]
+plotData = EKG[2:500]
 
 x = np.asarray(plotData[0])
 y = np.asarray(pd.to_numeric(plotData[1]))
@@ -39,28 +39,30 @@ def addArrays(arrayList):
 
 cA = y
 plotWave(cA, "Original", "Index 1n * 0.003")
-print(len(cA))
+pointsNum = len(cA)
 
 # level is the last index in list - 1
-# currLevel of original is totalLevels + 1
+# currLevel of original ^^ is totalLevels + 1
 # index kn * 0.003 k is (totalLevels - currLevel) + 2
 # cDK K is (totalLevels - currLevel) + 1
 # max pywavelets level is 6
 wavelet = 'db4'
 levels = 6
-mode = 'zero'
+mode = 'constant'
 coeffs = pywt.wavedecn(cA, wavelet, level=levels, mode=mode)
 # np.set_printoptions(threshold=np.nan)
 
-for i in range(1,levels + 1):
+for i in range(1 + 2,levels + 1):
     index = i
     smallK = (levels - i) + 2
     bigK = (levels - i) + 1
-    print(len(coeffs[index]['d']))
     plotWave(coeffs[index]['d'], "cD" + str(bigK), "Index " + str(smallK) + "n * 0.003")
 
 rebuilt = pywt.waverecn(coeffs, wavelet, mode=mode)
 plotWave(rebuilt, "rebuilt1", "hopefully correct indices")
+
+# TODO: figure out how to convert x values from cDK, * 2 - 6 (even) or - 7 (odd)
+# TODO: figure out how to custom reconstruct cDKs, ie CD2-4
 
 coeffs.pop(6)
 coeffs.pop(5)
