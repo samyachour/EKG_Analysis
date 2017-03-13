@@ -1,7 +1,6 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
-from scipy.interpolate import spline
 import pywt
 
 def plotWave(y, title, xLab, folder = ""):
@@ -16,7 +15,7 @@ def plotWave(y, title, xLab, folder = ""):
 
 EKG = pd.read_csv("../MIT-BIH_Arrhythmia/100.csv", header=None)
 
-plotData = EKG[2:500]
+plotData = EKG[2:502]
 
 x = np.asarray(plotData[0])
 y = np.asarray(pd.to_numeric(plotData[1]))
@@ -39,30 +38,36 @@ def addArrays(arrayList):
     return [sum(x) for x in zip(*arrayList)]
 
 cA = y
-plotWave(cA, "Original", "Index n * 0.003")
+plotWave(cA, "Original", "Index 1n * 0.003")
+print(len(cA))
 
-coeffs = pywt.wavedecn(cA, 'sym4', level=4, mode='smooth')
-cA4 = coeffs[0]
-cD4 = coeffs[1]['d']
-cD3 = coeffs[2]['d']
-cD2 = coeffs[3]['d']
-cD1 = coeffs[4]['d']
-#cA4, cD4, cD3, cD2, cD1 = coeffs
+# level is the last index in list - 1
+# currLevel of original is totalLevels + 1
+# index kn * 0.003 k is (totalLevels - currLevel) + 2
+# cDK K is (totalLevels - currLevel) + 1
+# max pywavelets level is 6
+wavelet = 'db4'
+levels = 6
+mode = 'zero'
+coeffs = pywt.wavedecn(cA, wavelet, level=levels, mode=mode)
+# np.set_printoptions(threshold=np.nan)
 
-rebuilt = pywt.waverecn(coeffs, 'sym4', mode='smooth')
+for i in range(1,levels + 1):
+    index = i
+    smallK = (levels - i) + 2
+    bigK = (levels - i) + 1
+    print(len(coeffs[index]['d']))
+    plotWave(coeffs[index]['d'], "cD" + str(bigK), "Index " + str(smallK) + "n * 0.003")
+
+rebuilt = pywt.waverecn(coeffs, wavelet, mode=mode)
 plotWave(rebuilt, "rebuilt1", "hopefully correct indices")
 
-#del coeffs[0]
-del coeffs[-1]
-del coeffs[-1]
-rebuilt = pywt.waverecn(coeffs, 'sym4', mode='smooth')
+coeffs.pop(6)
+coeffs.pop(5)
+coeffs.pop(4)
+#coeffs[1] = None
+rebuilt = pywt.waverecn(coeffs, wavelet, mode=mode)
 plotWave(rebuilt, "rebuilt2", "hopefully correct indices")
-
-plotWave(cD1, "cD1", "Index 2n * 0.003")
-plotWave(cD2, "cD2", "Index 3n * 0.003")
-plotWave(cD3, "cD3", "Index 4n * 0.003")
-plotWave(cD4, "cD4", "Index 5n * 0.003")
-plotWave(cA4, "cA4", "Index 5n * 0.003")
 
 # Imperatively grabbing features
 
