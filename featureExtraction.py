@@ -15,27 +15,12 @@ def plotWave(y, title, xLab, folder = ""):
 
 EKG = pd.read_csv("../MIT-BIH_Arrhythmia/100.csv", header=None)
 
-plotData = EKG[2:500]
+plotData = EKG[2:202]
 
 x = np.asarray(plotData[0])
 y = np.asarray(pd.to_numeric(plotData[1]))
 
 # Wavelet transforms, using pywavelets
-
-# Automated way to get graphs for different wavelet types and store the images in folders
-def getGraphs(waveletType):
-    waveletType = waveletType
-    w = pywt.Wavelet(waveletType)
-    cA = y
-    plotWave(cA, "Original", "Index n * 0.003", waveletType + "/")
-    
-    for i in range(1,5):
-        cA, cD = pywt.dwt(cA, wavelet=w, mode='constant')
-        plotWave(cA, "cA" + str(i), "Index " + str(i + 1) + "n * 0.003", waveletType + "/")
-        plotWave(cD, "cD" + str(i), "Index " + str(i + 1) + "n * 0.003", waveletType + "/")
-
-def addArrays(arrayList):
-    return [sum(x) for x in zip(*arrayList)]
 
 cA = y
 plotWave(cA, "Original", "Index 1n * 0.003")
@@ -45,9 +30,9 @@ pointsNum = len(cA)
 # currLevel of original ^^ is totalLevels + 1
 # index kn * 0.003 k is (totalLevels - currLevel) + 2
 # cDK K is (totalLevels - currLevel) + 1
-# max pywavelets level is 6
+# max pywavelets level is 4 for 200, 6 for 500, etc.
 wavelet = 'db4'
-levels = 6
+levels = 4
 mode = 'constant'
 coeffs = pywt.wavedecn(cA, wavelet, level=levels, mode=mode)
 # np.set_printoptions(threshold=np.nan)
@@ -63,10 +48,12 @@ plotWave(rebuilt, "rebuilt1", "hopefully correct indices")
 
 # TODO: figure out how to convert x values from cDK, * 2 - 6 (even) or - 7 (odd)
 # TODO: figure out how to custom reconstruct cDKs, ie CD2-4
+# TODO: Solve reconstruction error
 
-coeffs.pop(6)
-coeffs.pop(5)
 coeffs.pop(4)
+coeffs.pop(1)
+coeffs.pop(0)
+#print(coeffs)
 #coeffs[1] = None
 rebuilt = pywt.waverecn(coeffs, wavelet, mode=mode)
 plotWave(rebuilt, "rebuilt2", "hopefully correct indices")
