@@ -15,7 +15,7 @@ def plotWave(y, title, xLab, folder = ""):
 
 EKG = pd.read_csv("../MIT-BIH_Arrhythmia/100.csv", header=None)
 
-plotData = EKG[2:202]
+plotData = EKG[2:502]
 
 x = np.asarray(plotData[0])
 y = np.asarray(pd.to_numeric(plotData[1]))
@@ -31,8 +31,8 @@ pointsNum = len(cA)
 # index kn * 0.003 k is (totalLevels - currLevel) + 2
 # cDK K is (totalLevels - currLevel) + 1
 # max pywavelets level is 4 for 200, 6 for 500, etc.
-wavelet = 'db4'
-levels = 4
+wavelet = 'sym4'
+levels = 6
 mode = 'constant'
 coeffs = pywt.wavedecn(cA, wavelet, level=levels, mode=mode)
 # np.set_printoptions(threshold=np.nan)
@@ -46,17 +46,53 @@ for i in range(1 + 2,levels + 1):
 rebuilt = pywt.waverecn(coeffs, wavelet, mode=mode)
 plotWave(rebuilt, "rebuilt1", "hopefully correct indices")
 
-# TODO: figure out how to convert x values from cDK, * 2 - 6 (even) or - 7 (odd)
-# TODO: figure out how to custom reconstruct cDKs, ie CD2-4
-# TODO: Solve reconstruction error
+# Check on issue to make cleaner reconstruction using original lib https://github.com/PyWavelets/pywt/issues/302
 
-coeffs.pop(4)
+coeffs.pop(6)
+coeffs.pop(5)
 coeffs.pop(1)
 coeffs.pop(0)
-#print(coeffs)
-#coeffs[1] = None
 rebuilt = pywt.waverecn(coeffs, wavelet, mode=mode)
 plotWave(rebuilt, "rebuilt2", "hopefully correct indices")
+
+
+# Convert x value of level N to original coordinate
+
+def generateLengths(pointsNum, levels):
+    lengths = []
+    
+    for i in range (0,levels):
+        if pointsNum % 2 == 0:
+            pointsNum = (pointsNum + 6)/2
+            lengths.append(pointsNum)
+        else:
+            pointsNum = (pointsNum + 7)/2
+            lengths.append(pointsNum)
+    
+    return lengths
+
+def getNLevelX(xVal, domain, pointsNum, levels):
+    
+    lengths = [pointsNum] + generateLengths(pointsNum, levels)
+    index = lengths.index(domain)
+    newVal = xVal
+    
+    while index != 0:
+        if lengths[index - 1] % 2 == 0:
+            newVal = (newVal * 2) - 6
+        else:
+            newVal = (newVal * 2) - 7
+        index -= 1
+    
+    return newVal
+
+# grab max and see if it matches with original signal
+xMax = getNLevelX((np.argmax(rebuilt)), rebuilt.size, pointsNum, levels)
+print(xMax)
+print(cA[xMax])
+print(cA[np.argmax(cA)])
+
+        
 
 # Imperatively grabbing features
 
