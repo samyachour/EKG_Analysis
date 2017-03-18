@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+import pywt
 
 '''
 EKG = pd.read_csv("../MIT-BIH_Arrhythmia/100.csv", header=None)
@@ -94,3 +95,11 @@ def getGraphs(waveletType):
 # Add arrays by element quickly
 def addArrays(arrayList):
     return [sum(x) for x in zip(*arrayList)]
+
+
+def idxInt(num, index):
+    return int(str(num)[index])
+a= 1121
+print(type(idxInt(a,2)))
+print(str("hello"))
+

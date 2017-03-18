@@ -62,7 +62,6 @@ plotWave(rebuilt, "rebuilt2", "hopefully correct indices")
 
 # grab max and see if it matches with original signal
 xMax = np.argmax(rebuilt)
-print(xMax)
 print(cA[xMax])
 print(cA[np.argmax(cA)])
 
