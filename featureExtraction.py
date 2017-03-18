@@ -46,12 +46,11 @@ for i in range(1 + 2,levels + 1):
 rebuilt = pywt.waverecn(coeffs, wavelet, mode=mode)
 plotWave(rebuilt, "rebuilt1", "hopefully correct indices")
 
-# Check on issue to make cleaner reconstruction using original lib https://github.com/PyWavelets/pywt/issues/302
-
-coeffs.pop(6)
-coeffs.pop(5)
-coeffs.pop(1)
-coeffs.pop(0)
+# Removing cA, cD1, cD2, and cD6
+coeffs[-1] = {k: np.zeros_like(v) for k, v in coeffs[-1].items()}
+coeffs[-2] = {k: np.zeros_like(v) for k, v in coeffs[-2].items()}
+coeffs[1] = {k: np.zeros_like(v) for k, v in coeffs[1].items()}
+coeffs[0] = np.zeros_like(coeffs[0])
 rebuilt = pywt.waverecn(coeffs, wavelet, mode=mode)
 plotWave(rebuilt, "rebuilt2", "hopefully correct indices")
 
