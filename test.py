@@ -37,6 +37,15 @@ plotWave(cD4, "cD4", "Index 5n * 0.003")
 plotWave(cA4, "cA4", "Index 5n * 0.003")
 '''
 
+'''
+Uselessly prints specific detail levels and their corresponding unit conversion back to original
+for i in range(1 + 2,levels + 1):
+    index = i
+    smallK = (levels - i) + 2
+    bigK = (levels - i) + 1
+    plotWave(coeffs[index]['d'], "cD" + str(bigK), "Index " + str(smallK) + "n * 0.003")
+'''
+
 # Don't need anymore since pywavelets is fixed and I can set levels to zeros
 # thereby allowing reconstruction to give the full original coordinate system
 # ... it was a fun problem to solve though

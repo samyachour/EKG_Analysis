@@ -37,21 +37,23 @@ mode = 'constant'
 coeffs = pywt.wavedecn(cA, wavelet, level=levels, mode=mode)
 # np.set_printoptions(threshold=np.nan)
 
-for i in range(1 + 2,levels + 1):
-    index = i
-    smallK = (levels - i) + 2
-    bigK = (levels - i) + 1
-    plotWave(coeffs[index]['d'], "cD" + str(bigK), "Index " + str(smallK) + "n * 0.003")
-
 rebuilt = pywt.waverecn(coeffs, wavelet, mode=mode)
 plotWave(rebuilt, "rebuilt1", "hopefully correct indices")
 
-# Write automating function for coefficient omission
-# Removing cA, cD1, cD2, and cD6
-coeffs[-1] = {k: np.zeros_like(v) for k, v in coeffs[-1].items()}
-coeffs[-2] = {k: np.zeros_like(v) for k, v in coeffs[-2].items()}
-coeffs[-6] = {k: np.zeros_like(v) for k, v in coeffs[-6].items()}
-coeffs[0] = np.zeros_like(coeffs[0])
+# Automatically remove certain detail coefficients in coeffs
+
+def omit(coeffs, levels, cA=False):
+    newCoeffs = coeffs
+    
+    for i in levels:
+        newCoeffs[-i] = {k: np.zeros_like(v) for k, v in coeffs[-i].items()}
+    
+    if cA:
+        newCoeffs[0] = np.zeros_like(coeffs[0])
+    
+    return newCoeffs
+        
+coeffs = omit(coeffs, [1,2,6], True)
 rebuilt = pywt.waverecn(coeffs, wavelet, mode=mode)
 plotWave(rebuilt, "rebuilt2", "hopefully correct indices")
 
