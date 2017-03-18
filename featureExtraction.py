@@ -46,53 +46,21 @@ for i in range(1 + 2,levels + 1):
 rebuilt = pywt.waverecn(coeffs, wavelet, mode=mode)
 plotWave(rebuilt, "rebuilt1", "hopefully correct indices")
 
+# Write automating function for coefficient omission
 # Removing cA, cD1, cD2, and cD6
 coeffs[-1] = {k: np.zeros_like(v) for k, v in coeffs[-1].items()}
 coeffs[-2] = {k: np.zeros_like(v) for k, v in coeffs[-2].items()}
-coeffs[1] = {k: np.zeros_like(v) for k, v in coeffs[1].items()}
+coeffs[-6] = {k: np.zeros_like(v) for k, v in coeffs[-6].items()}
 coeffs[0] = np.zeros_like(coeffs[0])
 rebuilt = pywt.waverecn(coeffs, wavelet, mode=mode)
 plotWave(rebuilt, "rebuilt2", "hopefully correct indices")
 
 
-# Convert x value of level N to original coordinate
-
-def generateLengths(pointsNum, levels):
-    lengths = []
-    
-    for i in range (0,levels):
-        if pointsNum % 2 == 0:
-            pointsNum = (pointsNum + 6)/2
-            lengths.append(pointsNum)
-        else:
-            pointsNum = (pointsNum + 7)/2
-            lengths.append(pointsNum)
-    
-    return lengths
-
-def getNLevelX(xVal, domain, pointsNum, levels):
-    
-    lengths = [pointsNum] + generateLengths(pointsNum, levels)
-    index = lengths.index(domain)
-    newVal = xVal
-    
-    while index != 0:
-        if lengths[index - 1] % 2 == 0:
-            newVal = (newVal * 2) - 6
-        else:
-            newVal = (newVal * 2) - 7
-        index -= 1
-    
-    return newVal
+# Imperatively grabbing features
 
 # grab max and see if it matches with original signal
-xMax = getNLevelX((np.argmax(rebuilt)), rebuilt.size, pointsNum, levels)
+xMax = np.argmax(rebuilt)
 print(xMax)
 print(cA[xMax])
 print(cA[np.argmax(cA)])
-
-        
-
-# Imperatively grabbing features
-
 

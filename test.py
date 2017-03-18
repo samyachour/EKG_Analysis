@@ -37,6 +37,39 @@ plotWave(cD4, "cD4", "Index 5n * 0.003")
 plotWave(cA4, "cA4", "Index 5n * 0.003")
 '''
 
+# Don't need anymore since pywavelets is fixed and I can set levels to zeros
+# thereby allowing reconstruction to give the full original coordinate system
+# ... it was a fun problem to solve though
+# Convert x value of level N to original coordinate
+
+def generateLengths(pointsNum, levels):
+    lengths = [pointsNum]
+    
+    for i in range (0,levels):
+        if pointsNum % 2 == 0:
+            pointsNum = (pointsNum + 6)/2
+            lengths.append(pointsNum)
+        else:
+            pointsNum = (pointsNum + 7)/2
+            lengths.append(pointsNum)
+    
+    return lengths
+
+def getNLevelX(xVal, domain, pointsNum, levels):
+    
+    lengths = generateLengths(pointsNum, levels)
+    index = lengths.index(domain)
+    newVal = xVal
+    
+    while index != 0:
+        if lengths[index - 1] % 2 == 0:
+            newVal = (newVal * 2) - 6
+        else:
+            newVal = (newVal * 2) - 7
+        index -= 1
+    
+    return newVal
+
 # Automated way to get graphs for different wavelet types and store the images in folders
 def getGraphs(waveletType):
     waveletType = waveletType
