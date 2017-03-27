@@ -96,10 +96,3 @@ def getGraphs(waveletType):
 def addArrays(arrayList):
     return [sum(x) for x in zip(*arrayList)]
 
-
-def idxInt(num, index):
-    return int(str(num)[index])
-a= 1121
-print(type(idxInt(a,2)))
-print(str("hello"))
-
