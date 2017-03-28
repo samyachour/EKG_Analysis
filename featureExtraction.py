@@ -4,7 +4,6 @@ import numpy as np
 import pywt
 
 def plotWave(y, title, xLab, folder = ""):
-    # ignore time values, just use indices, get's iterated by 0.003 starting at 0
     plt.plot(y)
     plt.ylabel("mV")
     plt.xlabel(xLab)
@@ -17,43 +16,41 @@ EKG = pd.read_csv("../MIT_Data/MIT-BIH_Arrhythmia/100.csv", header=None)
 
 plotData = EKG[2:502]
 
-x = np.asarray(plotData[0])
-y = np.asarray(pd.to_numeric(plotData[1]))
+x = np.asarray(plotData[0]) # times, every 0.003s
+y = np.asarray(pd.to_numeric(plotData[1])) # voltages in mV
 
 # Wavelet transforms, using pywavelets
 
-cA = y
-wavelet = 'sym4'
-levels = 6 # max pywavelets level for e.g. sym4 w/ 500 points is 6
-mode = 'constant'
-coeffs = pywt.wavedecn(cA, wavelet, level=levels, mode=mode)
-# np.set_printoptions(threshold=np.nan)
-
-rebuilt = pywt.waverecn(coeffs, wavelet, mode=mode)
-plotWave(rebuilt, "Original Signal", "Index n * 0.003")
-
-# Automatically remove certain detail coefficients in coeffs
-
-def omit(coeffs, levels, cA=False):
+def omit(coeffs, levels):
     newCoeffs = coeffs
     
-    for i in levels:
+    for i in levels[0]:
         newCoeffs[-i] = {k: np.zeros_like(v) for k, v in coeffs[-i].items()}
     
-    if cA:
+    if levels[1]:
         newCoeffs[0] = np.zeros_like(coeffs[0])
     
     return newCoeffs
-        
-coeffs = omit(coeffs, [1,2,6], True)
-rebuilt = pywt.waverecn(coeffs, wavelet, mode=mode)
-plotWave(rebuilt, "rebuilt", "Index n * 0.003")
 
+def waveletDecomp(cA, wavelet, levels, mode, omissions):
+
+    coeffs = pywt.wavedecn(cA, wavelet, level=levels, mode=mode)
+    # np.set_printoptions(threshold=np.nan)
+    
+    rebuilt = pywt.waverecn(coeffs, wavelet, mode=mode)
+    plotWave(rebuilt, "Original Signal", "Index n * 0.003")
+    
+    # Automatically remove certain detail coefficients in coeffs
+            
+    coeffs = omit(coeffs, omissions)
+    return pywt.waverecn(coeffs, wavelet, mode=mode)
+    
+
+rebuilt = waveletDecomp(y, 'sym4', 6, 'constant', ([1,2,6], True))
+plotWave(rebuilt, "rebuilt", "Index n * 0.003")
 
 # Imperatively grabbing features
 
 # grab max and see if it matches with original signal
 xMax = np.argmax(rebuilt)
-print(cA[xMax])
-print(cA[np.argmax(cA)])
 
