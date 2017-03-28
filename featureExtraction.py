@@ -13,7 +13,7 @@ def plotWave(y, title, xLab, folder = ""):
         plt.savefig(folder + title + ".png")
     plt.show()
 
-EKG = pd.read_csv("../MIT-BIH_Arrhythmia/100.csv", header=None)
+EKG = pd.read_csv("../MIT_Data/MIT-BIH_Arrhythmia/100.csv", header=None)
 
 plotData = EKG[2:502]
 
@@ -23,22 +23,14 @@ y = np.asarray(pd.to_numeric(plotData[1]))
 # Wavelet transforms, using pywavelets
 
 cA = y
-plotWave(cA, "Original", "Index 1n * 0.003")
-pointsNum = len(cA)
-
-# level is the last index in list - 1
-# currLevel of original ^^ is totalLevels + 1
-# index kn * 0.003 k is (totalLevels - currLevel) + 2
-# cDK K is (totalLevels - currLevel) + 1
-# max pywavelets level is 4 for 200, 6 for 500, etc.
 wavelet = 'sym4'
-levels = 6
+levels = 6 # max pywavelets level for e.g. sym4 w/ 500 points is 6
 mode = 'constant'
 coeffs = pywt.wavedecn(cA, wavelet, level=levels, mode=mode)
 # np.set_printoptions(threshold=np.nan)
 
 rebuilt = pywt.waverecn(coeffs, wavelet, mode=mode)
-plotWave(rebuilt, "rebuilt1", "hopefully correct indices")
+plotWave(rebuilt, "Original Signal", "Index n * 0.003")
 
 # Automatically remove certain detail coefficients in coeffs
 
@@ -55,7 +47,7 @@ def omit(coeffs, levels, cA=False):
         
 coeffs = omit(coeffs, [1,2,6], True)
 rebuilt = pywt.waverecn(coeffs, wavelet, mode=mode)
-plotWave(rebuilt, "rebuilt2", "hopefully correct indices")
+plotWave(rebuilt, "rebuilt", "Index n * 0.003")
 
 
 # Imperatively grabbing features
