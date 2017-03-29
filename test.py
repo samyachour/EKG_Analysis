@@ -98,3 +98,5 @@ def getGraphs(waveletType):
 def addArrays(arrayList):
     return [sum(x) for x in zip(*arrayList)]
 
+EKG = pd.read_csv("../MIT_Data/noise/A00585.csv", header=None)
+print(EKG)
