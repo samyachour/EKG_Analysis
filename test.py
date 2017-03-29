@@ -98,6 +98,12 @@ def getGraphs(waveletType):
 def addArrays(arrayList):
     return [sum(x) for x in zip(*arrayList)]
 
-
-
+'''
+noisy = getRecords("~")
+for i, row in noisy.iterrows():
+    data = scipy.io.loadmat('../Physionet_Challenge/training2017/{0}.mat'.format(row['file']))
+    data = np.divide(data['val'][0],1000)
+    SNR_val = scipy.stats.signaltonoise(data)
+    noisy.set_value(i,'SNR',SNR_val)
+'''
 
