@@ -1,40 +1,41 @@
 import pandas as pd
 import numpy as np
-import scipy.stats
-import wave
+import scipy
+import wave # this is the wave.py file in the local folder
 # np.set_printoptions(threshold=np.nan)
 
 
-# Read in data
+# Reading in matlab data
 
-EKG = pd.read_csv("../MIT_Data/MIT-BIH_Arrhythmia/100.csv", header=None)
-# EKG = pd.read_csv("../MIT_Data/noise/A00585.csv", header=None)
-
-plotData = EKG[2:502]
-
-# x = np.asarray(plotData[0]) # times, every 0.003s
-y = np.asarray(pd.to_numeric(plotData[1])) # voltages in mV
+mat = scipy.io.loadmat('../Physionet_Challenge/training2017/A00001.mat')
+data = np.divide(mat['val'][0],1000)[2:1002]
     
 
 # Run Wavelet transforms
 
-wave.plotWave(y, "Original Signal", "Index n * 0.003")
+wave.plotWave(data, "Original Signal", "Index n * 0.003")
 
-rebuilt = wave.waveletDecomp(y, 'sym5', 5, omissions=([1,2,3], True))
+rebuilt = wave.waveletDecomp(data, 'sym5', 5, omissions=([1,5], True))
 wave.plotWave(rebuilt, "rebuilt", "Index n * 0.003")
 
 
 # Imperatively grabbing features
 
 # Detecting R Peaks
-
 xMax = np.argmax(rebuilt) # location of max peak
-threshold = y[xMax] * 0.35
-
+threshold = data[xMax] * 0.35
+peaks = np.zeros_like(data)
 
 
 
 # Detecting noise
 
-print(scipy.stats.signaltonoise(y))
+def getRecords(type):
+    
+    reference = pd.read_csv('../Physionet_Challenge/training2017/REFERENCE.csv') # N O A ~
+    subset = reference.ix[df[1]==type]
+    return subset
+
+print(getRecords("~"))
+print(scipy.stats.signaltonoise(data))
 print(scipy.stats.signaltonoise(rebuilt))
