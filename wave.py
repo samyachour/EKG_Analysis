@@ -34,6 +34,16 @@ def decomp(cA, wavelet, levels, mode='constant', omissions=([], False)):
     
     return pywt.waverecn(coeffs, wavelet, mode=mode)
 
+def s_decomp(cA, wavelet, levels, omissions=([], False)): # stationary wavelet transform, AKA maximal overlap
+    
+    if omissions[0] and max(omissions[0]) > levels:
+        raise ValueError("Omission level %d is too high.  Maximum allowed is %d." % (max(omissions[0]), levels))
+        
+    coeffs = pywt.swt(cA, wavelet, level=levels)
+    coeffs = omit(coeffs, omissions) # FIX
+    
+    return pywt.iswt(coeffs, wavelet)
+
 ##helper functions
 def load(filename, path = '../Physionet_Challenge/training2017/'):
     #
@@ -80,3 +90,5 @@ def all_residuals(records, wavelets='sym4', levels=3, mode='symmetric', omission
 
 
     
+
+

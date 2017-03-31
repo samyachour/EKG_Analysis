@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
 import scipy
+import pywt
 import wave # this is the wave.py file in the local folder
 # np.set_printoptions(threshold=np.nan)
 
@@ -12,7 +13,11 @@ data = np.divide(mat['val'][0],1000)
 data = data[:1000]
 
 reference = pd.read_csv('../Physionet_Challenge/training2017/REFERENCE.csv', names = ["file", "answer"]) # N O A ~
-    
+
+data1 = data[:200].tolist()
+coeffs = pywt.swt(data1, 'sym5', level=3)
+rebuilt = pywt.iswt(coeffs, 'sym5')
+wave.plot(rebuilt, "SWT")
 
 # Run Wavelet transforms
 
@@ -38,4 +43,7 @@ def getRecords(type):
     
     subset = reference.ix[reference['answer']==type]
     return subset
+
+
+    
 # TODO: Use fourier transforms to detect noisy datasets
