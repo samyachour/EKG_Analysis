@@ -12,7 +12,6 @@ data = np.divide(mat['val'][0],1000)
 data = data[:1000]
 
 reference = pd.read_csv('../Physionet_Challenge/training2017/REFERENCE.csv', names = ["file", "answer"]) # N O A ~
-    
 
 # Run Wavelet transforms
 
@@ -35,6 +34,12 @@ peaks = np.zeros_like(data)
 # Detecting noise
 
 residual_feature = wave.all_residuals('RECORDS')
+
+
+def getRecords(type):
+    
+    subset = reference.ix[reference['answer']==type]
+    return subset
 
 
 # TODO: Use fourier transforms to detect noisy datasets

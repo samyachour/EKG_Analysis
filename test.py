@@ -99,11 +99,23 @@ def addArrays(arrayList):
     return [sum(x) for x in zip(*arrayList)]
 
 '''
+testing signal to noise ratio
 noisy = getRecords("~")
 for i, row in noisy.iterrows():
     data = scipy.io.loadmat('../Physionet_Challenge/training2017/{0}.mat'.format(row['file']))
     data = np.divide(data['val'][0],1000)
     SNR_val = scipy.stats.signaltonoise(data)
     noisy.set_value(i,'SNR',SNR_val)
+'''
+
+'''
+plot the records
+for index, row in getRecords('A').iterrows():
+    mat = scipy.io.loadmat('../Physionet_Challenge/training2017/{0}.mat'.format(row['file']))
+    data = np.divide(mat['val'][0],1000)
+    data = data[:1000]
+    wave.plot(data, "Atrial", "Index")
+    if index > 200:
+        break
 '''
 

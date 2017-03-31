@@ -3,7 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import scipy.io as sio
 
-def plot(y, title, xLab, folder = ""):
+def plot(y, title, xLab="index", folder = ""):
     plt.plot(y)
     plt.ylabel("mV")
     plt.xlabel(xLab)
@@ -33,6 +33,17 @@ def decomp(cA, wavelet, levels, mode='constant', omissions=([], False)):
     coeffs = omit(coeffs, omissions)
     
     return pywt.waverecn(coeffs, wavelet, mode=mode)
+
+
+def s_decomp(cA, wavelet, levels, omissions=([], False)): # stationary wavelet transform, AKA maximal overlap
+    
+    if omissions[0] and max(omissions[0]) > levels:
+        raise ValueError("Omission level %d is too high.  Maximum allowed is %d." % (max(omissions[0]), levels))
+        
+    coeffs = pywt.swt(cA, wavelet, level=levels)
+    coeffs = omit(coeffs, omissions) # TODO: FIX
+    
+    return pywt.iswt(coeffs, wavelet)
 
 ##helper functions
 def load(filename, path = '../Physionet_Challenge/training2017/'):
@@ -79,8 +90,3 @@ def noise_feature_extract(records, wavelets='sym4', levels=5, mode='symmetric', 
     file.close()
     return residual_list
 
-
-    
-
-
-    
