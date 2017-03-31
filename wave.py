@@ -2,6 +2,7 @@ import pywt
 import numpy as np
 import matplotlib.pyplot as plt
 import scipy.io as sio
+import pandas as pd
 
 def plot(y, title, xLab="index", folder = ""):
     plt.plot(y)
@@ -119,6 +120,12 @@ def load(filename, path = '../Physionet_Challenge/training2017/'):
     mat = sio.loadmat(path + filename + '.mat')
     data = np.divide(mat['val'][0],1000)
     return data
+
+def getRecords(type):
+    
+    reference = pd.read_csv('../Physionet_Challenge/training2017/REFERENCE.csv', names = ["file", "answer"]) # N O A ~
+    subset = reference.ix[reference['answer']==type]
+    return subset['file'].tolist()
 
 def multiplot(data, graph_names):
     #plot multiple lines in one graph
