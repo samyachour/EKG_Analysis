@@ -1,6 +1,7 @@
 import pywt
 import numpy as np
 import matplotlib.pyplot as plt
+import scipy.io as sio
 
 def plot(y, title, xLab, folder = ""):
     plt.plot(y)
@@ -32,3 +33,24 @@ def decomp(cA, wavelet, levels, mode='constant', omissions=([], False)):
     coeffs = omit(coeffs, omissions)
     
     return pywt.waverecn(coeffs, wavelet, mode=mode)
+
+
+##helper functions
+def load(filename, path = '../Physionet_Challenge/training2017/'):
+    #
+    ### A helper function to load data
+    # input:
+    #   filename = the name of the .mat file
+    #   path = the path to the file
+    # output:
+    #   data = data output
+    
+    mat = sio.loadmat(path + filename + '.mat')
+    data = np.divide(mat['val'][0],1000)
+    return data
+
+def multiplot(data, graph_names):
+    for l in data:
+        plt.plot(l)
+    plt.legend(graph_names)
+    plt.show()
