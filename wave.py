@@ -32,3 +32,13 @@ def decomp(cA, wavelet, levels, mode='constant', omissions=([], False)):
     coeffs = omit(coeffs, omissions)
     
     return pywt.waverecn(coeffs, wavelet, mode=mode)
+
+def s_decomp(cA, wavelet, levels, omissions=([], False)): # stationary wavelet transform, AKA maximal overlap
+    
+    if omissions[0] and max(omissions[0]) > levels:
+        raise ValueError("Omission level %d is too high.  Maximum allowed is %d." % (max(omissions[0]), levels))
+        
+    coeffs = pywt.swt(cA, wavelet, level=levels)
+    coeffs = omit(coeffs, omissions) # FIX
+    
+    return pywt.iswt(coeffs, wavelet)
