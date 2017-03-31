@@ -33,9 +33,13 @@ def omit(coeffs, omissions, stationary=False):
 
     """
     
-    for i in omissions[0]:
-        if stationary: # if we want to use stationary wavelets
-            coeffs[-i] = ()
+    if stationary: # if we want to use stationary wavelets, which you don't, trust me
+        for i in omissions[0]:
+            if omissions[1]:
+                coeffs[-i] = (np.zeros_like(coeffs[-i][0]), np.zeros_like(coeffs[-i][1]))
+            else:
+                coeffs[-i] = (np.zeros_like(coeffs[-i][0]), coeffs[-i][1])
+        return coeffs
     
     for i in omissions[0]:
         coeffs[-i] = {k: np.zeros_like(v) for k, v in coeffs[-i].items()}
@@ -77,6 +81,7 @@ def decomp(cA, wavelet, levels, mode='constant', omissions=([], False)):
     return pywt.waverecn(coeffs, wavelet, mode=mode)
 
 
+# Don't use
 def s_decomp(cA, wavelet, levels, omissions=([], False)): # stationary wavelet transform, AKA maximal overlap
     """
     1-dimensional stationary wavelet decompisition and reconstruction
@@ -85,20 +90,19 @@ def s_decomp(cA, wavelet, levels, omissions=([], False)): # stationary wavelet t
     ----------
     Same as as decomp, not including mode
     omissions: tuple(list, bool), optional
-        List of levels (A & D) to omit, bool is irrelevant
+        List of levels (A & D) to omit, bool is still cA
 
     Returns
     -------
-        nD array of reconstructed data.
+        1D array of reconstructed data.
 
     """
 
     if omissions[0] and max(omissions[0]) > levels:
         raise ValueError("Omission level %d is too high.  Maximum allowed is %d." % (max(omissions[0]), levels))
         
-    coeffs = pywt.swt(cA, wavelet, level=levels)
-    print(coeffs)
-    coeffs = omit(coeffs, omissions, stationary=True) # TODO: FIX
+    coeffs = pywt.swt(cA, wavelet, level=levels, start_level=0)
+    coeffs = omit(coeffs, omissions, stationary=True)
     
     return pywt.iswt(coeffs, wavelet)
 

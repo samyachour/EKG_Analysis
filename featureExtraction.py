@@ -18,8 +18,6 @@ wave.plot(data[:200], "Original Signal", "Index n * 0.003")
 rebuilt = wave.decomp(data, 'sym4', 5, omissions=([1,2,4,5], True))
 wave.plot(rebuilt[:200], "rebuilt", "Index n * 0.003")
 
-#wave.s_decomp(data[:200], 'sym4', 3, omissions=([1], True))
-
 # Imperatively grabbing features
 
 # Detecting R Peaks
