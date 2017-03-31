@@ -90,7 +90,7 @@ def s_decomp(cA, wavelet, levels, omissions=([], False)): # stationary wavelet t
     ----------
     Same as as decomp, not including mode
     omissions: tuple(list, bool), optional
-        List of levels (A & D) to omit, bool is still cA
+        List of levels D to omit, bool is still cA
 
     Returns
     -------
