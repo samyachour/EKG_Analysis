@@ -63,8 +63,9 @@ def calculate_residuals(original, wavelets, levels, mode='symmetric', omissions=
     rebuilt = decomp(original, wavelets, levels, mode, omissions)
     residual = sum(abs(original-rebuilt[:len(original)]))/len(original)
     return residual
+    
 
-def all_residuals(records, wavelets='sym4', levels=3, mode='symmetric', omissions=([1],False), path = '../Physionet_Challenge/training2017/'):
+def noise_feature_extract(records, wavelets='sym4', levels=5, mode='symmetric', omissions=([1],False), path = '../Physionet_Challenge/training2017/'):
     #calculate residuals for all the EKGs
     residual_list = []
     file = open(path+records, 'r')
@@ -77,6 +78,9 @@ def all_residuals(records, wavelets='sym4', levels=3, mode='symmetric', omission
         residual_list.append(residuals)
     file.close()
     return residual_list
+
+
+    
 
 
     

@@ -34,8 +34,7 @@ peaks = np.zeros_like(data)
 
 # Detecting noise
 
-def getRecords(type):
-    
-    subset = reference.ix[reference['answer']==type]
-    return subset
+residual_feature = wave.all_residuals('RECORDS')
+
+
 # TODO: Use fourier transforms to detect noisy datasets
