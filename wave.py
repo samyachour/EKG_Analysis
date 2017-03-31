@@ -34,7 +34,6 @@ def decomp(cA, wavelet, levels, mode='constant', omissions=([], False)):
     
     return pywt.waverecn(coeffs, wavelet, mode=mode)
 
-
 ##helper functions
 def load(filename, path = '../Physionet_Challenge/training2017/'):
     #
@@ -50,7 +49,34 @@ def load(filename, path = '../Physionet_Challenge/training2017/'):
     return data
 
 def multiplot(data, graph_names):
+    #plot multiple lines in one graph
+    # input:
+    #   data = list of data to plot
+    #   graph_names = list of record names to show in the legend
     for l in data:
         plt.plot(l)
     plt.legend(graph_names)
     plt.show()
+    
+def calculate_residuals(original, wavelets, levels, mode='symmetric', omissions=([],True)):
+    # calculate residuals for a single EKG
+    rebuilt = decomp(original, wavelets, levels, mode, omissions)
+    residual = sum(abs(original-rebuilt[:len(original)]))/len(original)
+    return residual
+
+def all_residuals(records, wavelets='sym4', levels=3, mode='symmetric', omissions=([1],False), path = '../Physionet_Challenge/training2017/'):
+    #calculate residuals for all the EKGs
+    residual_list = []
+    file = open(path+records, 'r')
+    while (True):
+        newline = file.readline().rstrip('\n')
+        if newline == '':
+            break
+        data = load(newline)
+        residuals = calculate_residuals(data, wavelets, levels, mode, omissions)
+        residual_list.append(residuals)
+    file.close()
+    return residual_list
+
+
+    
