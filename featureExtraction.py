@@ -16,10 +16,10 @@ reference = pd.read_csv('../Physionet_Challenge/training2017/REFERENCE.csv', nam
 
 # Run Wavelet transforms
 
-wave.plotWave(data[:200], "Original Signal", "Index n * 0.003")
+wave.plot(data[:200], "Original Signal", "Index n * 0.003")
 
-rebuilt = wave.waveletDecomp(data, 'sym4', 5, omissions=([1,2,4,5], True))
-wave.plotWave(rebuilt[:200], "rebuilt", "Index n * 0.003")
+rebuilt = wave.decomp(data, 'sym4', 5, omissions=([1,2,4,5], True))
+wave.plot(rebuilt[:200], "rebuilt", "Index n * 0.003")
 
 
 # Imperatively grabbing features

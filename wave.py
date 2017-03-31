@@ -2,7 +2,7 @@ import pywt
 import numpy as np
 import matplotlib.pyplot as plt
 
-def plotWave(y, title, xLab, folder = ""):
+def plot(y, title, xLab, folder = ""):
     plt.plot(y)
     plt.ylabel("mV")
     plt.xlabel(xLab)
@@ -23,7 +23,7 @@ def omit(coeffs, levels):
     
     return coeffs
 
-def waveletDecomp(cA, wavelet, levels, mode='constant', omissions=([], False)):
+def decomp(cA, wavelet, levels, mode='constant', omissions=([], False)):
     
     if omissions[0] and max(omissions[0]) > levels:
         raise ValueError("Omission level %d is too high.  Maximum allowed is %d." % (max(omissions[0]), levels))
