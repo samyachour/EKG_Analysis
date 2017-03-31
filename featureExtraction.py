@@ -1,4 +1,5 @@
 import pandas as pd
+import pywt
 import numpy as np
 import scipy
 import wave # this is the wave.py file in the local folder
@@ -32,14 +33,9 @@ peaks = np.zeros_like(data)
 
 
 # Detecting noise
-
-residual_feature = wave.all_residuals('RECORDS')
-
-
-def getRecords(type):
-    
-    subset = reference.ix[reference['answer']==type]
-    return subset
-
+test = wave.load('A00001')
+coeffs = pywt.wavedecn(test, 'sym4', level=5)
+feat_list = wave.stats_feat(coeffs)
+print (feat_list, len(feat_list))
 
 # TODO: Use fourier transforms to detect noisy datasets

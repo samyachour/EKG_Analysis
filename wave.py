@@ -74,7 +74,37 @@ def calculate_residuals(original, wavelets, levels, mode='symmetric', omissions=
     rebuilt = decomp(original, wavelets, levels, mode, omissions)
     residual = sum(abs(original-rebuilt[:len(original)]))/len(original)
     return residual
+
+def cal_stats(feat_list, data_array):
+    #create a list of stats and add the stats to a list
     
+    feat_list.append(np.amin(data_array))
+    feat_list.append(np.amax(data_array))
+    #feat_list.append(np.median(data_array))
+    feat_list.append(np.average(data_array))
+    feat_list.append(np.mean(data_array))
+    feat_list.append(np.std(data_array))
+    feat_list.append(np.var(data_array))
+    power = np.square(data_array)
+    feat_list.append(np.average(power))
+    feat_list.append(np.mean(power))
+    feat_list.append(np.average(abs(data_array)))
+    feat_list.append(np.mean(abs(data_array)))
+    return feat_list
+    
+
+
+def stats_feat(coeffs):
+    #calculate the stats from teh coefficients
+    feat_list = []
+    feat_list = cal_stats(feat_list, coeffs[0])
+    print('1')
+    for i in range(1,len(coeffs)):
+        print('1')
+        feat_list = cal_stats(feat_list, coeffs[i]['d'])
+    return feat_list
+        
+        
 
 def noise_feature_extract(records, wavelets='sym4', levels=5, mode='symmetric', omissions=([1],False), path = '../Physionet_Challenge/training2017/'):
     #calculate residuals for all the EKGs
