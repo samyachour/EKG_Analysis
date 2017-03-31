@@ -1,15 +1,13 @@
 import pandas as pd
 import numpy as np
-import scipy
 import wave # this is the wave.py file in the local folder
 # np.set_printoptions(threshold=np.nan)
 
 
 # Reading in matlab data
 
-mat = scipy.io.loadmat('../Physionet_Challenge/training2017/A00001.mat')
-data = np.divide(mat['val'][0],1000)
-data = data[:1000]
+mat = wave.load('A00001')
+data = mat[:1000]
 
 reference = pd.read_csv('../Physionet_Challenge/training2017/REFERENCE.csv', names = ["file", "answer"]) # N O A ~
 
@@ -20,6 +18,7 @@ wave.plot(data[:200], "Original Signal", "Index n * 0.003")
 rebuilt = wave.decomp(data, 'sym4', 5, omissions=([1,2,4,5], True))
 wave.plot(rebuilt[:200], "rebuilt", "Index n * 0.003")
 
+#wave.s_decomp(data[:200], 'sym4', 3, omissions=([1], True))
 
 # Imperatively grabbing features
 
@@ -32,9 +31,6 @@ peaks = np.zeros_like(data)
 
 
 # Detecting noise
-
-residual_feature = wave.all_residuals('RECORDS')
-
 
 def getRecords(type):
     
