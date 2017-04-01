@@ -2,6 +2,7 @@ import pywt
 import numpy as np
 import matplotlib.pyplot as plt
 import scipy.io as sio
+from sklearn import preprocessing
 import pandas as pd
 
 def plot(y, title, xLab="index", folder = ""):
@@ -142,19 +143,75 @@ def calculate_residuals(original, wavelets, levels, mode='symmetric', omissions=
     rebuilt = decomp(original, wavelets, levels, mode, omissions)
     residual = sum(abs(original-rebuilt[:len(original)]))/len(original)
     return residual
+
+def cal_stats(feat_list, data_array):
+    #create a list of stats and add the stats to a list
     
+    feat_list.append(np.amin(data_array))
+    feat_list.append(np.amax(data_array))
+    #feat_list.append(np.median(data_array))
+    feat_list.append(np.average(data_array))
+    feat_list.append(np.mean(data_array))
+    feat_list.append(np.std(data_array))
+    feat_list.append(np.var(data_array))
+    power = np.square(data_array)
+    feat_list.append(np.average(power))
+    feat_list.append(np.mean(power))
+    feat_list.append(np.average(abs(data_array)))
+    feat_list.append(np.mean(abs(data_array)))
+    return feat_list
+    
+
+
+def stats_feat(coeffs):
+    #calculate the stats from the coefficients
+    feat_list = []
+    feat_list = cal_stats(feat_list, coeffs[0])
+    for i in range(1,len(coeffs)):
+        feat_list = cal_stats(feat_list, coeffs[i]['d'])
+    return feat_list
+
+def feat_combo(feat_list):
+    #Calculate the combination of each elements for ratios and multilications
+    new_list = []
+    for i in range (0, len(feat_list)):
+        new_list.append(feat_list[i])
+    
+    for i in range(0, len(feat_list)):
+        for j in range(0, len(feat_list)):
+            if i != j:
+                multiply = feat_list[i]*feat_list[j]
+                new_list.append(multiply)
+                ratio = feat_list[i]/feat_list[j]
+                new_list.append(ratio)
+    return new_list
+
+def normalize(feat_list):
+    return preprocessing.normalize(feat_list)
 
 def noise_feature_extract(records, wavelets='sym4', levels=5, mode='symmetric', omissions=([1],False), path = '../Physionet_Challenge/training2017/'):
     #calculate residuals for all the EKGs
+    full_list = []
     residual_list = []
     file = open(path+records, 'r')
+    x=0
     while (True):
         newline = file.readline().rstrip('\n')
         if newline == '':
             break
         data = load(newline)
-        residuals = calculate_residuals(data, wavelets, levels, mode, omissions)
-        residual_list.append(residuals)
+        coeffs = pywt.wavedecn(data, 'sym4', level=5)
+        feat_list = stats_feat(coeffs)
+    
+        #feat_list = feat_combo(feat_list)
+        residual = calculate_residuals(data, wavelets, levels, mode, omissions)
+        residual_list.append(residual)
+        full_list.append(feat_list)
+        x+=1
+        print('working on file '+ newline)
+        print('length of the data:' + str(len(data)))
+        print('feature created, record No.' + str(x))
+        print('length of feature:'+ str(len(feat_list)))
     file.close()
-    return residual_list
+    return np.array(full_list), np.array(residual_list)
 

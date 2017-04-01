@@ -56,3 +56,8 @@ plt.show()
 
 
 # Detecting noise
+
+noise_feat_mat, residuals = wave.noise_feature_extract('RECORDS')
+
+
+# Detecting noise
