@@ -1,6 +1,6 @@
 import numpy as np
 import wave # this is the wave.py file in the local folder
-# np.set_printoptions(threshold=np.nan)
+# np.set_printoptions(threshold=np.nan) # show full arrays, dataframes, etc. when printing
 
 
 # Reading in matlab data
