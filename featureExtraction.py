@@ -31,11 +31,7 @@ peaks = np.zeros_like(data)
 
 # Detecting noise
 
-test = wave.load('A00001')
-coeffs = pywt.wavedecn(test, 'sym4', level=5)
-feat_list = wave.stats_feat(coeffs)
-print (feat_list, len(feat_list))
-
+noise_feat_mat, residuals = wave.noise_feature_extract('RECORDS')
 
 
 # TODO: Use fourier transforms to detect noisy datasets
