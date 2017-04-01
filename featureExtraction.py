@@ -1,8 +1,3 @@
-<<<<<<< HEAD
-import pandas as pd
-import pywt
-=======
->>>>>>> master
 import numpy as np
 import wave # this is the wave.py file in the local folder
 # np.set_printoptions(threshold=np.nan)

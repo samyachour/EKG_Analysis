@@ -164,7 +164,7 @@ def cal_stats(feat_list, data_array):
 
 
 def stats_feat(coeffs):
-    #calculate the stats from teh coefficients
+    #calculate the stats from the coefficients
     feat_list = []
     feat_list = cal_stats(feat_list, coeffs[0])
     for i in range(1,len(coeffs)):
