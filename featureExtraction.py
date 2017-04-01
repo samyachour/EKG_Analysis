@@ -1,3 +1,8 @@
+<<<<<<< HEAD
+import pandas as pd
+import pywt
+=======
+>>>>>>> master
 import numpy as np
 import wave # this is the wave.py file in the local folder
 # np.set_printoptions(threshold=np.nan)
@@ -23,6 +28,12 @@ xMax = np.argmax(rebuilt) # location of max peak
 threshold = data[xMax] * 0.35
 peaks = np.zeros_like(data)
 # TODO: Find all the peak intervals using the threshold ad set them into peaks
+# Check out https://www.mathworks.com/examples/wavelet/mw/wavelet-ex77408607-r-wave-detection-in-the-ecg
+
+
+# Detecting noise
+
+noise_feat_mat, residuals = wave.noise_feature_extract('RECORDS')
 
 
 # Detecting noise

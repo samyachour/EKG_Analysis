@@ -119,3 +119,9 @@ for index, row in getRecords('A').iterrows():
         break
 '''
 
+def getRecords(type):
+    
+    subset = reference.ix[reference['answer']==type]
+    return subset
+
+
