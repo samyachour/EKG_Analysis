@@ -1,5 +1,8 @@
+<<<<<<< HEAD
 import pandas as pd
 import pywt
+=======
+>>>>>>> master
 import numpy as np
 import wave # this is the wave.py file in the local folder
 # np.set_printoptions(threshold=np.nan)
@@ -7,17 +10,16 @@ import wave # this is the wave.py file in the local folder
 
 # Reading in matlab data
 
-mat = wave.load('A00001')
+records = wave.getRecords('N')
+mat = wave.load(records[0])
 data = mat[:1000]
-
-reference = pd.read_csv('../Physionet_Challenge/training2017/REFERENCE.csv', names = ["file", "answer"]) # N O A ~
 
 # Run Wavelet transforms
 
-wave.plot(data[:200], "Original Signal", "Index n * 0.003")
-
-rebuilt = wave.decomp(data, 'sym4', 5, omissions=([1,2,4,5], True))
-wave.plot(rebuilt[:200], "rebuilt", "Index n * 0.003")
+omission = ([4,5,6], True)
+wave.plot(data[:600], "Original Signal", "Index n * 0.003")
+rebuilt = wave.decomp(data, 'sym4', 6, omissions=omission)
+wave.plot(rebuilt[:600], omission, "Index n * 0.003")
 
 # Imperatively grabbing features
 
@@ -34,4 +36,4 @@ peaks = np.zeros_like(data)
 noise_feat_mat, residuals = wave.noise_feature_extract('RECORDS')
 
 
-# TODO: Use fourier transforms to detect noisy datasets
+# Detecting noise
