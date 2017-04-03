@@ -23,6 +23,6 @@ We are participating in the PhysioNet 2017 Challenge: [Atrial Fibrillation Class
 * Flesh out readme explanation
 
 ## Dependencies
-Our codebase is all in Python (3+) and makes use of your typical data science libraries: Numpy, Scipy, Pandas, Matplotlib, and Scikit Learn
+Our codebase is all in Python (3+) and makes use of your typical data science libraries: Numpy, Scipy, Pandas, Matplotlib, and Scikit Learn.
 
 We currently only use one atypical library, [Pywavelets](https://pywavelets.readthedocs.io/en/latest/) to do wavelet decompisition/reconstruction for feature extraction.
