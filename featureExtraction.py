@@ -29,4 +29,4 @@ peaks = wave.detect_peaks(data, mpd=150, show=True)
 # Detecting noise
 
 
-# noise_feat_mat, residuals = wave.noise_feature_extract('RECORDS')
+noise_feat_mat, residuals = wave.noise_feature_extract('RECORDS')
