@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 import scipy.io as sio
 from sklearn import preprocessing
 import pandas as pd
+from detect_peaks import detect_peaks as detect_peaks_orig
 
 def plot(y, title, xLab="index", folder = ""):
     plt.plot(y)
@@ -108,6 +109,62 @@ def s_decomp(cA, wavelet, levels, omissions=([], False)): # stationary wavelet t
     
     return pywt.iswt(coeffs, wavelet)
 
+def detect_peaks(x, plotX=None, mph=None, mpd=1, threshold=0, edge='rising', 
+                 kpsh=False, valley=False, show=False, ax=None):
+    
+    """
+    Wrapper function for detect_peaks function in detect_peaks.py
+    Detect peaks in data based on their amplitude and other features.
+
+    Parameters
+    ----------
+    x : 1D array_like
+        data.
+    plotX : 1D array_like optional (default = x)
+        original signal you might want to plot detected peaks on, if you used wavelets or the like
+    mph : {None, number}, optional (default = None)
+        detect peaks that are greater than minimum peak height.
+    mpd : positive integer, optional (default = 1)
+        detect peaks that are at least separated by minimum peak distance (in
+        number of data).
+    threshold : positive number, optional (default = 0)
+        detect peaks (valleys) that are greater (smaller) than `threshold`
+        in relation to their immediate neighbors.
+    edge : {None, 'rising', 'falling', 'both'}, optional (default = 'rising')
+        for a flat peak, keep only the rising edge ('rising'), only the
+        falling edge ('falling'), both edges ('both'), or don't detect a
+        flat peak (None).
+    kpsh : bool, optional (default = False)
+        keep peaks with same height even if they are closer than `mpd`.
+    valley : bool, optional (default = False)
+        if True (1), detect valleys (local minima) instead of peaks.
+    show : bool, optional (default = False)
+        if True (1), plot data in matplotlib figure.
+    ax : a matplotlib.axes.Axes instance, optional (default = None).
+
+    Returns
+    -------
+    ind : 1D array_like
+        indices of the peaks in `x`.
+
+    Notes
+    -----
+    The detection of valleys instead of peaks is performed internally by simply
+    negating the data: `ind_valleys = detect_peaks(-x)`
+    
+    The function can handle NaN's 
+
+    See this IPython Notebook [1]_.
+
+    References
+    ----------
+    .. [1] http://nbviewer.ipython.org/github/demotu/BMC/blob/master/notebooks/DetectPeaks.ipynb
+    """
+    
+    if plotX == None:
+        plotX = x # couldn't do in function declaration
+    return detect_peaks_orig(x, plotX=plotX, mph=mph, mpd=mpd, threshold=threshold, edge=edge, kpsh=kpsh, valley=valley, show=show, ax=ax)
+
 ##helper functions
 def load(filename, path = '../Physionet_Challenge/training2017/'):
     #
@@ -122,10 +179,10 @@ def load(filename, path = '../Physionet_Challenge/training2017/'):
     data = np.divide(mat['val'][0],1000)
     return data
 
-def getRecords(type):
+def getRecords(trainingLabel):
     
     reference = pd.read_csv('../Physionet_Challenge/training2017/REFERENCE.csv', names = ["file", "answer"]) # N O A ~
-    subset = reference.ix[reference['answer']==type]
+    subset = reference.ix[reference['answer']==trainingLabel]
     return subset['file'].tolist()
 
 def multiplot(data, graph_names):
