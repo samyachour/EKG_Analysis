@@ -6,16 +6,7 @@ from sklearn import preprocessing
 import pandas as pd
 from detect_peaks import detect_peaks as detect_peaks_orig
 
-def plot(y, title, xLab="index", folder = ""):
-    plt.plot(y)
-    plt.ylabel("mV")
-    plt.xlabel(xLab)
-    plt.title(title)
-    if folder != "":
-        plt.savefig(folder + title + ".png")
-    plt.show()
-
-# Wavelet transforms
+""" Wave manipulation and feature extraction """
 
 def omit(coeffs, omissions, stationary=False):
     """
@@ -165,7 +156,8 @@ def detect_peaks(x, plotX=None, mph=None, mpd=1, threshold=0, edge='rising',
         plotX = x # couldn't do in function declaration
     return detect_peaks_orig(x, plotX=plotX, mph=mph, mpd=mpd, threshold=threshold, edge=edge, kpsh=kpsh, valley=valley, show=show, ax=ax)
 
-##helper functions
+""" Helper functions """
+
 def load(filename, path = '../Physionet_Challenge/training2017/'):
     #
     ### A helper function to load data
@@ -185,6 +177,15 @@ def getRecords(trainingLabel):
     subset = reference.ix[reference['answer']==trainingLabel]
     return subset['file'].tolist()
 
+def plot(y, title, xLab="index", folder = ""):
+    plt.plot(y)
+    plt.ylabel("mV")
+    plt.xlabel(xLab)
+    plt.title(title)
+    if folder != "":
+        plt.savefig(folder + title + ".png")
+    plt.show()
+
 def multiplot(data, graph_names):
     #plot multiple lines in one graph
     # input:
@@ -195,6 +196,8 @@ def multiplot(data, graph_names):
     plt.legend(graph_names)
     plt.show()
     
+""" Noise feature extraction """    
+
 def calculate_residuals(original, wavelets, levels, mode='symmetric', omissions=([],True)):
     # calculate residuals for a single EKG
     rebuilt = decomp(original, wavelets, levels, mode, omissions)

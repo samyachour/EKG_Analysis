@@ -5,8 +5,8 @@ import wave # this is the wave.py file in the local folder
 # Reading in matlab data
 
 records = wave.getRecords('N')
-mat = wave.load(records[9])
-data = mat[:1000]
+mat = wave.load('A00119')
+data = mat[:]
 
 # Run Wavelet transforms
 
@@ -24,7 +24,7 @@ rebuilt = wave.decomp(data, 'sym5', level, omissions=omission)
 
 # TODO: work on excluding r peaks that don't give good intervals, detect inversion (abs values?)
 # Play with these params
-peaks = wave.detect_peaks(rebuilt, data, mpd=50, mph=0.5, show=True, valley=True)
+peaks = wave.detect_peaks(rebuilt, data, mpd=50, mph=0.5, show=True,valley=True)
 
 # Detecting noise
 
