@@ -100,7 +100,7 @@ def s_decomp(cA, wavelet, levels, omissions=([], False)): # stationary wavelet t
     
     return pywt.iswt(coeffs, wavelet)
 
-def detect_peaks(x, plotX=None, mph=None, mpd=1, threshold=0, edge='rising', 
+def detect_peaks(x, plotX=np.array([]), mph=None, mpd=1, threshold=0, edge='rising', 
                  kpsh=False, valley=False, show=False, ax=None):
     
     """
@@ -152,10 +152,52 @@ def detect_peaks(x, plotX=None, mph=None, mpd=1, threshold=0, edge='rising',
     .. [1] http://nbviewer.ipython.org/github/demotu/BMC/blob/master/notebooks/DetectPeaks.ipynb
     """
     
-    if plotX == None:
+    if plotX.size == 0:
         plotX = x # couldn't do in function declaration
-    return detect_peaks_orig(x, plotX=plotX, mph=mph, mpd=mpd, threshold=threshold, edge=edge, kpsh=kpsh, valley=valley, show=show, ax=ax)
+    return detect_peaks_orig(x, plotX=plotX, mph=mph, mpd=mpd, threshold=threshold, edge=edge, 
+                             kpsh=kpsh, valley=valley, show=show, ax=ax)
+    
+def getRPeaks(data, minDistance):
+    """
+    R peak detection in 1 dimensional ECG wave
 
+    Parameters
+    ----------
+    data : array_like
+        1-dimensional array with input data.
+    minDistance : positive integer
+        minimum distance between R peaks
+
+    Returns
+    -------
+        list of tuple coordinates of R peaks in original signal data
+
+    """
+    
+    # Standardized best wavelet decompisition choice
+    level = 6
+    omission = ([1,2], True)
+    rebuilt = decomp(data, 'sym5', level, omissions=omission)
+    
+    # Get rough draft of R peaks/valleys
+    positive_R_first = [rebuilt[i] for i in np.nditer(detect_peaks(rebuilt, mpd=minDistance, mph=0.08))]
+    pos_mph = np.mean(positive_R_first)
+    
+    negative_R_first = [rebuilt[i] for i in np.nditer(detect_peaks(rebuilt, mpd=minDistance, mph=0.08,valley=True))]
+    neg_mph = abs(np.mean(negative_R_first))
+    
+    # If the wave isn't inverted
+    if pos_mph > neg_mph:
+        positive_R = detect_peaks(rebuilt, mpd=minDistance, mph=pos_mph - pos_mph/3)
+        coordinates = [(int(i), data[i]) for i in np.nditer(positive_R)]
+    
+    # If the wave is inverted
+    elif neg_mph > pos_mph or neg_mph > 0.25:
+        negative_R = detect_peaks(rebuilt, mpd=minDistance, mph=neg_mph - neg_mph/3,valley=True)
+        coordinates = [(int(i), data[i]) for i in np.nditer(negative_R)]
+    
+    return coordinates
+    
 """ Helper functions """
 
 def load(filename, path = '../Physionet_Challenge/training2017/'):
@@ -171,7 +213,7 @@ def load(filename, path = '../Physionet_Challenge/training2017/'):
     data = np.divide(mat['val'][0],1000)
     return data
 
-def getRecords(trainingLabel):
+def getRecords(trainingLabel): # N O A ~
     
     reference = pd.read_csv('../Physionet_Challenge/training2017/REFERENCE.csv', names = ["file", "answer"]) # N O A ~
     subset = reference.ix[reference['answer']==trainingLabel]
