@@ -2,12 +2,6 @@ import wave # this is the wave.py file in the local folder
 # np.set_printoptions(threshold=np.nan) # show full arrays, dataframes, etc. when printing
 
 
-# Reading in matlab data
-
-records = wave.getRecords('A') # N O A ~
-mat = wave.load('A00119')
-data = mat[:]
-
 # Run Wavelet transforms
 
 """
@@ -33,7 +27,7 @@ plt.plot(*zip(*points), marker='o', color='r', ls='')
 plt.title('A00123')
 plt.show()
 
-
+records = wave.getRecords('A') # N O A ~
 for i in range(60,80):
     data = wave.load(records[i])
     points = wave.getRPeaks(data, 150)
