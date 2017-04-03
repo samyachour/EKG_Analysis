@@ -36,9 +36,8 @@ def F1_score(prediction, target, path='../Physionet_Challenge/training2017/'):
                 t += 1
                 if ref_dict[rows[0]]==rows[1]:
                     Tt += 1
-    
-    print (Tt)
-    print (T)
-    print (t)
+    print('The target class is: ' + target)
     F1 = 2.* Tt / (T + t)
+    print('The F1 score for this class is: ' + str(F1))
+    
     return F1
