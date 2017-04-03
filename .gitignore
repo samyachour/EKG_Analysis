@@ -4,7 +4,7 @@
 __pycache__/
 *.py[cod]
 
-.ipnyb_checkpoints/
+.ipynb_checkpoints/
 
 # C extensions
 *.so
