@@ -1,4 +1,4 @@
-# EKG_Analysis
+# EKG Analysis
 
 ## Who we are
 The contributors to this repository make up the intern group at [MI3](http://www.choc.org/medical-intelligence-and-innovation-institute/) (Medical Intelligence and Innovation Institute) at the Children's Hospital of Orange County. We are a mixture of undergrad and grad students at Chapman University, studying pre-med, computer science, math, and data science to name a few.
