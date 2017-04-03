@@ -143,12 +143,12 @@ def detect_peaks(x, plotX, mph, mpd, threshold, edge,
             x[indnan] = np.nan
         if valley:
             x = -x
-        _plot(x, plotX, mph, mpd, threshold, edge, valley, ax, ind)
+        _plot(plotX, mph, mpd, threshold, edge, valley, ax, ind)
 
     return ind
 
 
-def _plot(x, plotX, mph, mpd, threshold, edge, valley, ax, ind):
+def _plot(plotX, mph, mpd, threshold, edge, valley, ax, ind):
     """Plot results of the detect_peaks function, see its help."""
     try:
         import matplotlib.pyplot as plt
