@@ -164,7 +164,7 @@ def getRPeaks(data, minDistance):
     Parameters
     ----------
     data : array_like
-        1-dimensional array with input data.
+        1-dimensional array with input signal data
     minDistance : positive integer
         minimum distance between R peaks
 
