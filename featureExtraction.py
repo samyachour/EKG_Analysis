@@ -1,7 +1,25 @@
 import wave # this is the wave.py file in the local folder
-from signal import Signal
 # np.set_printoptions(threshold=np.nan) # show full arrays, dataframes, etc. when printing
 
+class Signal(object):
+    """
+    An ECG/EKG signal
+
+    Attributes:
+        name: A string representing the record name.
+        data : 1-dimensional array with input signal data 
+    """
+
+    def __init__(self, name, data):
+        """Return a Signal object whose record name is *name*,
+        signal data is *data*,
+        R peaks array is *RPeaks*"""
+        self.name = name
+        self.data = data
+        RPeaks = wave.getRPeaks(data, 150)
+        self.RPeaks = RPeaks[1]
+        if RPeaks[0]: # flip every inverted signal
+            self.data = -data
 
 # Run Wavelet transforms
 
@@ -20,9 +38,10 @@ wave.plot(rebuilt, omission, "Index n * 0.003")
 # Testing P wave detection
 
 records = wave.getRecords('N') # N O A ~
-data = wave.load(records[0])
+data = wave.load(records[2])
 sig = Signal(records[0],data)
 
+wave.getPWaves(sig)
 
 
 # TODO: Detecting Q and S, put in a function
@@ -36,7 +55,7 @@ rebuilt = wave.decomp(data, 'sym5', level, omissions=omission)
 wave.plot(rebuilt, records[0], "Index n * 0.003")
 
 import matplotlib.pyplot as plt
-points = wave.getRPeaks(data, 150)
+points = wave.getRPeaks(data, 150)[1]
 plt.plot(data)
 plt.plot(*zip(*points), marker='o', color='r', ls='')
 plt.title(records[0])
