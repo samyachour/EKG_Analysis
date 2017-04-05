@@ -290,6 +290,20 @@ def multiplot(data, graph_names):
     plt.legend(graph_names)
     plt.show()
     
+def interval(data):
+    """
+    Calculate the intervals from a list
+
+    Parameters
+    ----------
+    data : a list of data
+
+    Returns
+    -------
+        a list of intervals
+    """
+    return np.array([data[i+1] - data[i] for i in range(0, len(data)-1)])
+    
 """ Noise feature extraction """    
 
 def calculate_residuals(original, wavelets, levels, mode='symmetric', omissions=([],True)):
@@ -372,6 +386,18 @@ def noise_feature_extract(records, wavelets='sym4', levels=5, mode='symmetric', 
 """RR feature extraction"""
 
 def R_peak_stats(peaks):
+    """
+    Calculate the statistics for the R peaks
+
+    Parameters
+    ----------
+        peaks: R peaks with tuples (index, R peaks value)
+
+    Returns
+    -------
+        A list of 8 different statistics
+
+    """
     values = [i[1] for i in peaks]
     feat_list=[]
     values = np.array(values)
@@ -379,11 +405,25 @@ def R_peak_stats(peaks):
     return stats
 
 def RR_interval(peaks, sampling_frequency=300):
+    """
+    Get a list of the RR intervals
+
+    Parameters
+    ----------
+        peaks: R peaks with tuples (index, R peaks value)
+
+    Returns
+    -------
+        A list of RR intervals
+
+    """
     unit_distance = 1./300
     RR_list = []
     for i in range(0, len(peaks)-1):
         RR_distance = peaks[i][0] - peaks[i+1][0]
         RR_interval = RR_distance * unit_distance
-        RR_list.append(RR_interval)
+        RR_list.append(abs(RR_interval))
     return np.array(RR_list)
+
+
     
