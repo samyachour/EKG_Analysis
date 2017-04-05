@@ -27,7 +27,6 @@ class Signal(object):
         plt.plot(self.data)
         plt.plot(*zip(*self.RPeaks), marker='o', color='r', ls='')
         plt.title(self.name)
-        plt.figure(figsize=(20,10)) # make bigger
         plt.show()
 
 # Run Wavelet transforms
@@ -47,15 +46,15 @@ wave.plot(rebuilt, omission, "Index n * 0.003")
 # Testing P wave detection
 
 records = wave.getRecords('N') # N O A ~
-data = wave.load(records[4])
-sig = Signal(records[0],data)
+data = wave.load(records[7])
+sig = Signal(records[7],data)
 
 sig.plotRPeaks()
 wave.getPWaves(sig)
 
 records = wave.getRecords('A') # N O A ~
-data = wave.load(records[1])
-sig = Signal(records[0],data)
+data = wave.load(records[3])
+sig = Signal(records[3],data)
 
 sig.plotRPeaks()
 wave.getPWaves(sig)

@@ -215,6 +215,9 @@ def getPWaves(signal):
 
     Returns
     -------
+        list of tuple coordinates of P peaks in original signal data
+        [(x1,y1), (x2, y2),..., (xn, yn)]
+        
         2D list of lists of 3 tuple coordinates
         first coordinate is start of P wave
         second coordinate is peak of P wave
@@ -228,17 +231,23 @@ def getPWaves(signal):
     omission = ([1,2], True) # <25 hz
     rebuilt = decomp(signal.data, 'sym5', level, omissions=omission)
     
+    maxes = []
+    
     for i in range(0, len(signal.RPeaks) - 1):
     # for i in range(len(signal.RPeaks) - 9, len(signal.RPeaks) - 4):
         plotData = rebuilt
-        left_limit = signal.RPeaks[i][0]
         right_limit = signal.RPeaks[i+1][0]
-        left_limit += (right_limit - left_limit)//2
+        left_limit = right_limit - 70
 
         plotData = plotData[left_limit:right_limit]
-        detect_peaks(plotData, plotX=signal.data[left_limit:right_limit],show=True)
-    
-    return None
+        peaks = detect_peaks(plotData, plotX=signal.data[left_limit:right_limit])
+        
+        if peaks.size != 0:
+            maxes.append(np.amax(peaks))
+        else: # if there is no p wave, flat signal in the interval
+            maxes.append(0)
+        
+    return [(i, signal.data[i]) for i in maxes]
 
     
 """ Helper functions """
