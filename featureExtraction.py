@@ -1,4 +1,5 @@
 import wave # this is the wave.py file in the local folder
+import matplotlib.pyplot as plt
 # np.set_printoptions(threshold=np.nan) # show full arrays, dataframes, etc. when printing
 
 class Signal(object):
@@ -13,13 +14,19 @@ class Signal(object):
     def __init__(self, name, data):
         """Return a Signal object whose record name is *name*,
         signal data is *data*,
-        R peaks array is *RPeaks*"""
+        R peaks array of coordinates is *RPeaks*"""
         self.name = name
         self.data = data
         RPeaks = wave.getRPeaks(data, 150)
         self.RPeaks = RPeaks[1]
         if RPeaks[0]: # flip every inverted signal
             self.data = -data
+            
+    def plotRPeaks(self):
+        plt.plot(self.data)
+        plt.plot(*zip(*self.RPeaks), marker='o', color='r', ls='')
+        plt.title(self.name)
+        plt.show()
 
 # Run Wavelet transforms
 
@@ -41,6 +48,7 @@ records = wave.getRecords('N') # N O A ~
 data = wave.load(records[2])
 sig = Signal(records[0],data)
 
+sig.plotRPeaks()
 wave.getPWaves(sig)
 
 
@@ -54,7 +62,6 @@ omission = ([1,6], True)
 rebuilt = wave.decomp(data, 'sym5', level, omissions=omission)
 wave.plot(rebuilt, records[0], "Index n * 0.003")
 
-import matplotlib.pyplot as plt
 points = wave.getRPeaks(data, 150)[1]
 plt.plot(data)
 plt.plot(*zip(*points), marker='o', color='r', ls='')

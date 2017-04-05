@@ -196,7 +196,8 @@ def getRPeaks(data, minDistance):
     # If the wave is inverted
     elif neg_mph > pos_mph or neg_mph > 0.25:
         negative_R = detect_peaks(rebuilt, mpd=minDistance, mph=neg_mph - neg_mph/3,valley=True)
-        coordinates = [(int(i), data[i]) for i in np.nditer(negative_R)]
+        # -data[i] because I invert the signal later, and want positive R peak values
+        coordinates = [(int(i), -data[i]) for i in np.nditer(negative_R)]
         inverted = True
     
     return (inverted, coordinates)
