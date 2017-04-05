@@ -246,8 +246,8 @@ def getPWaves(signal):
             maxes.append(np.amax(peaks))
         else: # if there is no p wave, flat signal in the interval
             maxes.append(0)
-        
-    return [(i, signal.data[i]) for i in maxes]
+    
+    return [(i, signal.data[i]) for i in maxes] # P peak coordinates
 
     
 """ Helper functions """

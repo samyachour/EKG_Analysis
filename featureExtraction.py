@@ -24,7 +24,7 @@ class Signal(object):
             self.data = -data
             
     def plotRPeaks(self):
-        plt.plot(self.data)
+        plt.plot(self.data) # TODO: make plot bigger
         plt.plot(*zip(*self.RPeaks), marker='o', color='r', ls='')
         plt.title(self.name)
         plt.show()
