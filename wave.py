@@ -233,8 +233,8 @@ def getPWaves(signal):
         plotData = rebuilt
         left_limit = signal.RPeaks[i][0]
         right_limit = signal.RPeaks[i+1][0]
-        left_limit += (right_limit - left_limit)/2
-        
+        left_limit += (right_limit - left_limit)//2
+
         plotData = plotData[left_limit:right_limit]
         detect_peaks(plotData, plotX=signal.data[left_limit:right_limit],show=True)
     
