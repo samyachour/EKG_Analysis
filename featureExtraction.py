@@ -52,7 +52,6 @@ sig = Signal(records[0],data)
 sig.plotRPeaks()
 wave.getPWaves(sig)
 
-feat_list = wave.R_peak_stats(sig.RPeaks)
 RR_interval = wave.RR_interval(sig.RPeaks)
 
 
