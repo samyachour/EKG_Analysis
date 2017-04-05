@@ -195,6 +195,38 @@ def getRPeaks(data, minDistance):
         coordinates = [(int(i), data[i]) for i in np.nditer(negative_R)]
     
     return coordinates
+
+# TODO: Detecting P and T waves, start using wavelets
+
+def getPWaves():
+    return None
+"""
+import matplotlib.pyplot as plt
+records = wave.getRecords('A') # N O A ~
+data = wave.load(records[0])
+points = wave.getRPeaks(data, 150)
+plt.plot(data)
+plt.plot(*zip(*points), marker='o', color='r', ls='')
+plt.title(records[0])
+plt.show()
+
+# Grabbing p and t waves
+for i in range(0,20):
+    plotData = data[points[i][0] + 2:points[i+1][0] - 2]
+    p_or_t = wave.detect_peaks(plotData, mpd=80, show=True)
+    # plt.plot(plotData)
+    # plt.title(records[0])
+    # plt.show()
+"""
+"""
+for i in range(60,80):
+    data = wave.load(records[i])
+    points = wave.getRPeaks(data, 150)
+    plt.plot(data)
+    plt.plot(*zip(*points), marker='o', color='r', ls='')
+    plt.title(records[i])
+    plt.show()
+"""
     
 """ Helper functions """
 
