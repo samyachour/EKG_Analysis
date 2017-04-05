@@ -14,18 +14,20 @@ class Signal(object):
     def __init__(self, name, data):
         """Return a Signal object whose record name is *name*,
         signal data is *data*,
-        R peaks array of coordinates is *RPeaks*"""
+        R peaks array of coordinates [(x1,y1), (x2, y2),..., (xn, yn)]  is *RPeaks*"""
         self.name = name
         self.data = data
         RPeaks = wave.getRPeaks(data, 150)
         self.RPeaks = RPeaks[1]
-        if RPeaks[0]: # flip every inverted signal
+        self.inverted = RPeaks[0]
+        if self.inverted: # flip the inverted signal
             self.data = -data
             
     def plotRPeaks(self):
         plt.plot(self.data)
         plt.plot(*zip(*self.RPeaks), marker='o', color='r', ls='')
         plt.title(self.name)
+        plt.figure(figsize=(20,10)) # make bigger
         plt.show()
 
 # Run Wavelet transforms
@@ -45,7 +47,14 @@ wave.plot(rebuilt, omission, "Index n * 0.003")
 # Testing P wave detection
 
 records = wave.getRecords('N') # N O A ~
-data = wave.load(records[2])
+data = wave.load(records[4])
+sig = Signal(records[0],data)
+
+sig.plotRPeaks()
+wave.getPWaves(sig)
+
+records = wave.getRecords('A') # N O A ~
+data = wave.load(records[1])
 sig = Signal(records[0],data)
 
 sig.plotRPeaks()
