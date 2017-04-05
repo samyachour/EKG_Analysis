@@ -162,19 +162,22 @@ def getRPeaks(data, minDistance):
     Parameters
     ----------
     data : array_like
-        1-dimensional array with input data.
+        1-dimensional array with input signal data
     minDistance : positive integer
         minimum distance between R peaks
 
     Returns
     -------
+        tuple consisting of 2 elements:
+        if signal is inverted
         list of tuple coordinates of R peaks in original signal data
+        [(x1,y1), (x2, y2),..., (xn, yn)]
 
     """
     
     # Standardized best wavelet decompisition choice
     level = 6
-    omission = ([1,2], True)
+    omission = ([1,2], True) # 5-40 hz
     rebuilt = decomp(data, 'sym5', level, omissions=omission)
     
     # Get rough draft of R peaks/valleys
@@ -188,13 +191,54 @@ def getRPeaks(data, minDistance):
     if pos_mph > neg_mph:
         positive_R = detect_peaks(rebuilt, mpd=minDistance, mph=pos_mph - pos_mph/3)
         coordinates = [(int(i), data[i]) for i in np.nditer(positive_R)]
+        inverted = False
     
     # If the wave is inverted
     elif neg_mph > pos_mph or neg_mph > 0.25:
         negative_R = detect_peaks(rebuilt, mpd=minDistance, mph=neg_mph - neg_mph/3,valley=True)
-        coordinates = [(int(i), data[i]) for i in np.nditer(negative_R)]
+        # -data[i] because I invert the signal later, and want positive R peak values
+        coordinates = [(int(i), -data[i]) for i in np.nditer(negative_R)]
+        inverted = True
     
-    return coordinates
+    return (inverted, coordinates)
+
+# TODO: Detecting P and T waves, start using wavelets
+
+def getPWaves(signal):
+    """
+    P Wave detection
+
+    Parameters
+    ----------
+    signal : Signal object
+        signal object from Signal class in signal.py
+
+    Returns
+    -------
+        2D list of lists of 3 tuple coordinates
+        first coordinate is start of P wave
+        second coordinate is peak of P wave
+        third coordinate is end of P wave
+        [[(start1x, start1y), (peak1x, peak1y), (end1x, end1y)], 
+        [(start2x, start2y), (peak2x, peak2y), (end2x, end2y)]
+        [(startNx, startNy), (peakNx, peakNy), (endNx, endNy)]]
+    """
+    
+    level = 6
+    omission = ([1,2], True) # <25 hz
+    rebuilt = decomp(signal.data, 'sym5', level, omissions=omission)
+    
+    for i in range(len(signal.RPeaks) - 5, len(signal.RPeaks) - 1):
+        plotData = rebuilt
+        left_limit = signal.RPeaks[i][0]
+        right_limit = signal.RPeaks[i+1][0]
+        left_limit += (right_limit - left_limit)/2
+        
+        plotData = plotData[left_limit:right_limit]
+        detect_peaks(plotData,show=True)
+    
+    return None
+
     
 """ Helper functions """
 
