@@ -294,14 +294,14 @@ def cal_stats(feat_list, data_array):
     feat_list.append(np.amin(data_array))
     feat_list.append(np.amax(data_array))
     #feat_list.append(np.median(data_array))
-    feat_list.append(np.average(data_array))
+    #feat_list.append(np.average(data_array))
     feat_list.append(np.mean(data_array))
     feat_list.append(np.std(data_array))
     feat_list.append(np.var(data_array))
     power = np.square(data_array)
     feat_list.append(np.average(power))
     feat_list.append(np.mean(power))
-    feat_list.append(np.average(abs(data_array)))
+    #feat_list.append(np.average(abs(data_array)))
     feat_list.append(np.mean(abs(data_array)))
     return feat_list
     
@@ -359,3 +359,21 @@ def noise_feature_extract(records, wavelets='sym4', levels=5, mode='symmetric', 
     file.close()
     return np.array(full_list), np.array(residual_list)
 
+"""RR feature extraction"""
+
+def R_peak_stats(peaks):
+    values = [i[1] for i in peaks]
+    feat_list=[]
+    values = np.array(values)
+    stats = np.array(cal_stats(feat_list, values))
+    return stats
+
+def RR_interval(peaks, sampling_frequency=300):
+    unit_distance = 1./300
+    RR_list = []
+    for i in range(0, len(peaks)-1):
+        RR_distance = peaks[i][0] - peaks[i+1][0]
+        RR_interval = RR_distance * unit_distance
+        RR_list.append(RR_interval)
+    return np.array(RR_list)
+    
