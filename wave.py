@@ -82,9 +82,7 @@ def s_decomp(cA, wavelet, levels, omissions=([], False)): # stationary wavelet t
 
     Parameters
     ----------
-    Same as as decomp, not including mode
-    omissions: tuple(list, bool), optional
-        List of levels D to omit, bool is still cA
+    ---Same as as decomp, not including mode---
 
     Returns
     -------
@@ -219,7 +217,7 @@ def getRecords(trainingLabel): # N O A ~
     subset = reference.ix[reference['answer']==trainingLabel]
     return subset['file'].tolist()
 
-def plot(y, title, xLab="index", folder = ""):
+def plot(y, title="Signal", xLab="Index", folder = ""):
     plt.plot(y)
     plt.ylabel("mV")
     plt.xlabel(xLab)
