@@ -27,6 +27,7 @@ class Signal(object):
         plt.plot(*zip(*self.RPeaks), marker='o', color='r', ls='')
         plt.title(self.name)
         plt.show()
+    
 
 # Run Wavelet transforms
 
@@ -50,6 +51,8 @@ sig = Signal(records[0],data)
 
 sig.plotRPeaks()
 wave.getPWaves(sig)
+
+#feat_list = wave.R_peak_stats(sig.data, sig.RPeaks)
 
 
 # TODO: Detecting Q and S, put in a function

@@ -359,3 +359,10 @@ def noise_feature_extract(records, wavelets='sym4', levels=5, mode='symmetric', 
     file.close()
     return np.array(full_list), np.array(residual_list)
 
+"""RR feature extraction"""
+
+#def R_peak_stats(data, coordinates):
+#    feat_list=[]
+#    R_peaks = np.array(data[coordinates])
+#    stats = cal_stats(feat_list, R_peaks)
+#    return stats
