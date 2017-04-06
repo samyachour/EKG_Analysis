@@ -20,6 +20,9 @@ class Signal(object):
         RPeaks = wave.getRPeaks(data, 150)
         self.RPeaks = RPeaks[1]
         self.inverted = RPeaks[0]
+        Pwaves = wave.getPWaves(self)
+        self.PPintervals = Pwaves[0]
+        self.Ppeaks = Pwaves[1]
         if self.inverted: # flip the inverted signal
             self.data = -data
             
@@ -28,7 +31,12 @@ class Signal(object):
         plt.plot(*zip(*self.RPeaks), marker='o', color='r', ls='')
         plt.title(self.name)
         plt.show()
-    
+        
+        
+    # TODO: add error handling for crazy cases of data i.e. A04244
+    # Wrap the whole thing in a try catch, assign as AF if there's an error
+    # Set everything to N in the beginning
+            
 
 # Run Wavelet transforms
 
@@ -51,14 +59,14 @@ data = wave.load(records[7])
 sig = Signal(records[7],data)
 
 sig.plotRPeaks()
-wave.getPWaves(sig)
+wave.getBaseline(sig)
 
 records = wave.getRecords('A') # N O A ~
 data = wave.load(records[3])
 sig = Signal(records[3],data)
 
 sig.plotRPeaks()
-wave.getPWaves(sig)
+wave.getBaseline(sig)
 
 RR_interval = wave.RR_interval(sig.RPeaks)
 
