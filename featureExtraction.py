@@ -45,15 +45,32 @@ wave.plot(rebuilt, omission, "Index n * 0.003")
 
 # Testing P wave detection
 
-records = wave.getRecords('N') # N O A ~
-data = wave.load(records[2])
-sig = Signal(records[0],data)
+records = wave.getRecords('O') # N O A ~
+data = wave.load('A04244')
+sig = Signal('A04244',data)
 
 sig.plotRPeaks()
-wave.getPWaves(sig)
+#wave.getPWaves(sig)
 
-RR_interval = wave.RR_interval(sig.RPeaks)
-
+#RR_interval = wave.RR_interval(sig.RPeaks)
+#
+#RR_interval_diff = wave.interval(RR_interval)
+#
+#bin_RR_intervals = wave.RR_interval_bin(RR_interval)
+#
+#x=0
+#for i in range(0, len(records)):
+#    print('working record:' + records[i])
+#    x+=1
+#    data = wave.load(records[i])
+#    sig = Signal(records[i],data)
+#    
+#    RR_interval = wave.RR_interval(sig.RPeaks)
+#    
+#    RR_interval_diff = wave.interval(RR_interval)
+#    
+#    bin_RR_intervals = wave.RR_interval_bin(RR_interval)
+#    print (bin_RR_intervals)
 
 # TODO: Detecting Q and S, put in a function
 """
