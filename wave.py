@@ -251,7 +251,7 @@ def getPWaves(signal):
 
 def getQS(signal):
     """
-    Q S detection
+    Q S points detection
 
     Parameters
     ----------
@@ -269,6 +269,7 @@ def getQS(signal):
     maxRPeak = len(signal.RPeaks)
         
     for i in range(0, maxRPeak - 1):
+        
         RPeak = signal.RPeaks[i][0]
         left_limit = RPeak - 20
         if left_limit < 0: left_limit = 0
@@ -298,9 +299,9 @@ def getQS(signal):
             S = S[0]
         
         # Convert to original signal coordinates
-        Q = int(Q + (middle-delta) + (RPeak - 20))
-        if middle-delta < 0: Q = int(Q + (RPeak - 20))
-        S = int(S + middle + (RPeak - 20))
+        Q = int(Q + (middle-delta) + left_limit)
+        if middle-delta < 0: Q = int(Q + left_limit)
+        S = int(S + middle + left_limit)
         QSall.append((Q, signal.data[Q]))
         QSall.append((S, signal.data[S]))
     
@@ -343,13 +344,13 @@ def getBaseline(signal):
             
             mean = np.mean(plotData)
             
-            left_limit = mean - 0.04
-            right_limit = mean + 0.04
+            bottom_limit = mean - 0.04
+            top_limit = mean + 0.04
             
             baseline = True
             
             for i in plotData:
-                if i < left_limit or i > right_limit:
+                if i < bottom_limit or i > top_limit:
                     baseline = False
             
             if baseline:
@@ -363,8 +364,6 @@ def getBaseline(signal):
         return (np.mean(signal.data), np.std(intervalMeans))
 
 """ Helper functions """
-
-# TODO: Write generalized functions for 3 bins, max bin, average, and variance
 
 def load(filename, path = '../Physionet_Challenge/training2017/'):
     #

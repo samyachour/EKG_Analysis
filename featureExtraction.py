@@ -51,7 +51,10 @@ class Signal(object):
         # ax.axhline(self.baseline)
         ax.plot(*zip(*self.RPeaks), marker='o', color='r', ls='')
         ax.set_title(self.name)
+        # fig.savefig('/Users/samy/Downloads/{0}.png'.format(self.name))
         plt.show()
+    
+    # TODO: Write generalized functions for 3 bins, max bin, average, and variance
         
         
     # TODO: add error handling for crazy cases of data i.e. A04244, A00057
@@ -60,13 +63,29 @@ class Signal(object):
     
     # TODO: Write bash script including pip install for pywavelets
 
+data = wave.load('A02569')
+sig = Signal('A02569', data)
+sig.plotRPeaks()
+
+data = wave.load('A08092')
+sig = Signal('A08092', data)
+sig.plotRPeaks()
+
+data = wave.load('A07933')
+sig = Signal('A07933', data)
+sig.plotRPeaks()
+
+level = 6
+omission = ([1,2], True) # 5-40 hz
+rebuilt = wave.decomp(data, 'sym5', level, omissions=omission)
+wave.plot(rebuilt)
+
+"""
 records = wave.getRecords('~') # N O A ~
 
 for i in records:
     data = wave.load(i)
-    print ('working on Record:' + i)
+    #print ('working on Record:' + i)
     sig = Signal(i,data)
 
-
-
-
+"""
