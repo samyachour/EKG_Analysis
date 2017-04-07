@@ -210,6 +210,8 @@ def getRPeaks(data, minDistance):
     
     return (inverted, coordinates)
 
+# TODO: Make differnt RPeak detection that uses windowing to ignore noisy sections
+
 def getPWaves(signal):
     """
     P Wave detection
