@@ -169,7 +169,7 @@ def getRPeaks(data, minDistance):
     Returns
     -------
         tuple consisting of 2 elements:
-        if signal is inverted
+        if signal is inverted (bool)
         list of tuple coordinates of R peaks in original signal data
         [(x1,y1), (x2, y2),..., (xn, yn)]
 
@@ -194,7 +194,7 @@ def getRPeaks(data, minDistance):
         inverted = False
     
     # If the wave is inverted
-    elif neg_mph > pos_mph or neg_mph > 0.25:
+    elif neg_mph >= pos_mph:
         negative_R = detect_peaks(rebuilt, mpd=minDistance, mph=neg_mph - neg_mph/3,valley=True)
         # -data[i] because I invert the signal later, and want positive R peak values
         coordinates = [(int(i), -data[i]) for i in np.nditer(negative_R)]
@@ -229,7 +229,7 @@ def getPWaves(signal):
     for i in range(0, len(signal.RPeaks) - 1):
         plotData = rebuilt
         right_limit = signal.RPeaks[i+1][0]
-        left_limit = right_limit - 70
+        left_limit = right_limit - 70 # 0.21s, usual max length of PR interval
 
         plotData = plotData[left_limit:right_limit]
         peaks = detect_peaks(plotData, plotX=signal.data[left_limit:right_limit])
@@ -262,29 +262,38 @@ def getBaseline(signal):
         Y value in mV of baseline
     """
     
-    level = 6
-    omission = ([1,2], True) # <25 hz
-    rebuilt = decomp(signal.data, 'sym5', level, omissions=omission)
-        
+    baselineY = 0
+    trueBaselines = 0
+    
     for i in range(0, len(signal.RPeaks) - 1):
         left_limit = signal.RPeaks[i][0]
         right_limit = signal.RPeaks[i+1][0]
 
-        plotData = rebuilt[left_limit:right_limit]
-        peaks = detect_peaks(plotData, edge='both', mpd=30, show=True)
+        RRinterval = signal.data[left_limit:right_limit]
+        innerPeaks = detect_peaks(RRinterval, edge='both', mpd=30)
         
-        for i in range(0, len(peaks) - 1):
-            left_limit = peaks[i]
-            right_limit = peaks[i+1]
+        for i in range(0, len(innerPeaks) - 1):
+            left_limit = innerPeaks[i]
+            right_limit = innerPeaks[i+1]
             
-            plotData = rebuilt[left_limit:right_limit]
+            plotData = RRinterval[left_limit:right_limit]
             
-            print(np.var(plotData))
+            mean = np.mean(plotData)
             
-            # TODO: Checking nearby slopes, exclude ones in super concave areas
+            left_limit = mean - 0.04
+            right_limit = mean + 0.04
             
+            baseline = True
+            
+            for i in plotData:
+                if i < left_limit or i > right_limit:
+                    baseline = False
+            
+            if baseline:
+                baselineY += mean
+                trueBaselines += 1
     
-    return None
+    return (baselineY/trueBaselines)
 
 """ Helper functions """
 # TODO: Write generalized functions for 3 bins, max bin, average, and variance

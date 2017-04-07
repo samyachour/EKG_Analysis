@@ -59,22 +59,20 @@ data = wave.load(records[7])
 sig = Signal(records[7],data)
 
 sig.plotRPeaks()
-wave.getBaseline(sig)
+baseline = wave.getBaseline(sig)
 
-records = wave.getRecords('A') # N O A ~
-data = wave.load(records[3])
-sig = Signal(records[3],data)
+plt.plot(sig.data[0:1000])
+plt.axhline(baseline)
+plt.show()
 
-sig.plotRPeaks()
-wave.getBaseline(sig)
 
-RR_interval = wave.RR_interval(sig.RPeaks)
+# Testing RR Interval calculation
 
 records = wave.getRecords('O') # N O A ~
 data = wave.load('A04244')
 sig = Signal('A04244',data)
 
-sig.plotRPeaks()
+#sig.plotRPeaks()
 #wave.getPWaves(sig)
 
 #RR_interval = wave.RR_interval(sig.RPeaks)
