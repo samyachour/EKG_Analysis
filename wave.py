@@ -400,6 +400,18 @@ def interval(data):
 
 def calculate_residuals(original, wavelets, levels, mode='symmetric', omissions=([],True)):
     # calculate residuals for a single EKG
+    """
+    Calculate the intervals from a list
+
+    Parameters
+    ----------
+    original: the original signal
+    other ones: same as the wavelet decomposition
+
+    Returns
+    -------
+        the residual
+    """
     rebuilt = decomp(original, wavelets, levels, mode, omissions)
     residual = sum(abs(original-rebuilt[:len(original)]))/len(original)
     return residual

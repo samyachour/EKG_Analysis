@@ -73,13 +73,14 @@ records = wave.getRecords('N') # N O A ~
 #RR interval stuff
 #error_list = []
 #for i in records:    
-filename = 'A08372'
+filename = 'A06495'
 try:
     data = wave.load(filename)
-    print ('working on Record:' + 'A08372')
-    sig = Signal('A08372',data)
+    print ('working on Record:' + filename)
+    sig = Signal(filename,data)
     
     sig.plotRPeaks()
+    wave.plot(sig.data[2000:4000])
        
     
 except:

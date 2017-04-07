@@ -1,3 +1,11 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Fri Apr  7 15:38:28 2017
+
+@author: Work
+"""
+
 import wave # this is the wave.py file in the local folder
 import matplotlib.pyplot as plt
 # np.set_printoptions(threshold=np.nan) # show full arrays, dataframes, etc. when printing
@@ -62,7 +70,7 @@ class Signal(object):
 #signal.plotRPeaks()
 
 
-records = wave.getRecords('N') # N O A ~
+records = wave.getRecords('A') # N O A ~
 #data = wave.load(records[7])
 #sig = Signal(records[7],data)
 #
@@ -86,12 +94,11 @@ for i in records:
         
         var = wave.var_every_other(sig.RRintervals)
         print ('variancs for '+ i + 'is: ' + str(var))
-        if var >0.1:
+        if var >0.05:
             var_list.append((i, var))
     except:
         print ('stupid EKG found: ' + i)
-
-
+        
         
 
 #records = wave.getRecords('A') # N O A ~
