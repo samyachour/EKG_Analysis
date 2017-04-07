@@ -17,15 +17,18 @@ class Signal(object):
         R peaks array of coordinates [(x1,y1), (x2, y2),..., (xn, yn)]  is *RPeaks*"""
         self.name = name
         self.data = data
+        
         RPeaks = wave.getRPeaks(data, 150)
         self.RPeaks = RPeaks[1]
         self.inverted = RPeaks[0]
+        if self.inverted: # flip the inverted signal
+            self.data = -data
+        
         Pwaves = wave.getPWaves(self)
         self.PPintervals = Pwaves[0]
         self.Ppeaks = Pwaves[1]
+        
         self.baseline = wave.getBaseline(self)
-        if self.inverted: # flip the inverted signal
-            self.data = -data
             
     def plotRPeaks(self):
         fig = plt.figure(figsize=(9.7, 6))
@@ -48,28 +51,6 @@ sig = Signal(records[7],data)
 
 sig.plotRPeaks()
 
-# TODO: Detecting Q and S, put in a function
-"""
-records = wave.getRecords('N') # N O A ~
-data = wave.load(records[0])
+wave.getQS(sig)
 
-level = 6
-omission = ([1,6], True)
-rebuilt = wave.decomp(data, 'sym5', level, omissions=omission)
-wave.plot(rebuilt, records[0], "Index n * 0.003")
 
-points = wave.getRPeaks(data, 150)[1]
-plt.plot(data)
-plt.plot(*zip(*points), marker='o', color='r', ls='')
-plt.title(records[0])
-plt.show()
-
-for i in range(20,40):
-    plotData = rebuilt
-    left_limit = points[i][0]-50
-    right_limit = points[i][0]+50
-    if right_limit > plotData.size:
-        break
-    plotData = plotData[left_limit:right_limit]
-    qrs = wave.detect_peaks(plotData, valley=True, show=True)
-"""

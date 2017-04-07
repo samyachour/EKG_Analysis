@@ -244,6 +244,34 @@ def getPWaves(signal):
 
 # TODO: get PR interval and QS length
 
+def getQS(signal):
+    """
+    Q S detection
+
+    Parameters
+    ----------
+    signal : Signal object
+        signal object from Signal class in signal.py
+
+    Returns
+    -------
+        list of 2 tuple coordinates, Q and S
+        [(x1, y1), (x2, y2)]
+    """
+    
+    level = 6
+    omission = ([1,2,6], True) # <25 hz
+    rebuilt = decomp(signal.data, 'sym5', level, omissions=omission)
+        
+    for i in range(0, len(signal.RPeaks) - 1):
+        left_limit = signal.RPeaks[i][0] - 20
+        right_limit = signal.RPeaks[i][0] + 20
+
+        RPeak = signal.data[left_limit:right_limit]
+        innerPeaks = detect_peaks(RPeak, valley=True, show=True)
+    
+    return None
+
 def getBaseline(signal):
     """
     Baseline estimation
