@@ -19,6 +19,7 @@ We are participating in the PhysioNet 2017 Challenge: [Atrial Fibrillation Class
 * Create multinomial logistic regression model for EKG Classification
 
 #### Administrative
+* Code refactoring/cleanup
 * Write unit tests for codebase
 * Flesh out readme explanation
 
