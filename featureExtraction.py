@@ -29,6 +29,13 @@ class Signal(object):
         self.Ppeaks = Pwaves[1]
         
         self.baseline = wave.getBaseline(self)
+        
+        #RR interval
+        self.RRintervals = wave.RR_interval(self.RPeaks)
+        #self.RRintervals_bin = wave.RR_intervals
+        
+        #noise features:
+        #self.
             
     def plotRPeaks(self):
         fig = plt.figure(figsize=(9.7, 6)) # I used figures to customize size
@@ -44,13 +51,31 @@ class Signal(object):
     # Set everything to N in the beginning
 
 # Imperatively grabbing features
+#data = wave.load('A00057')
+#signal = Signal('A00057', data)
+#signal.plotRPeaks()
 
 records = wave.getRecords('N') # N O A ~
-data = wave.load(records[7])
-sig = Signal(records[7],data)
+#data = wave.load(records[7])
+#sig = Signal(records[7],data)
+#
+#sig.plotRPeaks()
+#
+#wave.getQS(sig)
 
-sig.plotRPeaks()
-
-wave.getQS(sig)
+#RR interval stuff
+error_list = []
+for i in records:
+    try:
+        data = wave.load(i)
+        print ('working on Record:' + i)
+        sig = Signal(i,data)
+        
+        feat_list = wave.RR_interval_bin(sig.RRintervals)
+       
+        print (feat_list)
+    except:
+        print ('stupid EKG found')
+        error_list.append(i)
 
 

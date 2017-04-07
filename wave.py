@@ -496,6 +496,19 @@ def RR_interval(peaks, sampling_frequency=300):
     return np.array(RR_list)
 
 def RR_interval_bin(RR_intervals, mid_bin_range=[0.6,1]):
+    """
+    This function calculate the percentage of RR intervals that fall under 0.6, between 0.6 and 1, and above 1
+    and we want to make 
+
+    Parameters
+    ----------
+        peaks: R peaks with tuples (index, R peaks value)
+
+    Returns
+    -------
+        A list of RR intervals
+
+    """
     n_below = 0
     n_in = 0
     n_higher = 0
@@ -510,6 +523,10 @@ def RR_interval_bin(RR_intervals, mid_bin_range=[0.6,1]):
         print('RR interval == 0')
     feat_list = [n_below/len(RR_intervals), n_in/len(RR_intervals), n_higher/len(RR_intervals)]
     feat_list.append(feat_list.index(max(feat_list)))
+    if feat_list[2] > 0.3:
+        feat_list.append(1)
+    else:
+        feat_list.append(0)
     
     return feat_list
 
