@@ -1,6 +1,8 @@
 import wave # this is the wave.py file in the local folder
 import matplotlib.pyplot as plt
 # np.set_printoptions(threshold=np.nan) # show full arrays, dataframes, etc. when printing
+import warnings
+warnings.simplefilter("error") # Show warning traceback
 
 class Signal(object):
     """
@@ -18,7 +20,7 @@ class Signal(object):
         self.name = name
         self.data = data
         
-        RPeaks = wave.getRPeaks(data, 150)
+        RPeaks = wave.getRPeaks(self.data, 150)
         self.RPeaks = RPeaks[1]
         self.inverted = RPeaks[0]
         if self.inverted: # flip the inverted signal
@@ -28,6 +30,16 @@ class Signal(object):
         self.PPintervals = Pwaves[0]
         self.Ppeaks = Pwaves[1]
         
+        self.baseline = wave.getBaseline(self)
+        
+        self.QSPoints = wave.getQS(self)
+        
+        #RR interval
+        self.RRintervals = wave.RR_interval(self.RPeaks)
+        #self.RRintervals_bin = wave.RR_intervals
+        
+        #noise features:
+        #self.
         baseline = wave.getBaseline(self)
         self.baseline = baseline[0]
         self.RRIntervalMeanStd = baseline[1] # Standard deviation of all RR interval means
@@ -46,14 +58,15 @@ class Signal(object):
     # Wrap the whole thing in a try catch, assign as AF if there's an error
     # Set everything to N in the beginning
     
-    # TODO: Write bash scrip including pip install for pywavelets
+    # TODO: Write bash script including pip install for pywavelets
 
-# Imperatively grabbing features
+records = wave.getRecords('~') # N O A ~
 
-records = wave.getRecords('A') # N O A ~
-data = wave.load(records[7])
-sig = Signal(records[7],data)
+for i in records:
+    data = wave.load(i)
+    print ('working on Record:' + i)
+    sig = Signal(i,data)
 
-sig.plotRPeaks()
+
 
 

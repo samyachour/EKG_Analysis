@@ -152,3 +152,21 @@ def getRecords(type):
 #    
 #    bin_RR_intervals = wave.RR_interval_bin(RR_interval)
 #    print (bin_RR_intervals)
+
+
+"""
+# Testing QS points
+data = wave.load('A00857')
+wave.plot(data)
+signal = Signal('A00857', data)
+signal.plotRPeaks()
+
+fig = plt.figure(figsize=(60, 6))
+ax = fig.add_subplot(111)
+ax.plot(signal.data)
+ax.set_xlim(0, signal.data.size)
+ax.plot(*zip(*signal.QSPoints), marker='o', color='r', ls='')
+fig.savefig('/Users/samy/Downloads/graph.png')
+plt.close()
+
+"""
