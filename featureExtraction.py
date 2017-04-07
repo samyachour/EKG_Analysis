@@ -1,6 +1,8 @@
 import wave # this is the wave.py file in the local folder
 import matplotlib.pyplot as plt
 # np.set_printoptions(threshold=np.nan) # show full arrays, dataframes, etc. when printing
+import warnings
+warnings.simplefilter("error") # Show warning traceback
 
 class Signal(object):
     """
@@ -18,7 +20,7 @@ class Signal(object):
         self.name = name
         self.data = data
         
-        RPeaks = wave.getRPeaks(data, 150)
+        RPeaks = wave.getRPeaks(self.data, 150)
         self.RPeaks = RPeaks[1]
         self.inverted = RPeaks[0]
         if self.inverted: # flip the inverted signal
@@ -29,6 +31,8 @@ class Signal(object):
         self.Ppeaks = Pwaves[1]
         
         self.baseline = wave.getBaseline(self)
+        
+        self.QSPoints = wave.getQS(self)
         
         #RR interval
         self.RRintervals = wave.RR_interval(self.RPeaks)
@@ -54,50 +58,15 @@ class Signal(object):
     # Wrap the whole thing in a try catch, assign as AF if there's an error
     # Set everything to N in the beginning
     
-    # TODO: Write bash scrip including pip install for pywavelets
+    # TODO: Write bash script including pip install for pywavelets
 
-# Imperatively grabbing features
-#data = wave.load('A00057')
-#signal = Signal('A00057', data)
-#signal.plotRPeaks()
+records = wave.getRecords('~') # N O A ~
 
-
-records = wave.getRecords('N') # N O A ~
-#data = wave.load(records[7])
-#sig = Signal(records[7],data)
-#
-#sig.plotRPeaks()
-#
-#wave.getQS(sig)
-
-#RR interval stuff
-#error_list = []
-#for i in records:
-
-#8372    
-
-var_list=[]
 for i in records:
-    
-    try:
-        data = wave.load(i)
-        print ('working on Record:' + i)
-        sig = Signal(i,data)
-        
-        var = wave.var_every_other(sig.RRintervals)
-        print ('variancs for '+ i + 'is: ' + str(var))
-        if var >0.05:
-            var_list.append((i, var_list))
-    except:
-        print ('stupid EKG found: ' + i)
-        
-        
+    data = wave.load(i)
+    print ('working on Record:' + i)
+    sig = Signal(i,data)
 
-#records = wave.getRecords('A') # N O A ~
-#data = wave.load(records[7])
-#sig = Signal(records[7],data)
-
-#sig.plotRPeaks()
 
 
 

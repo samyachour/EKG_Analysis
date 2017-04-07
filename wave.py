@@ -181,10 +181,18 @@ def getRPeaks(data, minDistance):
     rebuilt = decomp(data, 'sym5', level, omissions=omission)
     
     # Get rough draft of R peaks/valleys
-    positive_R_first = [rebuilt[i] for i in np.nditer(detect_peaks(rebuilt, mpd=minDistance, mph=0.08))]
+    peaks = detect_peaks(rebuilt, mpd=minDistance, mph=0.08)
+    if peaks.size == 0:
+        positive_R_first = [0]
+    else:
+        positive_R_first = [rebuilt[i] for i in np.nditer(peaks)]
     pos_mph = np.mean(positive_R_first)
     
-    negative_R_first = [rebuilt[i] for i in np.nditer(detect_peaks(rebuilt, mpd=minDistance, mph=0.08,valley=True))]
+    valleys = detect_peaks(rebuilt, mpd=minDistance, mph=0.08,valley=True)
+    if valleys.size == 0:
+        negative_R_first = [0]
+    else:
+        negative_R_first = [rebuilt[i] for i in np.nditer(valleys)]
     neg_mph = abs(np.mean(negative_R_first))
     
     # If the wave isn't inverted
@@ -241,8 +249,6 @@ def getPWaves(signal):
     return (PPintervals, [(i, signal.data[i]) for i in maxes]) # P peak coordinates
 
 
-# TODO: get PR interval and QS length
-
 def getQS(signal):
     """
     Q S detection
@@ -259,15 +265,26 @@ def getQS(signal):
     """
     
     QSall = []
+    maxData = len(signal.data)
+    maxRPeak = len(signal.RPeaks)
         
-    for i in range(0, len(signal.RPeaks) - 1):
+    for i in range(0, maxRPeak - 1):
         RPeak = signal.RPeaks[i][0]
         left_limit = RPeak - 20
+        if left_limit < 0: left_limit = 0
         right_limit = RPeak + 20
+        if right_limit >= maxData: right_limit = maxData - 1
 
         RPeakIsol = signal.data[left_limit:right_limit]
-        QPoint = RPeakIsol[7:14]
-        SPoint = RPeakIsol[25:35]
+        maxIdx = RPeakIsol.size
+        middle = maxIdx//2
+        delta = 16
+        
+        QPoint = RPeakIsol[middle-delta:middle]
+        if middle-delta < 0: QPoint = RPeakIsol[:middle]
+        SPoint = RPeakIsol[middle:middle+delta]
+        if middle+delta > maxIdx: SPoint = RPeakIsol[middle:]
+        
         Q = detect_peaks(QPoint, mpd = 10, valley=True)
         S = detect_peaks(SPoint, mpd = 10, valley=True)
         
@@ -281,8 +298,9 @@ def getQS(signal):
             S = S[0]
         
         # Convert to original signal coordinates
-        Q = Q + 7 + (RPeak - 20)
-        S = S + 25 + (RPeak - 20)
+        Q = int(Q + (middle-delta) + (RPeak - 20))
+        if middle-delta < 0: Q = int(Q + (RPeak - 20))
+        S = int(S + middle + (RPeak - 20))
         QSall.append((Q, signal.data[Q]))
         QSall.append((S, signal.data[S]))
     
@@ -338,7 +356,11 @@ def getBaseline(signal):
                 baselineY += mean
                 trueBaselines += 1
     
-    return (baselineY/trueBaselines, np.std(intervalMeans))
+    if intervalMeans == []: intervalMeans = [0]
+    if trueBaselines > 0:
+        return (baselineY/trueBaselines, np.std(intervalMeans))
+    else:
+        return (np.mean(signal.data), np.std(intervalMeans))
 
 """ Helper functions """
 
