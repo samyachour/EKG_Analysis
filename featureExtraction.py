@@ -31,7 +31,7 @@ class Signal(object):
         self.baseline = wave.getBaseline(self)
             
     def plotRPeaks(self):
-        fig = plt.figure(figsize=(9.7, 6))
+        fig = plt.figure(figsize=(9.7, 6)) # I used figures to customize size
         ax = fig.add_subplot(111)
         ax.plot(self.data)
         ax.plot(*zip(*self.RPeaks), marker='o', color='r', ls='')

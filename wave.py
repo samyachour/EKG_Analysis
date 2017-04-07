@@ -225,11 +225,10 @@ def getPWaves(signal):
     maxes = []
     
     for i in range(0, len(signal.RPeaks) - 1):
-        plotData = rebuilt
         right_limit = signal.RPeaks[i+1][0]
         left_limit = right_limit - 70 # 0.21s, usual max length of PR interval
 
-        plotData = plotData[left_limit:right_limit]
+        plotData = rebuilt[left_limit:right_limit]
         peaks = detect_peaks(plotData, plotX=signal.data[left_limit:right_limit])
         
         if peaks.size != 0:
@@ -320,6 +319,7 @@ def getBaseline(signal):
     return (baselineY/trueBaselines)
 
 """ Helper functions """
+
 # TODO: Write generalized functions for 3 bins, max bin, average, and variance
 
 def load(filename, path = '../Physionet_Challenge/training2017/'):
