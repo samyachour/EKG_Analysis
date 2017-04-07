@@ -462,5 +462,22 @@ def RR_interval(peaks, sampling_frequency=300):
         RR_list.append(abs(RR_interval))
     return np.array(RR_list)
 
+def RR_interval_bin(RR_intervals, mid_bin_range=[0.6,1]):
+    n_below = 0
+    n_in = 0
+    n_higher = 0
+    for interval in RR_intervals:
+        if interval < mid_bin_range[0]:
+            n_below += 1
+        elif interval <= mid_bin_range[1]:
+            n_in += 1
+        else:
+            n_higher +=1
+    if len(RR_intervals)==0:
+        print('RR interval == 0')
+    feat_list = [n_below/len(RR_intervals), n_in/len(RR_intervals), n_higher/len(RR_intervals)]
+    feat_list.append(feat_list.index(max(feat_list)))
+    
+    return feat_list
 
     
