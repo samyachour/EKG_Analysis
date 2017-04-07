@@ -552,4 +552,16 @@ def RR_interval_bin(RR_intervals, mid_bin_range=[0.6,1]):
     
     return feat_list
 
+def var_every_other(RR_intervals):
+    diff = []
+    for i in range(0, len(RR_intervals)-2, 2):
+        per_diff= RR_intervals[i]-RR_intervals[i+2]
+        diff.append(per_diff)
+    diff = np.array(diff)
+    return np.var(diff)        
+    
+    
+    
+    
+    
     

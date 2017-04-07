@@ -71,19 +71,28 @@ records = wave.getRecords('N') # N O A ~
 #wave.getQS(sig)
 
 #RR interval stuff
-error_list = []
+#error_list = []
+#for i in records:
+
+#8372    
+
+var_list=[]
 for i in records:
+    
     try:
         data = wave.load(i)
         print ('working on Record:' + i)
         sig = Signal(i,data)
         
-        feat_list = wave.RR_interval_bin(sig.RRintervals)
-       
-        print (feat_list)
+        var = wave.var_every_other(sig.RRintervals)
+        print ('variancs for '+ i + 'is: ' + str(var))
+        if var >0.05:
+            var_list.append((i, var_list))
     except:
-        print ('stupid EKG found')
-        error_list.append(i)
+        print ('stupid EKG found: ' + i)
+        
+        
+
 #records = wave.getRecords('A') # N O A ~
 #data = wave.load(records[7])
 #sig = Signal(records[7],data)
