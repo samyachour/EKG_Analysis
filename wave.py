@@ -169,7 +169,7 @@ def getRPeaks(data, minDistance):
     Returns
     -------
         tuple consisting of 2 elements:
-        if signal is inverted
+        if signal is inverted (bool)
         list of tuple coordinates of R peaks in original signal data
         [(x1,y1), (x2, y2),..., (xn, yn)]
 
@@ -194,15 +194,13 @@ def getRPeaks(data, minDistance):
         inverted = False
     
     # If the wave is inverted
-    elif neg_mph > pos_mph or neg_mph > 0.25:
+    elif neg_mph >= pos_mph:
         negative_R = detect_peaks(rebuilt, mpd=minDistance, mph=neg_mph - neg_mph/3,valley=True)
         # -data[i] because I invert the signal later, and want positive R peak values
         coordinates = [(int(i), -data[i]) for i in np.nditer(negative_R)]
         inverted = True
     
     return (inverted, coordinates)
-
-# TODO: Detecting P and T waves, start using wavelets
 
 def getPWaves(signal):
     """
@@ -215,32 +213,114 @@ def getPWaves(signal):
 
     Returns
     -------
-        2D list of lists of 3 tuple coordinates
-        first coordinate is start of P wave
-        second coordinate is peak of P wave
-        third coordinate is end of P wave
-        [[(start1x, start1y), (peak1x, peak1y), (end1x, end1y)], 
-        [(start2x, start2y), (peak2x, peak2y), (end2x, end2y)]
-        [(startNx, startNy), (peakNx, peakNy), (endNx, endNy)]]
+        tuple consisting of 2 elements:
+        P peak to P peak intervals [1,2,1,3,...]
+        list of tuple coordinates of P peaks in original signal data [(x1,y1), (x2, y2),..., (xn, yn)]
     """
     
     level = 6
     omission = ([1,2], True) # <25 hz
     rebuilt = decomp(signal.data, 'sym5', level, omissions=omission)
     
-    for i in range(len(signal.RPeaks) - 5, len(signal.RPeaks) - 1):
-        plotData = rebuilt
-        left_limit = signal.RPeaks[i][0]
+    maxes = []
+    
+    for i in range(0, len(signal.RPeaks) - 1):
         right_limit = signal.RPeaks[i+1][0]
-        left_limit += (right_limit - left_limit)//2
+        left_limit = right_limit - 70 # 0.21s, usual max length of PR interval
 
-        plotData = plotData[left_limit:right_limit]
-        detect_peaks(plotData,show=True)
+        plotData = rebuilt[left_limit:right_limit]
+        peaks = detect_peaks(plotData, plotX=signal.data[left_limit:right_limit])
+        
+        if peaks.size != 0:
+            maxes.append(np.amax(peaks))
+        else: # if there is no p wave, flat signal in the interval
+            maxes.append(0)
+            
+    PPintervals = interval(maxes)
+    
+    return (PPintervals, [(i, signal.data[i]) for i in maxes]) # P peak coordinates
+
+
+# TODO: get PR interval and QS length
+
+def getQS(signal):
+    """
+    Q S detection
+
+    Parameters
+    ----------
+    signal : Signal object
+        signal object from Signal class in signal.py
+
+    Returns
+    -------
+        list of 2 tuple coordinates, Q and S
+        [(x1, y1), (x2, y2)]
+    """
+    
+    level = 6
+    omission = ([1,2,6], True) # <25 hz
+    rebuilt = decomp(signal.data, 'sym5', level, omissions=omission)
+        
+    for i in range(0, len(signal.RPeaks) - 1):
+        left_limit = signal.RPeaks[i][0] - 20
+        right_limit = signal.RPeaks[i][0] + 20
+
+        RPeak = signal.data[left_limit:right_limit]
+        innerPeaks = detect_peaks(RPeak, valley=True, show=True)
     
     return None
 
+def getBaseline(signal):
+    """
+    Baseline estimation
+
+    Parameters
+    ----------
+    signal : Signal object
+        signal object from Signal class in signal.py
+
+    Returns
+    -------
+        Y value in mV of baseline
+    """
     
+    baselineY = 0
+    trueBaselines = 0
+    
+    for i in range(0, len(signal.RPeaks) - 1):
+        left_limit = signal.RPeaks[i][0]
+        right_limit = signal.RPeaks[i+1][0]
+
+        RRinterval = signal.data[left_limit:right_limit]
+        innerPeaks = detect_peaks(RRinterval, edge='both', mpd=30)
+        
+        for i in range(0, len(innerPeaks) - 1):
+            left_limit = innerPeaks[i]
+            right_limit = innerPeaks[i+1]
+            
+            plotData = RRinterval[left_limit:right_limit]
+            
+            mean = np.mean(plotData)
+            
+            left_limit = mean - 0.04
+            right_limit = mean + 0.04
+            
+            baseline = True
+            
+            for i in plotData:
+                if i < left_limit or i > right_limit:
+                    baseline = False
+            
+            if baseline:
+                baselineY += mean
+                trueBaselines += 1
+    
+    return (baselineY/trueBaselines)
+
 """ Helper functions """
+
+# TODO: Write generalized functions for 3 bins, max bin, average, and variance
 
 def load(filename, path = '../Physionet_Challenge/training2017/'):
     #
