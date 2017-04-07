@@ -181,14 +181,14 @@ def getRPeaks(data, minDistance):
     rebuilt = decomp(data, 'sym5', level, omissions=omission)
     
     # Get rough draft of R peaks/valleys
-    peaks = detect_peaks(rebuilt, mpd=minDistance, mph=0.08)
+    peaks = detect_peaks(rebuilt, mpd=minDistance, mph=0.05)
     if peaks.size == 0:
         positive_R_first = [0]
     else:
         positive_R_first = [rebuilt[i] for i in np.nditer(peaks)]
     pos_mph = np.mean(positive_R_first)
     
-    valleys = detect_peaks(rebuilt, mpd=minDistance, mph=0.08,valley=True)
+    valleys = detect_peaks(rebuilt, mpd=minDistance, mph=0.05,valley=True)
     if valleys.size == 0:
         negative_R_first = [0]
     else:
@@ -384,13 +384,14 @@ def getRecords(trainingLabel): # N O A ~
     subset = reference.ix[reference['answer']==trainingLabel]
     return subset['file'].tolist()
 
-def plot(y, title="Signal", xLab="Index", folder = ""):
-    plt.plot(y)
-    plt.ylabel("mV")
-    plt.xlabel(xLab)
-    plt.title(title)
-    if folder != "":
-        plt.savefig(folder + title + ".png")
+def plot(y, title="Signal", xLab="Index * 0.003s"):
+    fig = plt.figure(figsize=(9.7, 6)) # I used figures to customize size
+    ax = fig.add_subplot(111)
+    ax.plot(y)
+    ax.set_title(title)
+    # fig.savefig('/Users/samy/Downloads/{0}.png'.format(self.name))
+    ax.set_ylabel("mV")
+    ax.set_xlabel(xLab)
     plt.show()
 
 def multiplot(data, graph_names):

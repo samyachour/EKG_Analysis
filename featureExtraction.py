@@ -51,7 +51,7 @@ class Signal(object):
         # ax.axhline(self.baseline)
         ax.plot(*zip(*self.RPeaks), marker='o', color='r', ls='')
         ax.set_title(self.name)
-        # fig.savefig('/Users/samy/Downloads/{0}.png'.format(self.name))
+        fig.savefig('/Users/samy/Downloads/{0}.png'.format(self.name))
         plt.show()
     
     # TODO: Write generalized functions for 3 bins, max bin, average, and variance
@@ -63,20 +63,16 @@ class Signal(object):
     
     # TODO: Write bash script including pip install for pywavelets
 
-data = wave.load('A02569')
-sig = Signal('A02569', data)
-sig.plotRPeaks()
+weird_records = ['A00111','A00269','A00420','A00550','A00692','A01053','A01329','A01509','A01650','A01734','A01780','A01980','A02021','A02282','A02397','A02478','A02569','A02777','A02781','A03196','A03581','A03650','A04342','A04378','A04465','A04824','A04979','A05261','A06371','A06471','A06495','A06632','A06697','A06895','A06931','A07016','A07088','A07098','A07235','A07933','A08092','A08327']
 
-data = wave.load('A08092')
-sig = Signal('A08092', data)
-sig.plotRPeaks()
+for i in weird_records:
+    data = wave.load(i)
+    sig = Signal(i, data)
+    sig.plotRPeaks()
 
-data = wave.load('A07933')
-sig = Signal('A07933', data)
-sig.plotRPeaks()
 
 level = 6
-omission = ([1,2], True) # 5-40 hz
+omission = ([5,6], True) # 5-40 hz
 rebuilt = wave.decomp(data, 'sym5', level, omissions=omission)
 wave.plot(rebuilt)
 
