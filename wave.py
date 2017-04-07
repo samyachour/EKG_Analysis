@@ -232,7 +232,7 @@ def getPWaves(signal):
         peaks = detect_peaks(plotData, plotX=signal.data[left_limit:right_limit])
         
         if peaks.size != 0:
-            maxes.append(np.amax(peaks))
+            maxes.append(left_limit + np.amax(peaks)) # need to convert to original signal coordinates
         else: # if there is no p wave, flat signal in the interval
             maxes.append(0)
             
@@ -254,22 +254,39 @@ def getQS(signal):
 
     Returns
     -------
-        list of 2 tuple coordinates, Q and S
-        [(x1, y1), (x2, y2)]
+        list of tuple coordinates, Q and S, for every QRS complex
+        [(qx1, qy1), (sx2, sy2), (qx3, qy3), (sx4, sy4)]
     """
     
-    level = 6
-    omission = ([1,2,6], True) # <25 hz
-    rebuilt = decomp(signal.data, 'sym5', level, omissions=omission)
+    QSall = []
         
     for i in range(0, len(signal.RPeaks) - 1):
-        left_limit = signal.RPeaks[i][0] - 20
-        right_limit = signal.RPeaks[i][0] + 20
+        RPeak = signal.RPeaks[i][0]
+        left_limit = RPeak - 20
+        right_limit = RPeak + 20
 
-        RPeak = signal.data[left_limit:right_limit]
-        innerPeaks = detect_peaks(RPeak, valley=True, show=True)
+        RPeakIsol = signal.data[left_limit:right_limit]
+        QPoint = RPeakIsol[7:14]
+        SPoint = RPeakIsol[25:35]
+        Q = detect_peaks(QPoint, mpd = 10, valley=True)
+        S = detect_peaks(SPoint, mpd = 10, valley=True)
+        
+        if Q.size == 0:
+            Q = np.amin(QPoint)
+        else:
+            Q = Q[0] # get first valley from detect_peaks return array
+        if S.size == 0:
+            S = np.amin(SPoint)
+        else:
+            S = S[0]
+        
+        # Convert to original signal coordinates
+        Q = Q + 7 + (RPeak - 20)
+        S = S + 25 + (RPeak - 20)
+        QSall.append((Q, signal.data[Q]))
+        QSall.append((S, signal.data[S]))
     
-    return None
+    return QSall
 
 def getBaseline(signal):
     """
@@ -282,11 +299,14 @@ def getBaseline(signal):
 
     Returns
     -------
+        tuple consisting of two elements:
         Y value in mV of baseline
+        Standard deviation of RR interval means
     """
     
     baselineY = 0
     trueBaselines = 0
+    intervalMeans = []
     
     for i in range(0, len(signal.RPeaks) - 1):
         left_limit = signal.RPeaks[i][0]
@@ -294,6 +314,8 @@ def getBaseline(signal):
 
         RRinterval = signal.data[left_limit:right_limit]
         innerPeaks = detect_peaks(RRinterval, edge='both', mpd=30)
+        
+        intervalMeans.append(np.mean(RRinterval)) # for a feature extraction
         
         for i in range(0, len(innerPeaks) - 1):
             left_limit = innerPeaks[i]
@@ -316,7 +338,7 @@ def getBaseline(signal):
                 baselineY += mean
                 trueBaselines += 1
     
-    return (baselineY/trueBaselines)
+    return (baselineY/trueBaselines, np.std(intervalMeans))
 
 """ Helper functions """
 
