@@ -202,8 +202,6 @@ def getRPeaks(data, minDistance):
     
     return (inverted, coordinates)
 
-# TODO: Detecting P and T waves, start using wavelets
-
 def getPWaves(signal):
     """
     P Wave detection
@@ -245,8 +243,6 @@ def getPWaves(signal):
 
 
 # TODO: get PR interval and QS length
-
-# TODO: get baseline
 
 def getBaseline(signal):
     """
