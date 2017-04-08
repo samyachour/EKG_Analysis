@@ -10,12 +10,18 @@ import csv
 import pywt
 import wave
 import numpy as np
+import pandas as pd
+import math
 from sklearn.decomposition import PCA
 
 
 
 
 
+columns = ['A','B', 'C']
+masterDF = pd.DataFrame(columns=columns)
+
+#TODO: loop add rows of feature vectors, exclude noisy signals
 
 def feat_PCA(feat_mat, components=12):
     """
@@ -131,3 +137,39 @@ def F1_score(prediction, target, path='../Physionet_Challenge/training2017/'):
     print('The F1 score for this class is: ' + str(F1))
     
     return F1
+
+# TODO: add error handling for crazy cases of data i.e. A04244, A00057
+# Wrap the whole thing in a try catch, assign as AF if there's an error
+# Set everything to N in the beginning
+# TODO: check if noisy when giving out feature matrix
+
+# TODO: run multi model on single rows to return value to answers.txt
+# TODO: Write bash script including pip install for pywavelets
+
+def multi_model(v):
+    B1 = [.3, .6, .8, .9, .5] #1 + num of features
+    B2 = [.6, .4, .2, .7, .2]    
+    x = [1] + v #1 + num of features
+    t1 = np.transpose(B1) 
+    t2 = np.transpose(B2)
+    par1 = math.exp(np.dot(t1,x))
+    par2 = math.exp(np.dot(t2,x))
+    cc    = (par1 + par2 + 1)
+    probN = 1.0/cc
+    probA = (1.0*par1)/cc
+    probO = (1.0*par2)/cc
+    ind = np.argmax([probN, probA, probO])
+    arryth_type = ["N","A","O"]
+    
+    return arryth_type[ind];
+
+def is_noisy(v):
+    # exp(t(Beta_Hat)%*%newdata) / (1+exp(t(Beta_Hat)%*%newdata))
+    B1 = [.3, .6, .8, .9, .5] #1 + num of features
+    thresh = 0.03
+    x = [1] + v
+    t1 = np.transpose(B1)
+    par1 = math.exp(np.dot(t1,x))
+    result = (1.0*par1) / (1 + par1)
+    print(result)
+    return (result > thresh)
