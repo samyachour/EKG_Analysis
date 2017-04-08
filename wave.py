@@ -398,7 +398,7 @@ def interval(data):
     
 """ Noise feature extraction """    
 
-def calculate_residuals(original, wavelets, levels, mode='symmetric', omissions=([],True)):
+def calculate_residuals(original):
     # calculate residuals for a single EKG
     """
     Calculate the intervals from a list
@@ -406,17 +406,30 @@ def calculate_residuals(original, wavelets, levels, mode='symmetric', omissions=
     Parameters
     ----------
     original: the original signal
-    other ones: same as the wavelet decomposition
 
     Returns
     -------
         the residual
     """
-    rebuilt = decomp(original, wavelets, levels, mode, omissions)
+    rebuilt = decomp(original, wavelet='sym4', levels=5, mode='symmetric', omissions=([1],False))
     residual = sum(abs(original-rebuilt[:len(original)]))/len(original)
     return residual
 
 def cal_stats(feat_list, data_array):
+    """
+     # Generate statistics for the data given and append each stats to the feature list.
+     # Input an empty list if your feature list has nothing at the time
+
+    Parameters
+    ----------
+        feat_list: the feature list that you want to add the stats to
+        data_array: the data you want to generate statistics from
+        
+    Returns
+    -------
+        The feat_list with all the statistics added
+
+    """
     #create a list of stats and add the stats to a list
     
     feat_list.append(np.amin(data_array))
@@ -436,6 +449,20 @@ def cal_stats(feat_list, data_array):
 
 
 def stats_feat(coeffs):
+    """
+     # Generate stats for wavelet coeffcients
+     # This special function is for wavelet coefficients input generated from
+     # pywt library because the coeffcients comes in with wired format
+
+    Parameters
+    ----------
+        coeffs: the wavelet coeffcients with the format [cA, {d:cDn},...,{d:cD1}]
+        
+    Returns
+    -------
+        The feat_list with all the statistics added
+
+    """
     #calculate the stats from the coefficients
     feat_list = []
     feat_list = cal_stats(feat_list, coeffs[0])
@@ -461,8 +488,26 @@ def feat_combo(feat_list):
 def normalize(feat_list):
     return preprocessing.normalize(feat_list)
 
-def noise_feature_extract(records, wavelets='sym4', levels=5, mode='symmetric', omissions=([1],False), path = '../Physionet_Challenge/training2017/'):
-    #calculate residuals for all the EKGs
+
+def noise_feature_extract(records, path = '../Physionet_Challenge/training2017/'):
+    """
+    A function takes in a list of records and returns a matrix of features
+
+    Parameters
+    ----------
+        records: the file name of the file containing the record names (string)
+        wavelet: 'sym4'
+        levels: wavelet 5 level decomposition
+        mode: 'symmetric'
+        omission: get rid of D1 and keep cA
+        path: the path to the file
+        
+    Returns
+    -------
+        1. A numpy array of stats for all wavelet coefficients for all the records
+        2. A numpy array of residuals for all the records
+
+    """
     full_list = []
     residual_list = []
     file = open(path+records, 'r')
@@ -476,7 +521,7 @@ def noise_feature_extract(records, wavelets='sym4', levels=5, mode='symmetric', 
         feat_list = stats_feat(coeffs)
     
         #feat_list = feat_combo(feat_list)
-        residual = calculate_residuals(data, wavelets, levels, mode, omissions)
+        residual = calculate_residuals(data, wavelets='sym4', levels=5, mode='symmetric', omissions=([1],False))
         residual_list.append(residual)
         full_list.append(feat_list)
         x+=1
@@ -505,8 +550,26 @@ def R_peak_stats(peaks):
     values = [i[1] for i in peaks]
     feat_list=[]
     values = np.array(values)
-    stats = np.array(cal_stats(feat_list, values))
+    stats = cal_stats(feat_list, values)
     return stats
+
+def RR_interval_stats(RR_interval):
+    """
+    Calculate the statistics for the RR intervals
+
+    Parameters
+    ----------
+        RR_interval: A list of RR_intervals
+        
+    Returns
+    -------
+        A list of 8 different statistics for RR intervals
+
+    """
+    feat_list=[]
+    RR_interval = np.array(RR_interval)
+    stats = cal_stats(feat_list, RR_interval)
+    return stats   
 
 def RR_interval(peaks, sampling_frequency=300):
     """
@@ -529,10 +592,9 @@ def RR_interval(peaks, sampling_frequency=300):
         RR_list.append(abs(RR_interval))
     return np.array(RR_list)
 
-def RR_interval_bin(RR_intervals, mid_bin_range=[0.6,1]):
+def interval_bin(intervals, mid_bin_range=[0.6,1]):
     """
-    This function calculate the percentage of RR intervals that fall under 0.6, between 0.6 and 1, and above 1
-    and we want to make 
+    This function calculate the percentage of intervals that fall under 0.6, between 0.6 and 1, and above 1
 
     Parameters
     ----------
@@ -546,16 +608,16 @@ def RR_interval_bin(RR_intervals, mid_bin_range=[0.6,1]):
     n_below = 0
     n_in = 0
     n_higher = 0
-    for interval in RR_intervals:
+    for interval in intervals:
         if interval < mid_bin_range[0]:
             n_below += 1
         elif interval <= mid_bin_range[1]:
             n_in += 1
         else:
             n_higher +=1
-    if len(RR_intervals)==0:
+    if len(intervals)==0:
         print('RR interval == 0')
-    feat_list = [n_below/len(RR_intervals), n_in/len(RR_intervals), n_higher/len(RR_intervals)]
+    feat_list = [n_below/len(intervals), n_in/len(intervals), n_higher/len(intervals)]
     feat_list.append(feat_list.index(max(feat_list)))
     if feat_list[2] > 0.3:
         feat_list.append(1)
@@ -565,6 +627,7 @@ def RR_interval_bin(RR_intervals, mid_bin_range=[0.6,1]):
     return feat_list
 
 def var_every_other(RR_intervals):
+    
     diff = []
     for i in range(0, len(RR_intervals)-2, 2):
         per_diff= RR_intervals[i]-RR_intervals[i+2]
@@ -572,6 +635,34 @@ def var_every_other(RR_intervals):
     diff = np.array(diff)
     return np.var(diff)        
     
+def var_every_third(RR_intervals):
+    
+    diff = []
+    for i in range(0, len(RR_intervals)-3, 3):
+        per_diff= RR_intervals[i]-RR_intervals[i+3]
+        diff.append(per_diff)
+    diff = np.array(diff)
+    return np.var(diff)        
+
+def var_every_fourth(RR_intervals):
+    
+    diff = []
+    for i in range(0, len(RR_intervals)-4, 4):
+        per_diff= RR_intervals[i]-RR_intervals[i+4]
+        diff.append(per_diff)
+    diff = np.array(diff)
+    return np.var(diff)
+
+def var_next(RR_intervals):
+    
+    diff = []
+    for i in range(0, len(RR_intervals)-1):
+        per_diff= RR_intervals[i]-RR_intervals[i+1]
+        diff.append(per_diff)
+    diff = np.array(diff)
+    return np.var(diff)
+
+
     
     
     

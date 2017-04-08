@@ -1,5 +1,6 @@
 import wave # this is the wave.py file in the local folder
 import matplotlib.pyplot as plt
+import pywt
 # np.set_printoptions(threshold=np.nan) # show full arrays, dataframes, etc. when printing
 
 class Signal(object):
@@ -29,13 +30,9 @@ class Signal(object):
         self.Ppeaks = Pwaves[1]
         
         self.baseline = wave.getBaseline(self)
-        
         #RR interval
         self.RRintervals = wave.RR_interval(self.RPeaks)
-        #self.RRintervals_bin = wave.RR_intervals
         
-        #noise features:
-        #self.
         baseline = wave.getBaseline(self)
         self.baseline = baseline[0]
         self.RRIntervalMeanStd = baseline[1] # Standard deviation of all RR interval means
@@ -63,9 +60,9 @@ class Signal(object):
 
 
 records = wave.getRecords('N') # N O A ~
-#data = wave.load(records[7])
-#sig = Signal(records[7],data)
-#
+data = wave.load(records[7])
+sig = Signal(records[7],data)
+
 #sig.plotRPeaks()
 #
 #wave.getQS(sig)
@@ -74,22 +71,6 @@ records = wave.getRecords('N') # N O A ~
 #error_list = []
 #for i in records:
 
-#8372    
-
-var_list=[]
-for i in records:
-    
-    try:
-        data = wave.load(i)
-        print ('working on Record:' + i)
-        sig = Signal(i,data)
-        
-        var = wave.var_every_other(sig.RRintervals)
-        print ('variancs for '+ i + 'is: ' + str(var))
-        if var >0.1:
-            var_list.append((i, var))
-    except:
-        print ('stupid EKG found: ' + i)
 
 
         
