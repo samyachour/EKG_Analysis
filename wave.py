@@ -490,11 +490,11 @@ def normalize(feat_list):
 
 def peak_stats(peaks):
     """
-    Calculate the statistics for the R peaks
+    Calculate the statistics for the peaks
 
     Parameters
     ----------
-        peaks: R peaks with tuples (index, R peaks value)
+        peaks: peaks with tuples (index, R peaks value)
 
     Returns
     -------
@@ -510,15 +510,15 @@ def peak_stats(peaks):
 
 def wave_intervals(peaks, sampling_frequency=300):
     """
-    Get a list of the RR intervals
+    Get a list of intervals
 
     Parameters
     ----------
-        peaks: R peaks with tuples (index, R peaks value)
+        peaks: peaks with tuples (index, R peaks value)
 
     Returns
     -------
-        A list of RR intervals
+        A list of intervals
 
     """
     unit_distance = 1./300
