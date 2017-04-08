@@ -11,6 +11,33 @@ import pywt
 import wave
 import numpy as np
 from sklearn.decomposition import PCA
+#import challenge
+
+
+#print ('helloworld')
+#
+#records = wave.getRecords('All') # N O A ~
+#
+#print(len(records))
+#print(records)
+#
+#feat_list=[]
+#for record in records:
+#    print ('hello')
+#    data = wave.load(record)
+#    print ('running record: '+ record)
+#    sig = featureExtraction.Signal(record,data)
+#    features, noise_features = challenge.feature_extract(sig)
+#    print ('this is the feature: ')
+#    print (features)
+#    feat_list.append(features)
+#    print ('the number of records in the feature list: ' + str(len(feat_list)))
+#
+#feat_list = np.array(feat_list)
+#
+#PCA_feature = challenge.feat_PCA(feat_list)
+#
+#print (PCA_feature)
 
 
 def feat_PCA(feat_mat, components=12):
