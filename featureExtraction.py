@@ -1,11 +1,8 @@
 import wave # this is the wave.py file in the local folder
 import matplotlib.pyplot as plt
-<<<<<<< HEAD
 import numpy as np
 import pandas as pd
-=======
 import pywt
->>>>>>> master
 # np.set_printoptions(threshold=np.nan) # show full arrays, dataframes, etc. when printing
 import warnings
 warnings.simplefilter("error") # Show warning traceback
@@ -65,37 +62,3 @@ class Signal(object):
     # TODO: Write bash script including pip install for pywavelets
     
     # TODO: Run PCA and then model coefficients
-
-records = wave.getRecords('~') # N O A ~
-
-for i in records:
-    data = wave.load(i)
-    print ('working on Record:' + i)
-    sig = Signal(i,data)
-
-# Imperatively grabbing features
-#data = wave.load('A00057')
-#signal = Signal('A00057', data)
-#signal.plotRPeaks()
-
-
-records = wave.getRecords('N') # N O A ~
-data = wave.load(records[7])
-sig = Signal(records[7],data)
-
-#sig.plotRPeaks()
-#
-#wave.getQS(sig)
-
-#RR interval stuff
-#error_list = []
-#for i in records:
-
-
-
-        
-
-#records = wave.getRecords('A') # N O A ~
-#data = wave.load(records[7])
-#sig = Signal(records[7],data)
-
