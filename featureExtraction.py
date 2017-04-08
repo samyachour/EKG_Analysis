@@ -33,15 +33,26 @@ class Signal(object):
         if self.inverted: # flip the inverted signal
             self.data = -self.data
         
-        Pwaves = wave.getPWaves(self)
-        self.PPintervals = Pwaves[0] * self.sampleFreq
-        self.Ppeaks = Pwaves[1]
-        self.TTintervals = Pwaves[2] * self.sampleFreq
-        self.Tpeaks = Pwaves[3]
+        PTWaves = wave.getPTWaves(self)
+        self.PPintervals = PTWaves[0] * self.sampleFreq
+        self.Ppeaks = PTWaves[1]
+        self.TTintervals = PTWaves[2] * self.sampleFreq
+        self.Tpeaks = PTWaves[3]
         
         self.baseline = wave.getBaseline(self)
         
-        self.QSPoints = wave.getQS(self)
+        self.Pheights = [i[1] - self.baseline for i in self.Ppeaks]
+        self.Rheights = [i[1] - self.baseline for i in self.Rpeaks]
+        
+        QSPoints = wave.getQS(self)
+        self.QPoints = QSPoints[0]
+        self.SPoints = QSPoints[1]
+        self.Qheights = [i[1] - self.baseline for i in self.QPoints]
+        self.Sheights = [i[1] - self.baseline for i in self.SPoints]
+        self.QSdiff = self.Qheights - self.Sheights
+        self.QSinterval = [i[0] for i in self.SPoints] - [i[0] for i in self.QPoints]
+        
+        # TODO: Get pr and qt, careful with offset
         
         #RR interval
         self.RRintervals = wave.wave_intervals(self.RPeaks)
@@ -57,8 +68,8 @@ class Signal(object):
         # fig.savefig('/Users/samy/Downloads/{0}.png'.format(self.name))
         plt.show()        
         
-data = wave.load('A00006')
-sig = Signal('A00006', data)
+data = wave.load('A00011')
+sig = Signal('A00011', data)
 wave.plot(data, title="Original")
 fig = plt.figure(figsize=(60, 6)) # I used figures to customize size
 ax = fig.add_subplot(211)
@@ -66,8 +77,10 @@ ax.plot(sig.data)
 ax.plot(*zip(*sig.Ppeaks), marker='o', color='r', ls='')
 ax.plot(*zip(*sig.Tpeaks), marker='o', color='r', ls='')
 ax.plot(*zip(*sig.RPeaks), marker='o', color='r', ls='')
-ax.plot(*zip(*sig.QSPoints), marker='o', color='r', ls='')
+ax.plot(*zip(*sig.QPoints), marker='o', color='r', ls='')
+ax.plot(*zip(*sig.SPoints), marker='o', color='r', ls='')
 ax.axhline(sig.baseline)
+ax.axhline(0)
 ax.set_title(sig.name)
 fig.savefig('/Users/samy/Downloads/{0}.png'.format(sig.name))
 plt.show()

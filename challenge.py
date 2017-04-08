@@ -108,13 +108,22 @@ def feature_extract(signal):
     RRinterval_bin_dis = RRinterval_bin[3:]
     
     RRinterval_stats = wave.cal_stats([],signal.RRintervals)
-    RPeak_stats = wave.peak_stats(signal.RPeaks)
+    RPeak_stats = wave.cal_stats(signal.Rheights)
     
     #variances for every other variances, every third, every fourth
     RR_var_everyother = wave.diff_var(signal.RRintervals, 2)
     RR_var_third = wave.diff_var(signal.RRintervals, 3)
     RR_var_fourth = wave.diff_var(signal.RRintervals, 4)
     RR_var_next = wave.diff_var(signal.RRintervals, 1)
+    
+    # P_Height
+    PPeak_stats = wave.cal_stats(signal.Pheight)
+    
+    # QS stuff
+    QPeak_stats = wave.cal_stats(signal.Qheights)
+    SPeak_stats = wave.cal_stats(signal.Sheights)
+    QSDiff_stats = wave.cal_stats(signal.QSdiff)
+    QSInterval_stats = wave.cal_stats(signal.QSinterval)
     
     #noise features:
     residuals = wave.calculate_residuals(signal.data)
