@@ -434,15 +434,12 @@ def cal_stats(feat_list, data_array):
     
     feat_list.append(np.amin(data_array))
     feat_list.append(np.amax(data_array))
-    #feat_list.append(np.median(data_array))
-    #feat_list.append(np.average(data_array))
     feat_list.append(np.mean(data_array))
     feat_list.append(np.std(data_array))
     feat_list.append(np.var(data_array))
     power = np.square(data_array)
     feat_list.append(np.average(power))
     feat_list.append(np.mean(power))
-    #feat_list.append(np.average(abs(data_array)))
     feat_list.append(np.mean(abs(data_array)))
     return feat_list
     
@@ -534,7 +531,7 @@ def noise_feature_extract(records, path = '../Physionet_Challenge/training2017/'
 
 """RR feature extraction"""
 
-def R_peak_stats(peaks):
+def peak_stats(peaks):
     """
     Calculate the statistics for the R peaks
 
@@ -553,25 +550,8 @@ def R_peak_stats(peaks):
     stats = cal_stats(feat_list, values)
     return stats
 
-def RR_interval_stats(RR_interval):
-    """
-    Calculate the statistics for the RR intervals
 
-    Parameters
-    ----------
-        RR_interval: A list of RR_intervals
-        
-    Returns
-    -------
-        A list of 8 different statistics for RR intervals
-
-    """
-    feat_list=[]
-    RR_interval = np.array(RR_interval)
-    stats = cal_stats(feat_list, RR_interval)
-    return stats   
-
-def RR_interval(peaks, sampling_frequency=300):
+def wave_intervals(peaks, sampling_frequency=300):
     """
     Get a list of the RR intervals
 
@@ -585,12 +565,12 @@ def RR_interval(peaks, sampling_frequency=300):
 
     """
     unit_distance = 1./300
-    RR_list = []
+    interval_list = []
     for i in range(0, len(peaks)-1):
-        RR_distance = peaks[i][0] - peaks[i+1][0]
-        RR_interval = RR_distance * unit_distance
-        RR_list.append(abs(RR_interval))
-    return np.array(RR_list)
+        distance = peaks[i][0] - peaks[i+1][0]
+        interval = distance * unit_distance
+        interval_list.append(abs(interval))
+    return np.array(interval_list)
 
 def interval_bin(intervals, mid_bin_range=[0.6,1]):
     """
@@ -598,12 +578,14 @@ def interval_bin(intervals, mid_bin_range=[0.6,1]):
 
     Parameters
     ----------
-        peaks: R peaks with tuples (index, R peaks value)
+        intervals: the interval that we wanted to bin
+        mid_bin_range: specify the bin range
 
     Returns
     -------
-        A list of RR intervals
-
+        feat_list: [percentage intervals below mid_bin_range[0], percentage intervals between mid_bin_range[0]
+                    and mid_bin_range[1], percentage intervals above mid_bin_range[1], the index of the bin has 
+                    that has the highest percentage, 1 if the third bin is above 0.3]
     """
     n_below = 0
     n_in = 0
@@ -626,43 +608,28 @@ def interval_bin(intervals, mid_bin_range=[0.6,1]):
     
     return feat_list
 
-def var_every_other(RR_intervals):
+def diff_var(intervals, skip):
+    """
+    This function calculate the variances for the differences between each value and the value that
+    is the specified number (skip) of values next to it.
+    eg. skip = 2 means the differences of one value and the value with 2 positions next to it.
+
+    Parameters
+    ----------
+        intervals: the interval that we want to calculate
+        skip: the number of position that we want the differences from
+
+    Returns
+    -------
+        the variances of the differences in the intervals
+    """
     
     diff = []
-    for i in range(0, len(RR_intervals)-2, 2):
-        per_diff= RR_intervals[i]-RR_intervals[i+2]
+    for i in range(0, len(intervals)-skip, skip):
+        per_diff= intervals[i]-intervals[i+skip]
         diff.append(per_diff)
     diff = np.array(diff)
     return np.var(diff)        
-    
-def var_every_third(RR_intervals):
-    
-    diff = []
-    for i in range(0, len(RR_intervals)-3, 3):
-        per_diff= RR_intervals[i]-RR_intervals[i+3]
-        diff.append(per_diff)
-    diff = np.array(diff)
-    return np.var(diff)        
-
-def var_every_fourth(RR_intervals):
-    
-    diff = []
-    for i in range(0, len(RR_intervals)-4, 4):
-        per_diff= RR_intervals[i]-RR_intervals[i+4]
-        diff.append(per_diff)
-    diff = np.array(diff)
-    return np.var(diff)
-
-def var_next(RR_intervals):
-    
-    diff = []
-    for i in range(0, len(RR_intervals)-1):
-        per_diff= RR_intervals[i]-RR_intervals[i+1]
-        diff.append(per_diff)
-    diff = np.array(diff)
-    return np.var(diff)
-
-
     
     
     

@@ -8,4 +8,6 @@ records = wave.getRecords('N') # N O A ~
 data = wave.load(records[7])
 sig = featureExtraction.Signal(records[7],data)
 
-feature_matrix = challenge.feature_extract(sig)
+features, noise_features = challenge.feature_extract(sig)
+print (len(features))
+print (len(noise_features))

@@ -25,8 +25,11 @@ def feature_extract(signal):
         A vector of features
 
     """
+    
     #variance for PP, average and variance for P amplitude, Bin PP
-    var_PP = np.var(signal.PPinterval)
+    
+    PPinterval_stats = wave.cal_stats([],signal.PPintervals)
+    PPeak_stats = wave.peak_stats(signal.Ppeaks)
     
     
     #wavelet decomp coeff
@@ -35,25 +38,28 @@ def feature_extract(signal):
     
     #RR interval
     RRinterval_bin = wave.interval_bin(signal.RRintervals)
-    RRinterval_stats = wave.RR_interval_stats(signal.RRintervals)
-    RPeak_stats = wave.R_peak_stats(signal.RPeaks)
+    RRinterval_stats = wave.cal_stats([],signal.RRintervals)
+    RPeak_stats = wave.peak_stats(signal.RPeaks)
     
     #variances for every other variances, every third, every fourth
-    RR_var_other = wave.var_every_other(signal.RRintervals)
-    RR_var_third = wave.var_every_third(signal.RRintervals)
-    RR_var_fourth = wave.var_every_fourth(signal.RRintervals)
-    RR_var_next = wave.var_next(signal.RRintervals)
+    RR_var_everyother = wave.diff_var(signal.RRintervals, 2)
+    RR_var_third = wave.diff_var(signal.RRintervals, 3)
+    RR_var_fourth = wave.diff_var(signal.RRintervals, 4)
+    RR_var_next = wave.diff_var(signal.RRintervals, 1)
+    
     #noise features:
     residuals = wave.calculate_residuals(signal.data)
+    noise_features = wtstats
+    noise_features.append(residuals)
     
-    feature_list = RRinterval_bin + RRinterval_stats + RPeak_stats + wtstats
-    feature_list.append(residuals)
-    feature_list.append(RR_var_other)
-    feature_list.append(RR_var_next)
-    feature_list.append(RR_var_fourth)
-    feature_list.append(RR_var_third)
-    feature_list.append(var_PP)
-    return feature_list
+    features = RRinterval_bin + RRinterval_stats + PPinterval_stats + RPeak_stats + wtstats + PPeak_stats
+    features.append(residuals)
+    features.append(RR_var_everyother)
+    features.append(RR_var_next)
+    features.append(RR_var_fourth)
+    features.append(RR_var_third)
+
+    return features, noise_features 
 
 def F1_score(prediction, target, path='../Physionet_Challenge/training2017/'):
     ## a function to calculate the F1 score

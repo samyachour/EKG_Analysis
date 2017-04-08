@@ -18,6 +18,7 @@ class Signal(object):
         R peaks array of coordinates [(x1,y1), (x2, y2),..., (xn, yn)]  is *RPeaks*"""
         self.name = name
         self.data = data
+        self.sampleFreq = 1/300
         
         RPeaks = wave.getRPeaks(data, 150)
         self.RPeaks = RPeaks[1]
@@ -26,12 +27,12 @@ class Signal(object):
             self.data = -data
         
         Pwaves = wave.getPWaves(self)
-        self.PPintervals = Pwaves[0]
+        self.PPintervals = Pwaves[0] * self.sampleFreq
         self.Ppeaks = Pwaves[1]
         
         self.baseline = wave.getBaseline(self)
         #RR interval
-        self.RRintervals = wave.RR_interval(self.RPeaks)
+        self.RRintervals = wave.wave_intervals(self.RPeaks)
         
         baseline = wave.getBaseline(self)
         self.baseline = baseline[0]
