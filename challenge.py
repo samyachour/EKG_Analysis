@@ -60,6 +60,14 @@ def feat_PCA(feat_mat, components=12):
     print('The pca explained variance ratio is:' + str(pca.explained_variance_ratio_)) 
     return pca.components_
 
+def noise_feature_extract(signal):
+    wtcoeff = pywt.wavedecn(signal.data, 'sym5', level=5, mode='constant')
+    wtstats = wave.stats_feat(wtcoeff)
+    #noise features:
+    residuals = wave.calculate_residuals(signal.data)
+    noise_features = wtstats
+    noise_features.append(residuals)
+    return noise_features
 
 def feature_extract(signal):
     """
@@ -80,6 +88,10 @@ def feature_extract(signal):
     PPinterval_stats = wave.cal_stats([],signal.PPintervals)
     PPeak_stats = wave.peak_stats(signal.Ppeaks)
     
+    #TT invervals
+    TTinterval_stats = wave.cal_stats([],signal.PPintervals)
+    TPeak_stats = wave.peak_stats(signal.Tpeak)
+    
     
     #wavelet decomp coeff
     wtcoeff = pywt.wavedecn(signal.data, 'sym5', level=5, mode='constant')
@@ -98,17 +110,16 @@ def feature_extract(signal):
     
     #noise features:
     residuals = wave.calculate_residuals(signal.data)
-    noise_features = wtstats
-    noise_features.append(residuals)
     
-    features = RRinterval_bin + RRinterval_stats + PPinterval_stats + RPeak_stats + wtstats + PPeak_stats
+    features = RRinterval_bin + RRinterval_stats + PPinterval_stats + RPeak_stats + wtstats + \
+                PPeak_stats + TTinterval_stats + TPeak_stats
     features.append(residuals)
     features.append(RR_var_everyother)
     features.append(RR_var_next)
     features.append(RR_var_fourth)
     features.append(RR_var_third)
 
-    return features, noise_features 
+    return features
 
 def F1_score(prediction, target, path='../Physionet_Challenge/training2017/'):
     ## a function to calculate the F1 score
