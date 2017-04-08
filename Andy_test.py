@@ -35,25 +35,25 @@ records = wave.getRecords('All') # N O A ~
 #A08034
 #A08402
 
-#wired_list=[]
-#
-#feat_list=[]
-#for record in records:
+wired_list=[]
+
+feat_list=[]
+for record in records:
 #    try:
-#        data = wave.load(record)
-#        print ('running record: '+ record)
-#        sig = featureExtraction.Signal(record,data)
-#        features, noise_features = challenge.feature_extract(sig)
-#        feat_list.append(features)
-#        print ('the number of records in the feature list: ' + str(len(feat_list)))
+    data = wave.load(record)
+    print ('running record: '+ record)
+    sig = featureExtraction.Signal(record,data)
+    features, noise_features = challenge.feature_extract(sig)
+    feat_list.append(features)
+    print ('the number of records in the feature list: ' + str(len(feat_list)))
 #    except:
 #        wired_list.append(record)
 #        print ('stupid one found: ' + record)
-##    
-##
-#feat_list = np.array(feat_list)
+#    
 #
-#PCA_feature = challenge.feat_PCA(feat_list)
+feat_list = np.array(feat_list)
+
+PCA_feature = challenge.feat_PCA(feat_list)
 #
 #for wired_one in wired_list:
 #    try:

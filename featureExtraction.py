@@ -98,18 +98,18 @@ class Signal(object):
     
     # TODO: Run PCA and then model coefficients
     
-data = wave.load('A08402')
-sig = Signal('A08402', data)
-wave.plot(data)
-#print(wave.calculate_residuals(sig.data[2500:3000], 4))
-sig.plotRPeaks()
-fig = plt.figure(figsize=(9.7, 6)) # I used figures to customize size
-ax = fig.add_subplot(211)
-ax.plot(sig.data)
-ax.plot(*zip(*sig.Ppeaks), marker='o', color='r', ls='')
-ax.plot(*zip(*sig.RPeaks), marker='o', color='r', ls='')
-ax.plot(*zip(*sig.QSPoints), marker='o', color='r', ls='')
-ax.axhline(sig.baseline)
-ax.set_title(sig.name)
-fig.savefig('/Users/samy/Downloads/{0}.png'.format(sig.name))
-plt.show()
+#data = wave.load('A08402')
+#sig = Signal('A08402', data)
+#wave.plot(data)
+##print(wave.calculate_residuals(sig.data[2500:3000], 4))
+#sig.plotRPeaks()
+#fig = plt.figure(figsize=(9.7, 6)) # I used figures to customize size
+#ax = fig.add_subplot(211)
+#ax.plot(sig.data)
+#ax.plot(*zip(*sig.Ppeaks), marker='o', color='r', ls='')
+#ax.plot(*zip(*sig.RPeaks), marker='o', color='r', ls='')
+#ax.plot(*zip(*sig.QSPoints), marker='o', color='r', ls='')
+#ax.axhline(sig.baseline)
+#ax.set_title(sig.name)
+#fig.savefig('/Users/samy/Downloads/{0}.png'.format(sig.name))
+#plt.show()
