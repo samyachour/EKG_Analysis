@@ -4,9 +4,9 @@ import numpy as np
 import pandas as pd
 import pywt
 # np.set_printoptions(threshold=np.nan) # show full arrays, dataframes, etc. when printing
-import warnings
+# import warnings
+# warnings.simplefilter("error") # Show runtime warning traceback
 import challenge
-warnings.simplefilter("error") # Show warning traceback
 
 class Signal(object):
     """
@@ -57,17 +57,8 @@ class Signal(object):
         # fig.savefig('/Users/samy/Downloads/{0}.png'.format(self.name))
         plt.show()        
         
-    # TODO: add error handling for crazy cases of data i.e. A04244, A00057
-    # Wrap the whole thing in a try catch, assign as AF if there's an error
-    # Set everything to N in the beginning
-    
-    # TODO: Write bash script including pip install for pywavelets    
-    
-
-    # TODO: Write bash script including pip install for pywavelets
-        
-data = wave.load('A00003')
-sig = Signal('A00003', data)
+data = wave.load('A00006')
+sig = Signal('A00006', data)
 wave.plot(data, title="Original")
 fig = plt.figure(figsize=(60, 6)) # I used figures to customize size
 ax = fig.add_subplot(211)
