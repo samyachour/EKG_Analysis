@@ -267,12 +267,14 @@ def getPWaves(signal):
 
     Returns
     -------
-        tuple consisting of 2 elements:
+        tuple consisting of 4 elements:
         P peak to P peak intervals [1,2,1,3,...]
         list of tuple coordinates of P peaks in original signal data [(x1,y1), (x2, y2),..., (xn, yn)]
+        T peak to T peak intervals [1,2,1,3,...]
+        list of tuple coordinates of T peaks in original signal data [(x1,y1), (x2, y2),..., (xn, yn)]
     """
     
-    maxes = []
+    maxesP = []
     
     for i in range(0, len(signal.RPeaks) - 1):
         left_limit = signal.RPeaks[i][0]
@@ -286,16 +288,19 @@ def getPWaves(signal):
         peakYs = [plotData[i] for i in peaks] # to get max peak
         
         if peaks.size != 0:
-            maxes.append(left_limit + peaks[np.argmax(peakYs)]) # need to convert to original signal coordinates
+            maxesP.append(left_limit + peaks[np.argmax(peakYs)]) # need to convert to original signal coordinates
         else: # if there is no p wave, flat signal in the interval
-            maxes.append(0)
+            maxesP.append(0)
             
-    PPintervals = interval(maxes)
+    PPintervals = interval(maxesP)
+    
+    maxesT = []
             
     for i in range(0, len(signal.RPeaks) - 1):
         left_limit = signal.RPeaks[i][0]
         right_limit = signal.RPeaks[i+1][0]
         right_limit = left_limit + (right_limit-left_limit)//2
+        left_limit += 5
         # left_limit = right_limit - 70 # 0.21s, usual max length of PR interval
 
         
@@ -304,12 +309,13 @@ def getPWaves(signal):
         peakYs = [plotData[i] for i in peaks] # to get max peak
         
         if peaks.size != 0:
-            maxes.append(left_limit + peaks[np.argmax(peakYs)]) # need to convert to original signal coordinates
+            maxesT.append(left_limit + peaks[np.argmax(peakYs)]) # need to convert to original signal coordinates
         else: # if there is no p wave, flat signal in the interval
-            maxes.append(0)
+            maxesT.append(0)
             
+    TTintervals = interval(maxesT)
     
-    return (PPintervals, [(i, signal.data[i]) for i in maxes]) # P peak coordinates
+    return (PPintervals, [(i, signal.data[i]) for i in maxesP], TTintervals, [(i, signal.data[i]) for i in maxesT]) # P peak coordinates
 
 
 def getQS(signal):
