@@ -4,6 +4,8 @@ import featureExtraction
 # np.set_printoptions(threshold=np.nan) # show full arrays, dataframes, etc. when printing
 import challenge
 import pywt
+import numpy as np
+
 
 records = wave.getRecords('All') # N O A ~
 
@@ -11,18 +13,19 @@ print(len(records))
 #data = wave.load(records[7])
 #sig = featureExtraction.Signal(records[7],data)
 
-features, noise_features = challenge.feature_extract(sig)
-print (len(features))
-print (len(noise_features))
+feat_list=[]
+for record in records:
+    data = wave.load(record)
+    sig = featureExtraction.Signal(record,data)
+    features, noise_features = challenge.feature_extract(sig)
+    feat_list.append(features)
 
+feat_list = np.array(feat_list)
 
-import numpy as np
-from sklearn.decomposition import PCA
-X = np.array([[-1, -1], [-2, -1], [-3, -2], [1, 1], [2, 1], [3, 2]])
-pca = PCA(n_components=2)
-pca.fit(X)
-print(pca.explained_variance_ratio_) 
-print(pca.components_)
+PCA_feature = challenge.feat_PCA(feat_list)
+
+print (PCA_feature)
+
 
 
 #def noise_feature_extract(records, path = '../Physionet_Challenge/training2017/'):

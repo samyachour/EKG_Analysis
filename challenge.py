@@ -10,6 +10,28 @@ import csv
 import pywt
 import wave
 import numpy as np
+from sklearn.decomposition import PCA
+
+
+def feat_PCA(feat_mat, components=12):
+    """
+    this function does PCA on a feature matrix
+
+    Parameters
+    ----------
+        feat_mat: the original matrix
+        components: the PCA components we want to keep
+
+    Returns
+    -------
+        1. PCA components
+
+    """
+    pca = PCA(n_components = components)
+    pca.fit(feat_mat)
+    print('The number of components is: ' + str(components))
+    print('The pca explained variance ratio is:' + str(pca.explained_variance_ratio_)) 
+    return pca.components_
 
 
 def feature_extract(signal):
