@@ -291,6 +291,23 @@ def getPWaves(signal):
             maxes.append(0)
             
     PPintervals = interval(maxes)
+            
+    for i in range(0, len(signal.RPeaks) - 1):
+        left_limit = signal.RPeaks[i][0]
+        right_limit = signal.RPeaks[i+1][0]
+        right_limit = left_limit + (right_limit-left_limit)//2
+        # left_limit = right_limit - 70 # 0.21s, usual max length of PR interval
+
+        
+        plotData = signal.data[left_limit:right_limit]
+        peaks = detect_peaks(plotData, plotX=signal.data[left_limit:right_limit])
+        peakYs = [plotData[i] for i in peaks] # to get max peak
+        
+        if peaks.size != 0:
+            maxes.append(left_limit + peaks[np.argmax(peakYs)]) # need to convert to original signal coordinates
+        else: # if there is no p wave, flat signal in the interval
+            maxes.append(0)
+            
     
     return (PPintervals, [(i, signal.data[i]) for i in maxes]) # P peak coordinates
 
