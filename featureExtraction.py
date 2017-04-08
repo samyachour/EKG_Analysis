@@ -25,13 +25,13 @@ class Signal(object):
         self.orignalData = data
         self.sampleFreq = 1/300
         
-        self.data = wave.discardNoise(self.data)
+        self.data = wave.discardNoise(data)
                 
         RPeaks = wave.getRPeaks(self.data, 150)
         self.RPeaks = RPeaks[1]
         self.inverted = RPeaks[0]
         if self.inverted: # flip the inverted signal
-            self.data = -data
+            self.data = -self.data
         
         Pwaves = wave.getPWaves(self)
         self.PPintervals = Pwaves[0] * self.sampleFreq
@@ -53,57 +53,18 @@ class Signal(object):
         ax.plot(*zip(*self.RPeaks), marker='o', color='r', ls='')
         ax.set_title(self.name)
         # fig.savefig('/Users/samy/Downloads/{0}.png'.format(self.name))
-        plt.show()
-    
-    # TODO: Write generalized functions for 3 bins, max bin, average, and variance
-        
+        plt.show()        
         
     # TODO: add error handling for crazy cases of data i.e. A04244, A00057
     # Wrap the whole thing in a try catch, assign as AF if there's an error
     # Set everything to N in the beginning
     
-    # TODO: Write bash script including pip install for pywavelets    
-    
-#print ('helloworld')
-#
-#records = wave.getRecords('All') # N O A ~
-#
-##print(len(records))
-##print(records)
-#
-#wired_list = []
-#
-#feat_list=[]
-#for record in records:
-#    print ('hello')
-#    data = wave.load(record)
-#    print ('running record: '+ record)
-#    try:
-#        sig = Signal(record,data)
-#        features, noise_features = challenge.feature_extract(sig)
-#        feat_list.append(features)
-#        print ('the number of records in the feature list: ' + str(len(feat_list)))
-#    except:
-#        wired_list.append(record)
-#        print ('skip this')
-#        continue
-#        
-##    
-##
-#feat_list = np.array(feat_list)
-#
-#PCA_feature = challenge.feat_PCA(feat_list)
-#
-#print (PCA_feature)
-    
-    # TODO: Run PCA and then model coefficients
-    
-data = wave.load('A08402')
-sig = Signal('A08402', data)
-wave.plot(data)
-#print(wave.calculate_residuals(sig.data[2500:3000], 4))
-sig.plotRPeaks()
-fig = plt.figure(figsize=(9.7, 6)) # I used figures to customize size
+    # TODO: Write bash script including pip install for pywavelets
+        
+data = wave.load('A00003')
+sig = Signal('A00003', data)
+wave.plot(data, title="Original")
+fig = plt.figure(figsize=(60, 6)) # I used figures to customize size
 ax = fig.add_subplot(211)
 ax.plot(sig.data)
 ax.plot(*zip(*sig.Ppeaks), marker='o', color='r', ls='')
