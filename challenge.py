@@ -291,7 +291,7 @@ def is_noisy(v):
 #QSDiff_stats = wave.cal_stats(signal.QSdiff)
 #QSInterval_stats = wave.cal_stats(signal.QSinterval)
 
-name_tuples = [('wavelet_coeff_', 48), ('PP_interval_stats_', 8), ('PPeaks_stats_', 8), \
+name_tuples = [('Record_name_', 1),('wavelet_coeff_', 48), ('PP_interval_stats_', 8), ('PPeaks_stats_', 8), \
              ('TTinterval_stats_', 8), ('QPeak_stats_', 8), ('SPeak_Stats_', 8), \
              ('QSDiff_stats_', 8), ('SQInterval_stats_',8),('RRinterval_stats_', 8), \
              ('RPeaks_stats_', 8), ('RRinterval_bin_cont_', 3), ('RR_var_', 4), ('Residuals_', 1), \
@@ -302,13 +302,19 @@ print(name_list)
 
 records = wave.getRecords('All') # N O A ~
 feature_list = []
+weird_list =[]
 for record in records:
-    data = wave.load(record)
-    print ('running record: '+ record)
-    sig = Signal(record,data)
-    features = feature_extract(sig)
-    feature_list.append(features)
-    
+    try:
+        data = wave.load(record)
+        print ('running record: '+ record)
+        sig = Signal(record,data)
+        features = [record] + feature_extract(sig)
+        feature_list.append(features)
+    except Exception as e:
+        print (record)
+        print (str(e))
+        weird_list.append(record)
+        
 
 columns = ['A','B', 'C']
 feature_matrix = pd.DataFrame(feature_list, columns=name_list)
