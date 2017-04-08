@@ -181,10 +181,18 @@ def getRPeaks(data, minDistance):
     rebuilt = decomp(data, 'sym5', level, omissions=omission)
     
     # Get rough draft of R peaks/valleys
-    positive_R_first = [rebuilt[i] for i in np.nditer(detect_peaks(rebuilt, mpd=minDistance, mph=0.08))]
+    peaks = detect_peaks(rebuilt, mpd=minDistance, mph=0.05)
+    if peaks.size == 0:
+        positive_R_first = [0]
+    else:
+        positive_R_first = [rebuilt[i] for i in np.nditer(peaks)]
     pos_mph = np.mean(positive_R_first)
     
-    negative_R_first = [rebuilt[i] for i in np.nditer(detect_peaks(rebuilt, mpd=minDistance, mph=0.08,valley=True))]
+    valleys = detect_peaks(rebuilt, mpd=minDistance, mph=0.05,valley=True)
+    if valleys.size == 0:
+        negative_R_first = [0]
+    else:
+        negative_R_first = [rebuilt[i] for i in np.nditer(valleys)]
     neg_mph = abs(np.mean(negative_R_first))
     
     # If the wave isn't inverted
@@ -202,6 +210,8 @@ def getRPeaks(data, minDistance):
     
     return (inverted, coordinates)
 
+# TODO: Make differnt RPeak detection that uses windowing to ignore noisy sections
+
 def getPWaves(signal):
     """
     P Wave detection
@@ -218,21 +228,21 @@ def getPWaves(signal):
         list of tuple coordinates of P peaks in original signal data [(x1,y1), (x2, y2),..., (xn, yn)]
     """
     
-    level = 6
-    omission = ([1,2], True) # <25 hz
-    rebuilt = decomp(signal.data, 'sym5', level, omissions=omission)
-    
     maxes = []
     
     for i in range(0, len(signal.RPeaks) - 1):
+        left_limit = signal.RPeaks[i][0]
         right_limit = signal.RPeaks[i+1][0]
-        left_limit = right_limit - 70 # 0.21s, usual max length of PR interval
+        left_limit = right_limit - (right_limit-left_limit)//3
+        # left_limit = right_limit - 70 # 0.21s, usual max length of PR interval
 
-        plotData = rebuilt[left_limit:right_limit]
+        
+        plotData = signal.data[left_limit:right_limit]
         peaks = detect_peaks(plotData, plotX=signal.data[left_limit:right_limit])
+        peakYs = [plotData[i] for i in peaks] # to get max peak
         
         if peaks.size != 0:
-            maxes.append(left_limit + np.amax(peaks)) # need to convert to original signal coordinates
+            maxes.append(left_limit + peaks[np.argmax(peakYs)]) # need to convert to original signal coordinates
         else: # if there is no p wave, flat signal in the interval
             maxes.append(0)
             
@@ -241,11 +251,9 @@ def getPWaves(signal):
     return (PPintervals, [(i, signal.data[i]) for i in maxes]) # P peak coordinates
 
 
-# TODO: get PR interval and QS length
-
 def getQS(signal):
     """
-    Q S detection
+    Q S points detection
 
     Parameters
     ----------
@@ -259,30 +267,43 @@ def getQS(signal):
     """
     
     QSall = []
+    maxData = len(signal.data)
+    maxRPeak = len(signal.RPeaks)
         
-    for i in range(0, len(signal.RPeaks) - 1):
+    for i in range(0, maxRPeak - 1):
+        
         RPeak = signal.RPeaks[i][0]
         left_limit = RPeak - 20
+        if left_limit < 0: left_limit = 0
         right_limit = RPeak + 20
+        if right_limit >= maxData: right_limit = maxData - 1
 
         RPeakIsol = signal.data[left_limit:right_limit]
-        QPoint = RPeakIsol[7:14]
-        SPoint = RPeakIsol[25:35]
+        maxIdx = RPeakIsol.size
+        middle = maxIdx//2
+        delta = 16
+        
+        QPoint = RPeakIsol[middle-delta:middle]
+        if middle-delta < 0: QPoint = RPeakIsol[:middle]
+        SPoint = RPeakIsol[middle:middle+delta]
+        if middle+delta > maxIdx: SPoint = RPeakIsol[middle:]
+        
         Q = detect_peaks(QPoint, mpd = 10, valley=True)
         S = detect_peaks(SPoint, mpd = 10, valley=True)
         
         if Q.size == 0:
-            Q = np.amin(QPoint)
+            Q = np.argmin(QPoint)
         else:
             Q = Q[0] # get first valley from detect_peaks return array
         if S.size == 0:
-            S = np.amin(SPoint)
+            S = np.argmin(SPoint)
         else:
             S = S[0]
         
         # Convert to original signal coordinates
-        Q = Q + 7 + (RPeak - 20)
-        S = S + 25 + (RPeak - 20)
+        Q = int(Q + (middle-delta) + left_limit)
+        if middle-delta < 0: Q = int(Q + left_limit)
+        S = int(S + middle + left_limit)
         QSall.append((Q, signal.data[Q]))
         QSall.append((S, signal.data[S]))
     
@@ -301,12 +322,10 @@ def getBaseline(signal):
     -------
         tuple consisting of two elements:
         Y value in mV of baseline
-        Standard deviation of RR interval means
     """
     
     baselineY = 0
     trueBaselines = 0
-    intervalMeans = []
     
     for i in range(0, len(signal.RPeaks) - 1):
         left_limit = signal.RPeaks[i][0]
@@ -314,9 +333,7 @@ def getBaseline(signal):
 
         RRinterval = signal.data[left_limit:right_limit]
         innerPeaks = detect_peaks(RRinterval, edge='both', mpd=30)
-        
-        intervalMeans.append(np.mean(RRinterval)) # for a feature extraction
-        
+                
         for i in range(0, len(innerPeaks) - 1):
             left_limit = innerPeaks[i]
             right_limit = innerPeaks[i+1]
@@ -325,24 +342,25 @@ def getBaseline(signal):
             
             mean = np.mean(plotData)
             
-            left_limit = mean - 0.04
-            right_limit = mean + 0.04
+            bottom_limit = mean - 0.04
+            top_limit = mean + 0.04
             
             baseline = True
             
             for i in plotData:
-                if i < left_limit or i > right_limit:
+                if i < bottom_limit or i > top_limit:
                     baseline = False
             
             if baseline:
                 baselineY += mean
                 trueBaselines += 1
     
-    return (baselineY/trueBaselines, np.std(intervalMeans))
+    if trueBaselines > 0:
+        return baselineY/trueBaselines
+    else:
+        return np.mean(signal.data)
 
 """ Helper functions """
-
-# TODO: Write generalized functions for 3 bins, max bin, average, and variance
 
 def load(filename, path = '../Physionet_Challenge/training2017/'):
     #
@@ -366,13 +384,14 @@ def getRecords(trainingLabel): # N O A ~
         subset = reference.ix[reference['answer']==trainingLabel]
         return subset['file'].tolist()
 
-def plot(y, title="Signal", xLab="Index", folder = ""):
-    plt.plot(y)
-    plt.ylabel("mV")
-    plt.xlabel(xLab)
-    plt.title(title)
-    if folder != "":
-        plt.savefig(folder + title + ".png")
+def plot(y, title="Signal", xLab="Index * 0.003s"):
+    fig = plt.figure(figsize=(9.7, 6)) # I used figures to customize size
+    ax = fig.add_subplot(111)
+    ax.plot(y)
+    ax.set_title(title)
+    # fig.savefig('/Users/samy/Downloads/{0}.png'.format(self.name))
+    ax.set_ylabel("mV")
+    ax.set_xlabel(xLab)
     plt.show()
 
 def multiplot(data, graph_names):
