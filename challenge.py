@@ -93,6 +93,50 @@ class Signal(object):
         # fig.savefig('/Users/samy/Downloads/{0}.png'.format(self.name))
         plt.show()        
 
+
+
+data = wave.load('A00022')
+#data = pd.read_csv('../../../../../Downloads/A00001.csv')[[0]].as_matrix()
+#data = np.asarray([i[0] for i in data])
+sig = Signal('A00022', data)
+fig = plt.figure(figsize=(9.7, 6)) # I used figures to customize size
+ax = fig.add_subplot(211)
+ax.plot(sig.data)
+ax.plot(*zip(*sig.Ppeaks), marker='o', color='r', ls='')
+ax.plot(*zip(*sig.Tpeaks), marker='o', color='r', ls='')
+ax.plot(*zip(*sig.RPeaks), marker='o', color='r', ls='')
+ax.plot(*zip(*sig.QPoints), marker='o', color='r', ls='')
+ax.plot(*zip(*sig.SPoints), marker='o', color='r', ls='')
+ax.axhline(sig.baseline)
+ax.set_title(sig.name)
+fig.savefig('/Users/samy/Downloads/{0}.png'.format(sig.name))
+plt.show()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 def feat_PCA(feat_mat, components=12):
     """
     this function does PCA on a feature matrix
