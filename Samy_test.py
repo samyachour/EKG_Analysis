@@ -217,3 +217,10 @@ for i in records:
 
 '''
 """
+
+
+w = pywt.Wavelet('sym5')
+print(pywt.dwt_max_level(data_len=1000, filter_len=w.dec_len))
+
+
+

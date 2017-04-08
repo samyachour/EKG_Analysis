@@ -21,9 +21,11 @@ class Signal(object):
         signal data is *data*,
         R peaks array of coordinates [(x1,y1), (x2, y2),..., (xn, yn)]  is *RPeaks*"""
         self.name = name
-        self.data = data
+        self.orignalData = data
         self.sampleFreq = 1/300
         
+        self.data = wave.discardNoise(self.data)
+                
         RPeaks = wave.getRPeaks(self.data, 150)
         self.RPeaks = RPeaks[1]
         self.inverted = RPeaks[0]
@@ -62,3 +64,19 @@ class Signal(object):
     # TODO: Write bash script including pip install for pywavelets
     
     # TODO: Run PCA and then model coefficients
+    
+data = wave.load('A08402')
+sig = Signal('A08402', data)
+wave.plot(data)
+#print(wave.calculate_residuals(sig.data[2500:3000], 4))
+sig.plotRPeaks()
+fig = plt.figure(figsize=(9.7, 6)) # I used figures to customize size
+ax = fig.add_subplot(211)
+ax.plot(sig.data)
+ax.plot(*zip(*sig.Ppeaks), marker='o', color='r', ls='')
+ax.plot(*zip(*sig.RPeaks), marker='o', color='r', ls='')
+ax.plot(*zip(*sig.QSPoints), marker='o', color='r', ls='')
+ax.axhline(sig.baseline)
+ax.set_title(sig.name)
+fig.savefig('/Users/samy/Downloads/{0}.png'.format(sig.name))
+plt.show()

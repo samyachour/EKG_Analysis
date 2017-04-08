@@ -154,8 +154,52 @@ def detect_peaks(x, plotX=np.array([]), mph=None, mpd=1, threshold=0, edge='risi
         plotX = x # couldn't do in function declaration
     return detect_peaks_orig(x, plotX=plotX, mph=mph, mpd=mpd, threshold=threshold, edge=edge, 
                              kpsh=kpsh, valley=valley, show=show, ax=ax)
+
+def discardNoise(data):
+    """
+    Discarding sections of the input signal that are noisy
+
+    Parameters
+    ----------
+    data : array_like
+        1-dimensional array with input signal data
+
+    Returns
+    -------
+    data : array_like
+        1-dimensional array with cleaned up signal data
+
+    """
     
-def getRPeaks(data, minDistance):
+    left_limit = 0
+    right_limit = 200
+    
+    dataSize = data.size
+    data = data.tolist()
+    cleanData = []
+    
+    while True:
+        
+        if right_limit > dataSize: window = data[left_limit:]
+        else: window = data[left_limit:right_limit]
+        
+        if len(window) < 50:
+            cleanData += window
+            break
+                
+        w = pywt.Wavelet('sym4')
+        residual = calculate_residuals(np.asarray(window), pywt.dwt_max_level(len(window), w))
+        
+        
+        if residual <= 0.001 and np.std(window) < 1:
+            cleanData += window
+                
+        left_limit += 200
+        right_limit += 200
+    
+    return np.asarray(cleanData)
+        
+def getRPeaks(data, minDistance=150):
     """
     R peak detection in 1 dimensional ECG wave
 
@@ -420,7 +464,7 @@ def interval(data):
     
 """ Noise feature extraction """    
 
-def calculate_residuals(original):
+def calculate_residuals(original, levels=5):
     # calculate residuals for a single EKG
     """
     Calculate the intervals from a list
@@ -433,7 +477,7 @@ def calculate_residuals(original):
     -------
         the residual
     """
-    rebuilt = decomp(original, wavelet='sym4', levels=5, mode='symmetric', omissions=([1],False))
+    rebuilt = decomp(original, wavelet='sym4', levels=levels, mode='symmetric', omissions=([1],False))
     residual = sum(abs(original-rebuilt[:len(original)]))/len(original)
     return residual
 
@@ -587,7 +631,7 @@ def interval_bin(intervals, mid_bin_range=[0.6,1]):
     
     return feat_list
 
-def diff_var(intervals, skip):
+def diff_var(intervals, skip=2):
     """
     This function calculate the variances for the differences between each value and the value that
     is the specified number (skip) of values next to it.
