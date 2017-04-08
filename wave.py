@@ -256,7 +256,7 @@ def getRPeaks(data, minDistance=150):
 
 # TODO: Make differnt RPeak detection that uses windowing to ignore noisy sections
 
-def getPWaves(signal):
+def getPTWaves(signal):
     """
     P Wave detection
 
@@ -310,7 +310,7 @@ def getPWaves(signal):
         
         if peaks.size != 0:
             maxesT.append(left_limit + peaks[np.argmax(peakYs)]) # need to convert to original signal coordinates
-        else: # if there is no p wave, flat signal in the interval
+        else: # if there is no t wave, flat signal in the interval
             maxesT.append(0)
             
     TTintervals = interval(maxesT)
@@ -329,11 +329,14 @@ def getQS(signal):
 
     Returns
     -------
-        list of tuple coordinates, Q and S, for every QRS complex
-        [(qx1, qy1), (sx2, sy2), (qx3, qy3), (sx4, sy4)]
+        tuple consisting of 2 elements:
+        list of tuple Q coordinates, for every QRS complex
+        list of tuple S coordinates, for every QRS complex
+        ([(qx1, qy1), (qx2, qy2)...], [(sx1, sy1), (sx2, sy2)...])
     """
     
-    QSall = []
+    Qall = []
+    Sall = []
     maxData = len(signal.data)
     maxRPeak = len(signal.RPeaks)
         
@@ -371,10 +374,10 @@ def getQS(signal):
         Q = int(Q + (middle-delta) + left_limit)
         if middle-delta < 0: Q = int(Q + left_limit)
         S = int(S + middle + left_limit)
-        QSall.append((Q, signal.data[Q]))
-        QSall.append((S, signal.data[S]))
+        Qall.append((Q, signal.data[Q]))
+        Sall.append((S, signal.data[S]))
     
-    return QSall
+    return (Qall, Sall)
 
 def getBaseline(signal):
     """
