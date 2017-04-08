@@ -505,58 +505,15 @@ def normalize(feat_list):
     return preprocessing.normalize(feat_list)
 
 
-def noise_feature_extract(records, path = '../Physionet_Challenge/training2017/'):
-    """
-    A function takes in a list of records and returns a matrix of features
-
-    Parameters
-    ----------
-        records: the file name of the file containing the record names (string)
-        wavelet: 'sym4'
-        levels: wavelet 5 level decomposition
-        mode: 'symmetric'
-        omission: get rid of D1 and keep cA
-        path: the path to the file
-        
-    Returns
-    -------
-        1. A numpy array of stats for all wavelet coefficients for all the records
-        2. A numpy array of residuals for all the records
-
-    """
-    full_list = []
-    residual_list = []
-    file = open(path+records, 'r')
-    x=0
-    while (True):
-        newline = file.readline().rstrip('\n')
-        if newline == '':
-            break
-        data = load(newline)
-        coeffs = pywt.wavedecn(data, 'sym4', level=5)
-        feat_list = stats_feat(coeffs)
-    
-        #feat_list = feat_combo(feat_list)
-        residual = calculate_residuals(data, wavelets='sym4', levels=5, mode='symmetric', omissions=([1],False))
-        residual_list.append(residual)
-        full_list.append(feat_list)
-        x+=1
-        print('working on file '+ newline)
-        print('length of the data:' + str(len(data)))
-        print('feature created, record No.' + str(x))
-        print('length of feature:'+ str(len(feat_list)))
-    file.close()
-    return np.array(full_list), np.array(residual_list)
-
 """RR feature extraction"""
 
 def peak_stats(peaks):
     """
-    Calculate the statistics for the R peaks
+    Calculate the statistics for the peaks
 
     Parameters
     ----------
-        peaks: R peaks with tuples (index, R peaks value)
+        peaks: peaks with tuples (index, R peaks value)
 
     Returns
     -------
@@ -572,15 +529,15 @@ def peak_stats(peaks):
 
 def wave_intervals(peaks, sampling_frequency=300):
     """
-    Get a list of the RR intervals
+    Get a list of intervals
 
     Parameters
     ----------
-        peaks: R peaks with tuples (index, R peaks value)
+        peaks: peaks with tuples (index, R peaks value)
 
     Returns
     -------
-        A list of RR intervals
+        A list of intervals
 
     """
     unit_distance = 1./300
