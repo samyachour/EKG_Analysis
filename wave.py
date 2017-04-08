@@ -360,8 +360,11 @@ def load(filename, path = '../Physionet_Challenge/training2017/'):
 def getRecords(trainingLabel): # N O A ~
     
     reference = pd.read_csv('../Physionet_Challenge/training2017/REFERENCE.csv', names = ["file", "answer"]) # N O A ~
-    subset = reference.ix[reference['answer']==trainingLabel]
-    return subset['file'].tolist()
+    if trainingLabel == 'All':
+        return reference['file'].tolist()
+    else:
+        subset = reference.ix[reference['answer']==trainingLabel]
+        return subset['file'].tolist()
 
 def plot(y, title="Signal", xLab="Index", folder = ""):
     plt.plot(y)

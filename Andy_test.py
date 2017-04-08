@@ -5,13 +5,24 @@ import featureExtraction
 import challenge
 import pywt
 
-records = wave.getRecords('N') # N O A ~
-data = wave.load(records[7])
-sig = featureExtraction.Signal(records[7],data)
+records = wave.getRecords('All') # N O A ~
+
+print(len(records))
+#data = wave.load(records[7])
+#sig = featureExtraction.Signal(records[7],data)
 
 features, noise_features = challenge.feature_extract(sig)
 print (len(features))
 print (len(noise_features))
+
+
+import numpy as np
+from sklearn.decomposition import PCA
+X = np.array([[-1, -1], [-2, -1], [-3, -2], [1, 1], [2, 1], [3, 2]])
+pca = PCA(n_components=2)
+pca.fit(X)
+print(pca.explained_variance_ratio_) 
+print(pca.components_)
 
 
 #def noise_feature_extract(records, path = '../Physionet_Challenge/training2017/'):
