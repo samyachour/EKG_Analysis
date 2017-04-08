@@ -1,7 +1,11 @@
 import wave # this is the wave.py file in the local folder
 import matplotlib.pyplot as plt
+<<<<<<< HEAD
 import numpy as np
 import pandas as pd
+=======
+import pywt
+>>>>>>> master
 # np.set_printoptions(threshold=np.nan) # show full arrays, dataframes, etc. when printing
 import warnings
 warnings.simplefilter("error") # Show warning traceback
@@ -21,6 +25,7 @@ class Signal(object):
         R peaks array of coordinates [(x1,y1), (x2, y2),..., (xn, yn)]  is *RPeaks*"""
         self.name = name
         self.data = data
+        self.sampleFreq = 1/300
         
         RPeaks = wave.getRPeaks(self.data, 150)
         self.RPeaks = RPeaks[1]
@@ -29,7 +34,7 @@ class Signal(object):
             self.data = -data
         
         Pwaves = wave.getPWaves(self)
-        self.PPintervals = Pwaves[0]
+        self.PPintervals = Pwaves[0] * self.sampleFreq
         self.Ppeaks = Pwaves[1]
         
         self.baseline = wave.getBaseline(self)
@@ -37,10 +42,8 @@ class Signal(object):
         self.QSPoints = wave.getQS(self)
         
         #RR interval
-        self.RRintervals = wave.RR_interval(self.RPeaks)
-        #self.RRintervals_bin = wave.RR_intervals
+        self.RRintervals = wave.wave_intervals(self.RPeaks)
         
-        #noise features:
             
     def plotRPeaks(self):
         fig = plt.figure(figsize=(9.7, 6)) # I used figures to customize size
@@ -63,4 +66,36 @@ class Signal(object):
     
     # TODO: Run PCA and then model coefficients
 
+records = wave.getRecords('~') # N O A ~
+
+for i in records:
+    data = wave.load(i)
+    print ('working on Record:' + i)
+    sig = Signal(i,data)
+
+# Imperatively grabbing features
+#data = wave.load('A00057')
+#signal = Signal('A00057', data)
+#signal.plotRPeaks()
+
+
+records = wave.getRecords('N') # N O A ~
+data = wave.load(records[7])
+sig = Signal(records[7],data)
+
+#sig.plotRPeaks()
+#
+#wave.getQS(sig)
+
+#RR interval stuff
+#error_list = []
+#for i in records:
+
+
+
+        
+
+#records = wave.getRecords('A') # N O A ~
+#data = wave.load(records[7])
+#sig = Signal(records[7],data)
 
