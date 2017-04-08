@@ -28,7 +28,12 @@ import matplotlib.pyplot as plt
 #    RR_var_next = wave.diff_var(signal.RRintervals, 1)
 
 
-#TODO: loop add rows of feature vectors, exclude noisy signals
+# TODO: Debug record errors
+
+# TODO: add error handling for crazy cases of data i.e. A04244, A00057
+# Wrap the whole thing in a try catch, assign as AF if there's an error
+# Set everything to N in the beginning
+# TODO: check if noisy when giving out feature matrix
 
 
 class Signal(object):
@@ -293,11 +298,6 @@ def F1_score(prediction, target, path='../Physionet_Challenge/training2017/'):
     print('The F1 score for this class is: ' + str(F1))
     
     return F1
-
-# TODO: add error handling for crazy cases of data i.e. A04244, A00057
-# Wrap the whole thing in a try catch, assign as AF if there's an error
-# Set everything to N in the beginning
-# TODO: check if noisy when giving out feature matrix
 
 # TODO: run multi model on single rows to return value to answers.txt
 # TODO: Write bash script including pip install for pywavelets
