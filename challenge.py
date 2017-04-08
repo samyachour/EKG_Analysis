@@ -15,11 +15,17 @@ import math
 from sklearn.decomposition import PCA
 
 
+#coeff_names = generate_name('wavelet_coeff_', 48)
+#PP_interval_stats_names = generate_name('PP_interval_stats_', 8)
+#PPeaks_stats_names = generate_name('PPeaks_stats_', 8)
+#TTinterval_stats_names = generate_name('TTinterval_stats_', 8)
+#TPeak_stats_names = generate_name('TPeak_stats', 8)
+#RRinterval_stats_names generate_name('')
+#RR_var_everyother = wave.diff_var(signal.RRintervals, 2)
+#    RR_var_third = wave.diff_var(signal.RRintervals, 3)
+#    RR_var_fourth = wave.diff_var(signal.RRintervals, 4)
+#    RR_var_next = wave.diff_var(signal.RRintervals, 1)
 
-
-
-columns = ['A','B', 'C']
-masterDF = pd.DataFrame(columns=columns)
 
 #TODO: loop add rows of feature vectors, exclude noisy signals
 
@@ -42,6 +48,22 @@ def feat_PCA(feat_mat, components=12):
     print('The number of components is: ' + str(components))
     print('The pca explained variance ratio is:' + str(pca.explained_variance_ratio_)) 
     return pca.components_
+
+def generate_name_list(name_tuples):
+    name_list = []
+    for name, n in name_tuples:
+        names = generate_name(name, n)
+        for ne in names:
+            name_list.append(ne)
+    return name_list
+    
+
+def generate_name(name, n):
+    name_list = []
+    for i in range(1,n+1):
+        create_name = name+str(i)
+        name_list.append(create_name)
+    return name_list
 
 def noise_feature_extract(signal):
     wtcoeff = pywt.wavedecn(signal.data, 'sym5', level=5, mode='constant')
@@ -82,6 +104,9 @@ def feature_extract(signal):
     
     #RR interval
     RRinterval_bin = wave.interval_bin(signal.RRintervals)
+    RRinterval_bin_cont = RRinterval_bin[:2]
+    RRinterval_bin_dis = RRinterval_bin[3:]
+    
     RRinterval_stats = wave.cal_stats([],signal.RRintervals)
     RPeak_stats = wave.peak_stats(signal.RPeaks)
     
@@ -94,7 +119,7 @@ def feature_extract(signal):
     #noise features:
     residuals = wave.calculate_residuals(signal.data)
     
-    features = RRinterval_bin + RRinterval_stats + PPinterval_stats + RPeak_stats + wtstats + \
+    features = wtstats + RRinterval_bin + RRinterval_stats + PPinterval_stats + RPeak_stats + \
                 PPeak_stats + TTinterval_stats + TPeak_stats
     features.append(residuals)
     features.append(RR_var_everyother)
@@ -173,3 +198,16 @@ def is_noisy(v):
     result = (1.0*par1) / (1 + par1)
     print(result)
     return (result > thresh)
+
+
+
+name_tuples = [('wavelet_coeff_', 48), ('PP_interval_stats_', 8), ('PPeaks_stats_', 8), \
+             ('TTinterval_stats_', 8), ('TPeak_stats_', 8), ('RRinterval_stats_', 8), \
+             ('RPeaks_stats_', 8), ('RR_var_', 4), ('Residuals_', 1), ('RRinterval_bin_cont_', 3), \
+             ('RRinterval_bin_dis_', 2)]
+
+name_list = generate_name_list(name_tuples)
+print(name_list)
+
+columns = ['A','B', 'C']
+masterDF = pd.DataFrame(columns=columns)
