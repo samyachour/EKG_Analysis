@@ -152,3 +152,68 @@ def getRecords(type):
 #    
 #    bin_RR_intervals = wave.RR_interval_bin(RR_interval)
 #    print (bin_RR_intervals)
+
+
+"""
+# Testing QS points
+data = wave.load('A00857')
+wave.plot(data)
+signal = Signal('A00857', data)
+signal.plotRPeaks()
+
+fig = plt.figure(figsize=(60, 6))
+ax = fig.add_subplot(111)
+ax.plot(signal.data)
+ax.set_xlim(0, signal.data.size)
+ax.plot(*zip(*signal.QSPoints), marker='o', color='r', ls='')
+fig.savefig('/Users/samy/Downloads/graph.png')
+plt.close()
+
+"""
+
+# data = pd.read_csv('../../../../../Downloads/A00001.csv')[[0]]
+# print(data)
+
+"""
+More testing
+weird_records = ['A00111','A00269','A00420','A00550','A00692','A01053','A01329','A01509','A01650','A01734','A01780','A01980','A02021','A02282','A02397','A02478','A02569','A02777','A02781','A03196','A03581','A03650','A04342','A04378','A04465','A04824','A04979','A05261','A06371','A06471','A06495','A06632','A06697','A06895','A06931','A07016','A07088','A07098','A07235','A07933','A08092','A08327']
+'''
+for i in weird_records:
+    data = wave.load(i)
+    sig = Signal(i, data)
+    sig.plotRPeaks()
+'''
+data = wave.load(weird_records[0])
+sig = Signal(weird_records[0], data)
+sig.plotRPeaks()
+
+level = 6
+omission = ([5,6], True) # 5-40 hz
+rebuilt = wave.decomp(data, 'sym4', level, omissions=omission)
+wave.plot(rebuilt)
+
+data = wave.load('A00002')
+#data = pd.read_csv('../../../../../Downloads/A00001.csv')[[0]].as_matrix()
+#data = np.asarray([i[0] for i in data])
+sig = Signal('A00001', data)
+fig = plt.figure(figsize=(400, 6)) # I used figures to customize size
+ax = fig.add_subplot(211)
+ax.plot(sig.data)
+ax.plot(*zip(*sig.Ppeaks), marker='o', color='r', ls='')
+ax.plot(*zip(*sig.RPeaks), marker='o', color='r', ls='')
+ax.plot(*zip(*sig.QSPoints), marker='o', color='r', ls='')
+ax.axhline(sig.baseline)
+ax.set_title(sig.name)
+fig.savefig('/Users/samy/Downloads/{0}.png'.format(sig.name))
+plt.show()
+
+'''
+records = wave.getRecords('~') # N O A ~
+
+for i in records:
+    data = wave.load(i)
+    #print ('working on Record:' + i)
+    sig = Signal(i,data)
+
+'''
+"""
