@@ -36,6 +36,8 @@ class Signal(object):
         Pwaves = wave.getPWaves(self)
         self.PPintervals = Pwaves[0] * self.sampleFreq
         self.Ppeaks = Pwaves[1]
+        self.TTintervals = Pwaves[2] * self.sampleFreq
+        self.Tpeaks = Pwaves[3]
         
         self.baseline = wave.getBaseline(self)
         
@@ -68,6 +70,7 @@ fig = plt.figure(figsize=(60, 6)) # I used figures to customize size
 ax = fig.add_subplot(211)
 ax.plot(sig.data)
 ax.plot(*zip(*sig.Ppeaks), marker='o', color='r', ls='')
+ax.plot(*zip(*sig.Tpeaks), marker='o', color='r', ls='')
 ax.plot(*zip(*sig.RPeaks), marker='o', color='r', ls='')
 ax.plot(*zip(*sig.QSPoints), marker='o', color='r', ls='')
 ax.axhline(sig.baseline)
