@@ -5,6 +5,7 @@ import pandas as pd
 import pywt
 # np.set_printoptions(threshold=np.nan) # show full arrays, dataframes, etc. when printing
 import warnings
+import challenge
 warnings.simplefilter("error") # Show warning traceback
 
 class Signal(object):
@@ -61,7 +62,39 @@ class Signal(object):
     # Wrap the whole thing in a try catch, assign as AF if there's an error
     # Set everything to N in the beginning
     
-    # TODO: Write bash script including pip install for pywavelets
+    # TODO: Write bash script including pip install for pywavelets    
+    
+#print ('helloworld')
+#
+#records = wave.getRecords('All') # N O A ~
+#
+##print(len(records))
+##print(records)
+#
+#wired_list = []
+#
+#feat_list=[]
+#for record in records:
+#    print ('hello')
+#    data = wave.load(record)
+#    print ('running record: '+ record)
+#    try:
+#        sig = Signal(record,data)
+#        features, noise_features = challenge.feature_extract(sig)
+#        feat_list.append(features)
+#        print ('the number of records in the feature list: ' + str(len(feat_list)))
+#    except:
+#        wired_list.append(record)
+#        print ('skip this')
+#        continue
+#        
+##    
+##
+#feat_list = np.array(feat_list)
+#
+#PCA_feature = challenge.feat_PCA(feat_list)
+#
+#print (PCA_feature)
     
     # TODO: Run PCA and then model coefficients
     

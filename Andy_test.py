@@ -1,28 +1,71 @@
 import wave # this is the wave.py file in the local folder
-import matplotlib.pyplot as plt
 import featureExtraction 
-# np.set_printoptions(threshold=np.nan) # show full arrays, dataframes, etc. when printing
+#import challenge
+## np.set_printoptions(threshold=np.nan) # show full arrays, dataframes, etc. when printing
 import challenge
+import numpy as np
 import pywt
+import warnings
+warnings.simplefilter("error") # Show warning traceback
+
+
+print ('helloworld')
 
 records = wave.getRecords('All') # N O A ~
 
-print(len(records))
-#data = wave.load(records[7])
-#sig = featureExtraction.Signal(records[7],data)
-
-features, noise_features = challenge.feature_extract(sig)
-print (len(features))
-print (len(noise_features))
+#print(len(records))
+#print(records)
 
 
-import numpy as np
-from sklearn.decomposition import PCA
-X = np.array([[-1, -1], [-2, -1], [-3, -2], [1, 1], [2, 1], [3, 2]])
-pca = PCA(n_components=2)
-pca.fit(X)
-print(pca.explained_variance_ratio_) 
-print(pca.components_)
+#A00397
+#A00763
+#A01312
+#A01429
+#A01818
+#A02417
+#A02706
+#A02961
+#A03549
+#A04244
+#A04735
+#A06103
+#A07524
+#A07648
+#A07664
+#A08034
+#A08402
+
+#wired_list=[]
+#
+#feat_list=[]
+#for record in records:
+#    try:
+#        data = wave.load(record)
+#        print ('running record: '+ record)
+#        sig = featureExtraction.Signal(record,data)
+#        features, noise_features = challenge.feature_extract(sig)
+#        feat_list.append(features)
+#        print ('the number of records in the feature list: ' + str(len(feat_list)))
+#    except:
+#        wired_list.append(record)
+#        print ('stupid one found: ' + record)
+##    
+##
+#feat_list = np.array(feat_list)
+#
+#PCA_feature = challenge.feat_PCA(feat_list)
+#
+#for wired_one in wired_list:
+#    try:
+#        print(wired_one)
+#        data = wave.load(wired_one)
+#        sig = featureExtraction.Signal(wired_one, data)
+#        features, noise_features = challenge.feature_extract(sig)
+#        feat_list.append(features)
+#    except Exception as e:
+#        print(e)
+#        sig.plotRPeaks()
+
 
 
 #def noise_feature_extract(records, path = '../Physionet_Challenge/training2017/'):
@@ -52,12 +95,12 @@ print(pca.components_)
 #        newline = file.readline().rstrip('\n')
 #        if newline == '':
 #            break
-#        data = load(newline)
+#        data = wave.load(newline)
 #        coeffs = pywt.wavedecn(data, 'sym4', level=5)
-#        feat_list = stats_feat(coeffs)
+#        feat_list = wave.stats_feat(coeffs)
 #    
 #        #feat_list = feat_combo(feat_list)
-#        residual = calculate_residuals(data, wavelets='sym4', levels=5, mode='symmetric', omissions=([1],False))
+#        residual = wave.calculate_residuals(data)
 #        residual_list.append(residual)
 #        full_list.append(feat_list)
 #        x+=1
@@ -67,3 +110,6 @@ print(pca.components_)
 #        print('length of feature:'+ str(len(feat_list)))
 #    file.close()
 #    return np.array(full_list), np.array(residual_list)
+#
+#noise_feature, residual = noise_feature_extract('RECORDS')
+
