@@ -13,6 +13,7 @@ import numpy as np
 import pandas as pd
 import math
 from sklearn.decomposition import PCA
+import matplotlib.pyplot as plt
 
 
 #coeff_names = generate_name('wavelet_coeff_', 48)
@@ -28,6 +29,69 @@ from sklearn.decomposition import PCA
 
 
 #TODO: loop add rows of feature vectors, exclude noisy signals
+
+
+class Signal(object):
+    """
+    An ECG/EKG signal
+
+    Attributes:
+        name: A string representing the record name.
+        data : 1-dimensional array with input signal data 
+    """
+
+    def __init__(self, name, data):
+        """Return a Signal object whose record name is *name*,
+        signal data is *data*,
+        R peaks array of coordinates [(x1,y1), (x2, y2),..., (xn, yn)]  is *RPeaks*"""
+        self.name = name
+        self.orignalData = data
+        self.sampleFreq = 1/300
+        
+        self.data = wave.discardNoise(data)
+                
+        RPeaks = wave.getRPeaks(self.data, 150)
+        self.RPeaks = RPeaks[1]
+        self.inverted = RPeaks[0]
+        if self.inverted: # flip the inverted signal
+            self.data = -self.data
+        
+        PTWaves = wave.getPTWaves(self)
+        self.PPintervals = PTWaves[0] * self.sampleFreq
+        self.Ppeaks = PTWaves[1]
+        self.TTintervals = PTWaves[2] * self.sampleFreq
+        self.Tpeaks = PTWaves[3]
+        
+        self.baseline = wave.getBaseline(self)
+        
+        self.Pheights = [i[1] - self.baseline for i in self.Ppeaks]
+        self.Rheights = [i[1] - self.baseline for i in self.RPeaks]
+        
+        QSPoints = wave.getQS(self)
+        self.QPoints = QSPoints[0]
+        self.SPoints = QSPoints[1]
+        self.Qheights = [i[1] - self.baseline for i in self.QPoints]
+        self.Sheights = [i[1] - self.baseline for i in self.SPoints]
+        self.QSdiff = np.asarray(self.Qheights) - np.asarray(self.Sheights)
+        self.QSdiff = self.QSdiff.tolist()
+        self.QSinterval = np.asarray([i[0] for i in self.SPoints]) - np.asarray([i[0] for i in self.QPoints])
+        self.QSinterval = self.QSinterval.tolist()
+        
+        # TODO: Get pr and qt, careful with offset
+        
+        #RR interval
+        self.RRintervals = wave.wave_intervals(self.RPeaks)
+        
+            
+    def plotRPeaks(self):
+        fig = plt.figure(figsize=(9.7, 6)) # I used figures to customize size
+        ax = fig.add_subplot(111)
+        ax.plot(self.data)
+        # ax.axhline(self.baseline)
+        ax.plot(*zip(*self.RPeaks), marker='o', color='r', ls='')
+        ax.set_title(self.name)
+        # fig.savefig('/Users/samy/Downloads/{0}.png'.format(self.name))
+        plt.show()        
 
 def feat_PCA(feat_mat, components=12):
     """
@@ -91,12 +155,10 @@ def feature_extract(signal):
     #variance for PP, average and variance for P amplitude, Bin PP
     
     PPinterval_stats = wave.cal_stats([],signal.PPintervals)
-    PPeak_stats = wave.peak_stats(signal.Ppeaks)
+    PPeak_stats = wave.cal_stats([],signal.Pheights)
     
     #TT invervals
-    TTinterval_stats = wave.cal_stats([],signal.PPintervals)
-    TPeak_stats = wave.peak_stats(signal.Tpeak)
-    
+    TTinterval_stats = wave.cal_stats([],signal.TTintervals)    
     
     #wavelet decomp coeff
     wtcoeff = pywt.wavedecn(signal.data, 'sym5', level=5, mode='constant')
@@ -108,7 +170,7 @@ def feature_extract(signal):
     RRinterval_bin_dis = RRinterval_bin[3:]
     
     RRinterval_stats = wave.cal_stats([],signal.RRintervals)
-    RPeak_stats = wave.cal_stats(signal.Rheights)
+    RPeak_stats = wave.cal_stats([],signal.Rheights)
     
     #variances for every other variances, every third, every fourth
     RR_var_everyother = wave.diff_var(signal.RRintervals, 2)
@@ -116,25 +178,41 @@ def feature_extract(signal):
     RR_var_fourth = wave.diff_var(signal.RRintervals, 4)
     RR_var_next = wave.diff_var(signal.RRintervals, 1)
     
-    # P_Height
-    PPeak_stats = wave.cal_stats(signal.Pheight)
+    # total points
+    Total_points = signal.data.size
+    
     
     # QS stuff
-    QPeak_stats = wave.cal_stats(signal.Qheights)
-    SPeak_stats = wave.cal_stats(signal.Sheights)
-    QSDiff_stats = wave.cal_stats(signal.QSdiff)
-    QSInterval_stats = wave.cal_stats(signal.QSinterval)
+    QPeak_stats = wave.cal_stats([],signal.Qheights)
+    SPeak_stats = wave.cal_stats([],signal.Sheights)
+    QSDiff_stats = wave.cal_stats([],signal.QSdiff)
+    QSInterval_stats = wave.cal_stats([],signal.QSinterval)
     
     #noise features:
     residuals = wave.calculate_residuals(signal.data)
     
-    features = wtstats + RRinterval_bin + RRinterval_stats + PPinterval_stats + RPeak_stats + \
-                PPeak_stats + TTinterval_stats + TPeak_stats
-    features.append(residuals)
+    #
+    inverted = signal.inverted
+    
+    features = wtstats + PPinterval_stats + PPeak_stats + TTinterval_stats + \
+                QPeak_stats + SPeak_stats + QSDiff_stats + QSInterval_stats + \
+                RRinterval_stats + RPeak_stats + RRinterval_bin_cont
     features.append(RR_var_everyother)
     features.append(RR_var_next)
     features.append(RR_var_fourth)
     features.append(RR_var_third)
+    features.append(residuals)
+    features.append(Total_points)
+    
+    features = features + RRinterval_bin_dis
+    
+    features.append(inverted)
+    
+#    name_tuples = [('wavelet_coeff_', 48), ('PP_interval_stats_', 8), ('PPeaks_stats_', 8), \
+#             ('TTinterval_stats_', 8), ('QPeak_stats_', 8), ('SPeak_Stats_', 8), \
+#             ('QSDiff_stats_', 8), ('SQInterval_stats_',8),('RRinterval_stats_', 8), \
+#             ('RPeaks_stats_', 8), ('RRinterval_bin_cont_', 3), ('RR_var_', 4), ('Residuals_', 1),  \
+#             ('Total_points_', 1),('RRinterval_bin_dis_', 2), ('Inverted_', 1)]
 
     return features
 
@@ -208,15 +286,29 @@ def is_noisy(v):
     print(result)
     return (result > thresh)
 
-
+#QPeak_stats = wave.cal_stats(signal.Qheights)
+#SPeak_stats = wave.cal_stats(signal.Sheights)
+#QSDiff_stats = wave.cal_stats(signal.QSdiff)
+#QSInterval_stats = wave.cal_stats(signal.QSinterval)
 
 name_tuples = [('wavelet_coeff_', 48), ('PP_interval_stats_', 8), ('PPeaks_stats_', 8), \
-             ('TTinterval_stats_', 8), ('TPeak_stats_', 8), ('RRinterval_stats_', 8), \
-             ('RPeaks_stats_', 8), ('RR_var_', 4), ('Residuals_', 1), ('RRinterval_bin_cont_', 3), \
-             ('RRinterval_bin_dis_', 2)]
+             ('TTinterval_stats_', 8), ('QPeak_stats_', 8), ('SPeak_Stats_', 8), \
+             ('QSDiff_stats_', 8), ('SQInterval_stats_',8),('RRinterval_stats_', 8), \
+             ('RPeaks_stats_', 8), ('RRinterval_bin_cont_', 3), ('RR_var_', 4), ('Residuals_', 1), \
+             ('Total_points_', 1), ('RRinterval_bin_dis_', 2), ('Inverted_', 1)]
 
 name_list = generate_name_list(name_tuples)
 print(name_list)
 
+records = wave.getRecords('All') # N O A ~
+feature_list = []
+for record in records:
+    data = wave.load(record)
+    print ('running record: '+ record)
+    sig = Signal(record,data)
+    features = feature_extract(sig)
+    feature_list.append(features)
+    
+
 columns = ['A','B', 'C']
-masterDF = pd.DataFrame(columns=columns)
+feature_matrix = pd.DataFrame(feature_list, columns=name_list)

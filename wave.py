@@ -532,7 +532,7 @@ def cal_stats(feat_list, data_array):
     power = np.square(data_array)
     feat_list.append(np.average(power))
     feat_list.append(np.mean(power))
-    feat_list.append(np.mean(abs(data_array)))
+    feat_list.append(np.mean(np.absolute(data_array)))
     return feat_list
     
 

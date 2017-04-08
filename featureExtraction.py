@@ -49,8 +49,10 @@ class Signal(object):
         self.SPoints = QSPoints[1]
         self.Qheights = [i[1] - self.baseline for i in self.QPoints]
         self.Sheights = [i[1] - self.baseline for i in self.SPoints]
-        self.QSdiff = self.Qheights - self.Sheights
-        self.QSinterval = [i[0] for i in self.SPoints] - [i[0] for i in self.QPoints]
+        self.QSdiff = np.asarray(self.Qheights) - np.asarray(self.Sheights)
+        self.QSdiff = self.QSdiff.tolist()
+        self.QSinterval = np.asarray([i[0] for i in self.SPoints]) - np.asarray([i[0] for i in self.QPoints])
+        self.QSinterval = self.QSinterval.tolist()
         
         # TODO: Get pr and qt, careful with offset
         
