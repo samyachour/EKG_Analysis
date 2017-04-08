@@ -19,8 +19,15 @@ We are participating in the PhysioNet 2017 Challenge: [Atrial Fibrillation Class
 * Create multinomial logistic regression model for EKG Classification
 
 #### Administrative
+* Code refactoring/cleanup
 * Write unit tests for codebase
 * Flesh out readme explanation
+
+#### Training data errors
+In the process of training our model on the training2017 dataset, we have found a handful of mislabeled ECG's (in our opinion). The first character is the original incorrect label, and the second is what we think it should be.
+* A02569 N -> ~
+* A07933 N -> ~
+* A00269 N -> ~
 
 ## Dependencies
 Our codebase is all in Python (3+) and makes use of your typical data science libraries: Numpy, Scipy, Pandas, Matplotlib, and Scikit Learn.
