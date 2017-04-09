@@ -14,27 +14,8 @@ import pandas as pd
 import math
 from sklearn.decomposition import PCA
 import matplotlib.pyplot as plt
-import scipy.io as sio
-
-#coeff_names = generate_name('wavelet_coeff_', 48)
-#PP_interval_stats_names = generate_name('PP_interval_stats_', 8)
-#PPeaks_stats_names = generate_name('PPeaks_stats_', 8)
-#TTinterval_stats_names = generate_name('TTinterval_stats_', 8)
-#TPeak_stats_names = generate_name('TPeak_stats', 8)
-#RRinterval_stats_names generate_name('')
-#RR_var_everyother = wave.diff_var(signal.RRintervals, 2)
-#    RR_var_third = wave.diff_var(signal.RRintervals, 3)
-#    RR_var_fourth = wave.diff_var(signal.RRintervals, 4)
-#    RR_var_next = wave.diff_var(signal.RRintervals, 1)
-
 
 # TODO: Debug record errors
-
-# TODO: add error handling for crazy cases of data i.e. A04244, A00057
-# Wrap the whole thing in a try catch, assign as AF if there's an error
-# Set everything to N in the beginning
-# TODO: check if noisy when giving out feature matrix
-
 
 class Signal(object):
     """
@@ -213,12 +194,6 @@ def feature_extract(signal):
     
     features.append(int(inverted))
     
-#    name_tuples = [('wavelet_coeff_', 48), ('PP_interval_stats_', 8), ('PPeaks_stats_', 8), \
-#             ('TTinterval_stats_', 8), ('QPeak_stats_', 8), ('SPeak_Stats_', 8), \
-#             ('QSDiff_stats_', 8), ('SQInterval_stats_',8),('RRinterval_stats_', 8), \
-#             ('RPeaks_stats_', 8), ('RRinterval_bin_cont_', 3), ('RR_var_', 4), ('Residuals_', 1),  \
-#             ('Total_points_', 1),('RRinterval_bin_dis_', 2), ('Inverted_', 1)]
-
     return features
 
 def F1_score(prediction, target, path='../Physionet_Challenge/training2017/'):
@@ -293,33 +268,52 @@ def is_noisy(v):
 /scale.vec<-(element by element division)) %*% rotation.matrix
 """
 
-#QPeak_stats = wave.cal_stats(signal.Qheights)
-#SPeak_stats = wave.cal_stats(signal.Sheights)
-#QSDiff_stats = wave.cal_stats(signal.QSdiff)
-#QSInterval_stats = wave.cal_stats(signal.QSinterval)
 
-#name_tuples = [('Record_name_', 1),('wavelet_coeff_', 42), ('PP_interval_stats_', 7), ('PPeaks_stats_', 7), \
-#             ('TTinterval_stats_', 7), ('QPeak_stats_', 7), ('SPeak_Stats_', 7), \
-#             ('QSDiff_stats_', 7), ('SQInterval_stats_',7),('RRinterval_stats_', 7), \
-#             ('RPeaks_stats_', 7), ('RRinterval_bin_cont_', 3), ('RR_var_', 4), ('Residuals_', 1), \
-#             ('Total_points_', 1), ('RRinterval_bin_dis_', 2), ('Inverted_', 1)]
-#
-#name_list = generate_name_list(name_tuples)
-#print(name_list)
-#
-#records = wave.getRecords('~', _not=True) # N O A ~
-#feature_list = []
-#weird_list =[]
-#for record in records:
-#    try:
-#        data = wave.load(record)
-#        print ('running record: '+ record)
-#        sig = Signal(record,data)
-#        features = [record] + feature_extract(sig)
-#        feature_list.append(features)
-#    except Exception as e:
-#        print (record)
-#        print (str(e))
-#        weird_list.append(record)
-#        
-#feature_matrix = pd.DataFrame(feature_list, columns=name_list)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+"""
+PHYSIONET SUBMISSION CODE
+"""
+
+import sys
+import scipy.io
+
+record = sys.argv[1]
+
+# Read waveform samples (input is in WFDB-MAT format)
+mat = scipy.io.loadmat("validation/" + record + ".mat")
+#samples = mat_data['val']
+data = np.divide(mat['val'][0],1000)
+
+# Your classification algorithm goes here...
+
+# TODO: add error handling for crazy cases of data i.e. A04244, A00057
+# Wrap the whole thing in a try catch, assign as AF if there's an error
+# Set everything to N in the beginning
+# TODO: check if noisy when giving out feature matrix
+
+if data[0] < 0:
+    answer = "N"
+else:
+    answer = "A"
+
+# Write result to answers.txt
+answers_file = open("answers.txt", "a")
+answers_file.write("%s,%s\n" % (record, answer))
+answers_file.close()
