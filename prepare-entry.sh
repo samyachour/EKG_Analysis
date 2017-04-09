@@ -27,8 +27,8 @@ if parallel -k </dev/null >/dev/null 2>/dev/null; then
 else
     for r in `cat validation/RECORDS`; do
         echo $r
-        ln -sf validation/$r.hea .
-        ln -sf validation/$r.mat .
+        #ln -sf validation/$r.hea .
+        #ln -sf validation/$r.mat .
         ./next.sh $r
     done
 fi

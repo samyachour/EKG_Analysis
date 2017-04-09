@@ -263,7 +263,7 @@ def multi_model(v):
     ind = np.argmax([probN, probA, probO])
     arryth_type = ["N","A","O"]
     
-    return arryth_type[ind];
+    return arryth_type[ind]
 
 def is_noisy(v):
     # exp(t(Beta_Hat)%*%newdata) / (1+exp(t(Beta_Hat)%*%newdata))
@@ -363,7 +363,7 @@ mat = scipy.io.loadmat("validation/" + record + ".mat")
 #samples = mat_data['val']
 data = np.divide(mat['val'][0],1000) # convert to millivolts
 
-answer = get_answer(data)
+answer = get_answer(record, data)
 
 # Write result to answers.txt
 answers_file = open("answers.txt", "a")
