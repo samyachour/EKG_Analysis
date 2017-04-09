@@ -158,10 +158,10 @@ def feature_extract(signal):
     RPeak_stats = wave.cal_stats([],signal.Rheights)
     
     #variances for every other variances, every third, every fourth
-    RR_var_everyother = wave.diff_var(signal.RRintervals, 2)
-    RR_var_third = wave.diff_var(signal.RRintervals, 3)
-    RR_var_fourth = wave.diff_var(signal.RRintervals, 4)
-    RR_var_next = wave.diff_var(signal.RRintervals, 1)
+#    RR_var_everyother = wave.diff_var(signal.RRintervals, 2)
+#    RR_var_third = wave.diff_var(signal.RRintervals, 3)
+#    RR_var_fourth = wave.diff_var(signal.RRintervals, 4)
+#    RR_var_next = wave.diff_var(signal.RRintervals, 1)
     
     # total points
     Total_points = signal.data.size
@@ -182,10 +182,10 @@ def feature_extract(signal):
     features = wtstats + PPinterval_stats + PPeak_stats + TTinterval_stats + \
                 QPeak_stats + SPeak_stats + QSDiff_stats + QSInterval_stats + \
                 RRinterval_stats + RPeak_stats + RRinterval_bin_cont
-    features.append(RR_var_everyother)
-    features.append(RR_var_next)
-    features.append(RR_var_fourth)
-    features.append(RR_var_third)
+#    features.append(RR_var_everyother)
+#    features.append(RR_var_next)
+#    features.append(RR_var_fourth)
+#    features.append(RR_var_third)
     features.append(residuals)
     features.append(Total_points)
     
@@ -208,26 +208,28 @@ def F1_score(prediction, target, path='../Physionet_Challenge/training2017/'):
     Tt = 0
     t = 0
     T = 0
-    with open(path+'REFERENCE.csv', mode='r') as f:
-        reader = csv.reader(f)
-        ref_dict = {rows[0]:rows[1] for rows in reader}
+
+    reference = pd.read_csv(path + 'REFERENCE.csv', names= ['file', 'answer'])
+    ref_dict = {rows['file']:rows['answer'] for index, rows in reference.iterrows()}
             
     
-    with open(prediction, mode='r') as f:
-        reader = csv.reader(f)
-        for rows in reader:
-            if ref_dict[rows[0]]==target:
-                T+=1
-            
-            if rows[1]==target:
-                t += 1
-                if ref_dict[rows[0]]==rows[1]:
-                    Tt += 1
+    predict = pd.read_csv(prediction, names = ['file', 'answer'])
+    for index, rows in predict.iterrows():
+        if ref_dict[rows['file']]==target:
+            T+=1
+        
+        if rows['answer']==target:
+            t += 1
+            if ref_dict[rows['file']]==rows['answer']:
+                Tt += 1
     print('The target class is: ' + target)
-    F1 = 2.* Tt / (T + t)
-    print('The F1 score for this class is: ' + str(F1))
-    
-    return F1
+    if T == 0 or t ==0:
+        print (target + 'is ' + str(0))
+        return 0
+    else :
+        F1 = 2.* Tt / (T + t)
+        print('The F1 score for this class is: ' + str(F1))
+        return F1
 
 # TODO: run multi model on single rows to return value to answers.txt
 # TODO: Write bash script including pip install for pywavelets
@@ -295,23 +297,6 @@ def get_answer(record, data):
     
     print ('The ECG is: ' + answer)
     return answer
-    
-    
-
-        
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -344,4 +329,4 @@ answers_file = open("answers.txt", "a")
 answers_file.write("%s,%s\n" % (record, answer))
 answers_file.close()
 
-# TODO: FINAL, change setup.sh and uncomment all the pip lines
+## TODO: FINAL, change setup.sh and uncomment all the pip lines
