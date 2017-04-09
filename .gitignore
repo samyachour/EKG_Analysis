@@ -10,8 +10,9 @@ __pycache__/
 # C extensions
 *.so
 
-# Data
+# Physionet submission files
 validation/
+*.tar.gz
 
 # Distribution / packaging
 bin/
