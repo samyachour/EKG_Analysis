@@ -78,6 +78,19 @@ class Signal(object):
         # fig.savefig('/Users/samy/Downloads/{0}.png'.format(self.name))
         plt.show()        
 
+
+
+# A03509 RRvar1, RRvar2, RRvar3 NaNs
+# A03863 A03812 too
+
+
+
+
+
+
+
+
+
 def feat_PCA(feat_mat, components=12):
     """
     this function does PCA on a feature matrix
@@ -260,12 +273,36 @@ def is_noisy(v):
     print(result)
     return (result > thresh)
 
-"""
-((test.DATA - center.vec)/scale.vec) %*% rotation.matrix
 
-((test.DATA (<-vector of data you want to test) - center.vec (<-vector alex is giving us, same length as test.Data))
-/scale.vec<-(element by element division)) %*% rotation.matrix
-"""
+def applyPCA(testData):
+    """
+    this function applies PCA to a dataset
+
+    Parameters
+    ----------
+        testData : 1xN vector (list or numpy array)
+            Your feature vector
+
+    Returns
+    -------
+        A vector of features 1xN
+        
+    Notes
+    -----
+    Code in R:
+        ((test.DATA - center.vec)/scale.vec) %*% rotation.matrix
+
+    """
+    
+    # e.g. 1x4
+    center = np.asarray([.1,.2,.3,.4]) # 1xN
+    scale = np.asarray([.1,.1,.2,.4]) # 1xN
+    rotation = np.asarray([[.1,.1,.2,.4], [.1,.1,.2,.4], [.1,.1,.2,.4], [.1,.1,.2,.4]]) # NxN
+    testData = np.asarray(testData)
+    
+    if center.size == scale.size == testData.size == np.size(rotation,0): 
+        result = (testData - center)/scale
+        return rotation.dot(result)
 
 
 def get_answer(record, data):
@@ -328,14 +365,7 @@ record = sys.argv[1]
 # Read waveform samples (input is in WFDB-MAT format)
 mat = scipy.io.loadmat("validation/" + record + ".mat")
 #samples = mat_data['val']
-data = np.divide(mat['val'][0],1000)
-
-# Your classification algorithm goes here...
-
-# TODO: add error handling for crazy cases of data i.e. A04244, A00057
-# Wrap the whole thing in a try catch, assign as AF if there's an error
-# Set everything to N in the beginning
-# TODO: check if noisy when giving out feature matrix
+data = np.divide(mat['val'][0],1000) # convert to millivolts
 
 answer = get_answer(data)
 

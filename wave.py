@@ -187,7 +187,7 @@ def discardNoise(data):
             break
                 
         w = pywt.Wavelet('sym4')
-        residual = calculate_residuals(np.asarray(window), pywt.dwt_max_level(len(window), w))
+        residual = calculate_residuals(np.asarray(window), levels=pywt.dwt_max_level(len(window), w))
         
         
         if residual <= 0.001 and np.std(window) < 1:
