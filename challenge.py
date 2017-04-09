@@ -28,7 +28,12 @@ import matplotlib.pyplot as plt
 #    RR_var_next = wave.diff_var(signal.RRintervals, 1)
 
 
-#TODO: loop add rows of feature vectors, exclude noisy signals
+# TODO: Debug record errors
+
+# TODO: add error handling for crazy cases of data i.e. A04244, A00057
+# Wrap the whole thing in a try catch, assign as AF if there's an error
+# Set everything to N in the beginning
+# TODO: check if noisy when giving out feature matrix
 
 
 class Signal(object):
@@ -92,6 +97,50 @@ class Signal(object):
         ax.set_title(self.name)
         # fig.savefig('/Users/samy/Downloads/{0}.png'.format(self.name))
         plt.show()        
+
+
+
+data = wave.load('A00022')
+#data = pd.read_csv('../../../../../Downloads/A00001.csv')[[0]].as_matrix()
+#data = np.asarray([i[0] for i in data])
+sig = Signal('A00022', data)
+fig = plt.figure(figsize=(9.7, 6)) # I used figures to customize size
+ax = fig.add_subplot(211)
+ax.plot(sig.data)
+ax.plot(*zip(*sig.Ppeaks), marker='o', color='r', ls='')
+ax.plot(*zip(*sig.Tpeaks), marker='o', color='r', ls='')
+ax.plot(*zip(*sig.RPeaks), marker='o', color='r', ls='')
+ax.plot(*zip(*sig.QPoints), marker='o', color='r', ls='')
+ax.plot(*zip(*sig.SPoints), marker='o', color='r', ls='')
+ax.axhline(sig.baseline)
+ax.set_title(sig.name)
+fig.savefig('/Users/samy/Downloads/{0}.png'.format(sig.name))
+plt.show()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 def feat_PCA(feat_mat, components=12):
     """
@@ -249,11 +298,6 @@ def F1_score(prediction, target, path='../Physionet_Challenge/training2017/'):
     print('The F1 score for this class is: ' + str(F1))
     
     return F1
-
-# TODO: add error handling for crazy cases of data i.e. A04244, A00057
-# Wrap the whole thing in a try catch, assign as AF if there's an error
-# Set everything to N in the beginning
-# TODO: check if noisy when giving out feature matrix
 
 # TODO: run multi model on single rows to return value to answers.txt
 # TODO: Write bash script including pip install for pywavelets

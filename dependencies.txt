@@ -1,0 +1,10 @@
+# file: dependencies.txt
+#
+# These are all the python packages we need to run our code
+
+numpy
+pandas
+math
+scikit-learn
+matplotlib
+PyWavelets
