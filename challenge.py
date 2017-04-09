@@ -243,7 +243,10 @@ def F1_score(prediction, target, path='../Physionet_Challenge/training2017/'):
         F1 = 2.* Tt / (T + t)
         print('The F1 score for this class is: ' + str(F1))
         return F1
-
+    
+def all_F1_score(prediction, target=['N', 'A', 'O', '~'], path='../Physionet_Challenge/training2017/')
+    for n in target:
+        F1 = F1_score(prediction, n, path)
 # TODO: run multi model on single rows to return value to answers.txt
 # TODO: Write bash script including pip install for pywavelets
 
