@@ -6,7 +6,6 @@ Created on Mon Apr  3 12:47:16 2017
 @author: Work
 """
 
-import csv
 import pywt
 import wave
 import numpy as np
@@ -344,3 +343,5 @@ answer = get_answer(data)
 answers_file = open("answers.txt", "a")
 answers_file.write("%s,%s\n" % (record, answer))
 answers_file.close()
+
+# TODO: FINAL, change setup.sh and uncomment all the pip lines
