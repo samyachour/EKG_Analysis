@@ -1,5 +1,4 @@
 import wave # this is the wave.py file in the local folder
-import featureExtraction 
 #import challenge
 ## np.set_printoptions(threshold=np.nan) # show full arrays, dataframes, etc. when printing
 import challenge
@@ -42,9 +41,9 @@ for record in records:
 #    try:
     data = wave.load(record)
     print ('running record: '+ record)
-    sig = featureExtraction.Signal(record,data)
-    features, noise_features = challenge.feature_extract(sig)
-    feat_list.append(features)
+    sig = challenge.Signal(record,data)
+    noise_features = challenge.noise_feat_extract(sig)
+    feat_list.append(noise_features)
     print ('the number of records in the feature list: ' + str(len(feat_list)))
 #    except:
 #        wired_list.append(record)
@@ -53,7 +52,6 @@ for record in records:
 #
 feat_list = np.array(feat_list)
 
-PCA_feature = challenge.feat_PCA(feat_list)
 #
 #for wired_one in wired_list:
 #    try:
