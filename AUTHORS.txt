@@ -1,7 +1,7 @@
-Alex Barrett - PhD Candidate, Senior Fellow at CHOC MI3
+Alex Barrett - M.S. Computational Data Science, Senior Fellow at CHOC MI3
 Dehua Liang - Computational Data Science Masters student, Chapman University
-Andrew Nguygen - Computational Data Science Masters student, Chapman University
+Andrew Nguyen - Computational Data Science Masters student, Chapman University
 Arjun Tummala - Computational Data Science Masters student, Chapman University
-Chris Elliot - Health Sciences/Pre-med Undergrad, Chapman University
+Chris Elliott - Health Sciences/Pre-med Undergrad, Chapman University
 Mina Ibrahim - Biology/Pre-med Undergrad, Chapman University
 Samy Achour - Computer Science Undergrad, Chapman University

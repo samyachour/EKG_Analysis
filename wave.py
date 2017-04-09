@@ -1,7 +1,6 @@
 import pywt
 import numpy as np
 import matplotlib.pyplot as plt
-from sklearn import preprocessing
 import pandas as pd
 from detect_peaks import detect_peaks as detect_peaks_orig
 import scipy.io as sio
@@ -575,10 +574,6 @@ def feat_combo(feat_list):
                 ratio = feat_list[i]/feat_list[j]
                 new_list.append(ratio)
     return new_list
-
-def normalize(feat_list):
-    return preprocessing.normalize(feat_list)
-
 
 """RR feature extraction"""
 
