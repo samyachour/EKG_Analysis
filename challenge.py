@@ -130,8 +130,8 @@ def noise_feature_extract(data):
     wtstats = wave.stats_feat(wtcoeff)
     #noise features:
     residuals = wave.calculate_residuals(data)
-    noise_features = wtstats
-    noise_features.append(residuals)
+    noise_features = [residuals] + wtstats
+    #noise_features.append(residuals)
     return noise_features
 
 def feature_extract(signal):
@@ -242,16 +242,31 @@ def F1_score(prediction, target, path='../Physionet_Challenge/training2017/'):
         print('The F1 score for this class is: ' + str(F1))
         return F1
     
-def all_F1_score(prediction, target=['N', 'A', 'O', '~'], path='../Physionet_Challenge/training2017/'):
-    for n in target:
-        F1 = F1_score(prediction, n, path)
+#def all_F1_score(prediction, target=['N', 'A', 'O', '~'], path='../Physionet_Challenge/training2017/'):
+#    output[target]:F1_score(prediction, n, path) }
+#    total = 0
+#    for i in output:
+#        total += i
+#    avg = total/4
+#    output['avg'] = avg
+#    return output
+    
+    
+        
 # TODO: run multi model on single rows to return value to answers.txt
 # TODO: Write bash script including pip install for pywavelets
 
 def multi_model(v):
-    B1 = [.3, .6, .8, .9, .5] #1 + num of features
-    B2 = [.6, .4, .2, .7, .2]    
-    x = [1] + v #1 + num of features
+    
+    #get important vectors:
+    mb1_mb2 = np.asarray(pd.read_csv('mb1_mb2.csv', header=None))
+    mb1_mb2_t = mb1_mb2.T
+    
+    
+    B1 = mb1_mb2_t[0] #1 + num of features
+    B2 = mb1_mb2_t[1]
+    x = np.append(np.asarray([1]), v) #1 + num of features
+    print ('x is:' + str(len(x)))
     t1 = np.transpose(B1) 
     t2 = np.transpose(B2)
     par1 = math.exp(np.dot(t1,x))
@@ -267,8 +282,9 @@ def multi_model(v):
 
 def is_noisy(v):
     # exp(t(Beta_Hat)%*%newdata) / (1+exp(t(Beta_Hat)%*%newdata))
-    B1 = [.3, .6, .8, .9, .5] #1 + num of features
-    thresh = 0.03
+    B1 = [-3.836891, 0.16960, -0.39009, -0.13013] #1 + num of features
+    #thresh = 0.0219
+    thresh = 0.219
     x = [1] + v
     t1 = np.transpose(B1)
     par1 = math.exp(np.dot(t1,x))
@@ -299,15 +315,25 @@ def applyPCA(testData, isNoise):
     
     if isNoise: # if we're doing noisy data PCA, so the first step in get_answer
         # e.g. 1x4
-        center = np.asarray([.1,.2,.3,.4]) # 1xN
-        scale = np.asarray([.1,.1,.2,.4]) # 1xN
-        rotation = np.asarray([[.1,.1,.2,.4], [.1,.1,.2,.4], [.1,.1,.2,.4], [.1,.1,.2,.4]]) # NxN
+        #get the vectors and matrixs
+        pca_matrix = pd.read_csv('noise_pca_matrix.csv', header=None)
+        center_scale = np.asarray(pd.read_csv('center_scale.csv', header=None))
+        center_scale_t = center_scale.T
+        
+        center = center_scale_t[0] # 1xN
+        scale = center_scale_t[1] # 1xN
+        rotation = np.asarray(pca_matrix) # NxN
         
     else: # if we're doing regular features PCA, so after noisy signals are disqualified
         # e.g. 1x4
-        center = np.asarray([.1,.2,.3,.4]) # 1xN
-        scale = np.asarray([.1,.1,.2,.4]) # 1xN
-        rotation = np.asarray([[.1,.1,.2,.4], [.1,.1,.2,.4], [.1,.1,.2,.4], [.1,.1,.2,.4]]) # NxN
+        #geting the important matrix
+        multi_pca_matrix = pd.read_csv('multi_pca_matrix.csv', header=None)
+        center_scale_multi = np.asarray(pd.read_csv('center_scale_multi.csv', header=None))
+        center_scale_multi_t = center_scale_multi.T
+        
+        center = np.asarray(center_scale_multi_t[0]) # 1xN
+        scale = np.asarray(center_scale_multi_t[1]) # 1xN
+        rotation = np.asarray(multi_pca_matrix) # NxN
         
         
     testData = np.asarray(testData)
@@ -326,9 +352,10 @@ def get_answer(record, data):
         noise_feature = noise_feature_extract(data)
         ## do PCA here in R
         noise_feature = applyPCA(noise_feature, True)
+        PCA_noise_feature = [noise_feature[0], noise_feature[2], noise_feature[4]]
         
         print ('noise ECG classifier:')
-        if is_noisy(noise_feature):
+        if is_noisy(PCA_noise_feature):
             answer = "~"
         else:
             print ('Not noisy, initalize signal object...')
@@ -336,12 +363,16 @@ def get_answer(record, data):
             
             print ('generating feature vector...')
             features = feature_extract(sig)
+            features_cont = features[0:110]
+            features_dist = features[110]
             ## do PCA in R
-            features = applyPCA(features, False)
+            features_cont = applyPCA(features_cont, False)
+            features = np.append(features_cont[0:24],features_dist)
             print ('multinomial classifier:')
             answer = multi_model(features)
-    except:
-        answer = '~'
+    except Exception as e:
+        print (str(e))
+        answer = 'A'
     
     print ('The ECG is: ' + answer)
     return answer
@@ -357,7 +388,7 @@ import sys
 import scipy.io
 
 record = sys.argv[1]
-
+#record = 'A00001'
 # Read waveform samples (input is in WFDB-MAT format)
 mat = scipy.io.loadmat("validation/" + record + ".mat")
 #samples = mat_data['val']

@@ -5,15 +5,30 @@ import challenge
 import numpy as np
 import pywt
 import warnings
+import pandas as pd
 warnings.simplefilter("error") # Show warning traceback
 
 
-print ('helloworld')
+#print ('helloworld')
+path='../Physionet_Challenge/training2017/'
 
-records = wave.getRecords('All') # N O A ~
+records_train = pd.read_csv(path+'REFERENCE.csv', names=['file','answer'])
+records_validation = pd.read_csv('validation/' + 'REFERENCE.csv', names=['file','answer'])
+
+new_validation = []
+for index, row in records_validation.iterrows():
+    record = records_train.ix[records_train['file']==row['file']]
+    filename = record['file'].tolist()
+    answer = record['answer'].tolist()
+    new_validation.append([filename[0],answer[0]])
+    
+
+
 
 #print(len(records))
 #print(records)
+
+records = wave.getRecords('All')
 
 wired_list=[]
 
@@ -22,9 +37,9 @@ for record in records:
 #    try:
     data = wave.load(record)
     print ('running record: '+ record)
-    sig = challenge.Signal(record, data)
-    features = challenge.feature_extract(sig)
-    feat_list.append(features)
+    #sig = challenge.Signal(record, data)
+    noise_features = challenge.noise_feature_extract(data)
+    feat_list.append(noise_features)
     print ('the number of records in the feature list: ' + str(len(feat_list)))
 #    except:
 #        wired_list.append(record)
@@ -32,6 +47,23 @@ for record in records:
 #    
 #
 feat_list = np.array(feat_list)
+
+
+#feat_list=[]
+#for record in records:
+##    try:
+#    data = wave.load(record)
+#    print ('running record: '+ record)
+#    sig = challenge.Signal(record, data)
+#    features = challenge.feature_extract(sig)
+#    feat_list.append(features)
+#    print ('the number of records in the feature list: ' + str(len(feat_list)))
+##    except:
+##        wired_list.append(record)
+##        print ('stupid one found: ' + record)
+##    
+##
+#feat_list = np.array(feat_list)
 
 #
 #for wired_one in wired_list:
