@@ -166,7 +166,7 @@ def feature_extract(signal):
     
     #RR interval
     RRinterval_bin = wave.interval_bin(signal.RRintervals)
-    RRinterval_bin_cont = RRinterval_bin[:2]
+    RRinterval_bin_cont = RRinterval_bin[:3]
     RRinterval_bin_dis = RRinterval_bin[3:]
     
     RRinterval_stats = wave.cal_stats([],signal.RRintervals)
@@ -206,7 +206,7 @@ def feature_extract(signal):
     
     features = features + RRinterval_bin_dis
     
-    features.append(inverted)
+    features.append(int(inverted))
     
 #    name_tuples = [('wavelet_coeff_', 48), ('PP_interval_stats_', 8), ('PPeaks_stats_', 8), \
 #             ('TTinterval_stats_', 8), ('QPeak_stats_', 8), ('SPeak_Stats_', 8), \
@@ -291,16 +291,16 @@ def is_noisy(v):
 #QSDiff_stats = wave.cal_stats(signal.QSdiff)
 #QSInterval_stats = wave.cal_stats(signal.QSinterval)
 
-name_tuples = [('Record_name_', 1),('wavelet_coeff_', 48), ('PP_interval_stats_', 8), ('PPeaks_stats_', 8), \
-             ('TTinterval_stats_', 8), ('QPeak_stats_', 8), ('SPeak_Stats_', 8), \
-             ('QSDiff_stats_', 8), ('SQInterval_stats_',8),('RRinterval_stats_', 8), \
-             ('RPeaks_stats_', 8), ('RRinterval_bin_cont_', 3), ('RR_var_', 4), ('Residuals_', 1), \
+name_tuples = [('Record_name_', 1),('wavelet_coeff_', 42), ('PP_interval_stats_', 7), ('PPeaks_stats_', 7), \
+             ('TTinterval_stats_', 7), ('QPeak_stats_', 7), ('SPeak_Stats_', 7), \
+             ('QSDiff_stats_', 7), ('SQInterval_stats_',7),('RRinterval_stats_', 7), \
+             ('RPeaks_stats_', 7), ('RRinterval_bin_cont_', 3), ('RR_var_', 4), ('Residuals_', 1), \
              ('Total_points_', 1), ('RRinterval_bin_dis_', 2), ('Inverted_', 1)]
 
 name_list = generate_name_list(name_tuples)
 print(name_list)
 
-records = wave.getRecords('All') # N O A ~
+records = wave.getRecords('~', _not=True) # N O A ~
 feature_list = []
 weird_list =[]
 for record in records:
@@ -315,6 +315,4 @@ for record in records:
         print (str(e))
         weird_list.append(record)
         
-
-columns = ['A','B', 'C']
 feature_matrix = pd.DataFrame(feature_list, columns=name_list)

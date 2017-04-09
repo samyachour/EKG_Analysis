@@ -445,11 +445,14 @@ def load(filename, path = '../Physionet_Challenge/training2017/'):
     data = np.divide(mat['val'][0],1000)
     return data
 
-def getRecords(trainingLabel): # N O A ~
+def getRecords(trainingLabel, _not=False): # N O A ~
     
     reference = pd.read_csv('../Physionet_Challenge/training2017/REFERENCE.csv', names = ["file", "answer"]) # N O A ~
     if trainingLabel == 'All':
         return reference['file'].tolist()
+    if _not:
+        subset = reference.ix[reference['answer']!=trainingLabel]
+        return subset['file'].tolist()
     else:
         subset = reference.ix[reference['answer']==trainingLabel]
         return subset['file'].tolist()
@@ -531,7 +534,6 @@ def cal_stats(feat_list, data_array):
     feat_list.append(np.var(data_array))
     power = np.square(data_array)
     feat_list.append(np.average(power))
-    feat_list.append(np.mean(power))
     feat_list.append(np.mean(np.absolute(data_array)))
     return feat_list
     
