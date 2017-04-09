@@ -10,7 +10,6 @@ set -e
 set -o pipefail
 
 # Example: install a local package in pip format
-#pip3 install --user xyzzy-1.0.tar.gz
 #pip3 install --user scipy-0.19.0.tar.gz
 #pip3 install --user matplotlib-2.0.0.tar.gz
 #pip3 install --user PyWavelets-0.5.2.tar.gz
