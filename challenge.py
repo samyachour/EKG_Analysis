@@ -242,7 +242,7 @@ def F1_score(prediction, target, path='../Physionet_Challenge/training2017/'):
         print('The F1 score for this class is: ' + str(F1))
         return F1
     
-def all_F1_score(prediction, target=['N', 'A', 'O', '~'], path='../Physionet_Challenge/training2017/')
+def all_F1_score(prediction, target=['N', 'A', 'O', '~'], path='../Physionet_Challenge/training2017/'):
     for n in target:
         F1 = F1_score(prediction, n, path)
 # TODO: run multi model on single rows to return value to answers.txt
@@ -370,4 +370,4 @@ answers_file = open("answers.txt", "a")
 answers_file.write("%s,%s\n" % (record, answer))
 answers_file.close()
 
-## TODO: FINAL, change setup.sh and uncomment all the pip lines
+### TODO: FINAL, change setup.sh and uncomment all the pip lines
