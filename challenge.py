@@ -16,6 +16,9 @@ import matplotlib.pyplot as plt
 
 # TODO: Debug record errors
 
+# A03509 RRvar1, RRvar2, RRvar3 NaNs
+# A03863 A03812 too
+
 class Signal(object):
     """
     An ECG/EKG signal
@@ -77,11 +80,6 @@ class Signal(object):
         ax.set_title(self.name)
         # fig.savefig('/Users/samy/Downloads/{0}.png'.format(self.name))
         plt.show()        
-
-
-
-# A03509 RRvar1, RRvar2, RRvar3 NaNs
-# A03863 A03812 too
 
 
 
@@ -244,9 +242,6 @@ def F1_score(prediction, target, path='../Physionet_Challenge/training2017/'):
         print('The F1 score for this class is: ' + str(F1))
         return F1
 
-# TODO: run multi model on single rows to return value to answers.txt
-# TODO: Write bash script including pip install for pywavelets
-
 def multi_model(v):
     B1 = [.3, .6, .8, .9, .5] #1 + num of features
     B2 = [.6, .4, .2, .7, .2]    
@@ -276,7 +271,7 @@ def is_noisy(v):
     return (result > thresh)
 
 
-def applyPCA(testData):
+def applyPCA(testData, isNoise):
     """
     this function applies PCA to a dataset
 
@@ -296,10 +291,19 @@ def applyPCA(testData):
 
     """
     
-    # e.g. 1x4
-    center = np.asarray([.1,.2,.3,.4]) # 1xN
-    scale = np.asarray([.1,.1,.2,.4]) # 1xN
-    rotation = np.asarray([[.1,.1,.2,.4], [.1,.1,.2,.4], [.1,.1,.2,.4], [.1,.1,.2,.4]]) # NxN
+    if isNoise: # if we're doing noisy data PCA, so the first step in get_answer
+        # e.g. 1x4
+        center = np.asarray([.1,.2,.3,.4]) # 1xN
+        scale = np.asarray([.1,.1,.2,.4]) # 1xN
+        rotation = np.asarray([[.1,.1,.2,.4], [.1,.1,.2,.4], [.1,.1,.2,.4], [.1,.1,.2,.4]]) # NxN
+        
+    else: # if we're doing regular features PCA, so after noisy signals are disqualified
+        # e.g. 1x4
+        center = np.asarray([.1,.2,.3,.4]) # 1xN
+        scale = np.asarray([.1,.1,.2,.4]) # 1xN
+        rotation = np.asarray([[.1,.1,.2,.4], [.1,.1,.2,.4], [.1,.1,.2,.4], [.1,.1,.2,.4]]) # NxN
+        
+        
     testData = np.asarray(testData)
     
     if center.size == scale.size == testData.size == np.size(rotation,0): 
@@ -311,10 +315,11 @@ def get_answer(record, data):
     answer = ""
     try:
         print ('processing record: ' + record)
-        
+                
         print ('noise feature extraction...')
         noise_feature = noise_feature_extract(data)
         ## do PCA here in R
+        noise_feature = applyPCA(noise_feature, True)
         
         print ('noise ECG classifier:')
         if is_noisy(noise_feature):
@@ -326,7 +331,7 @@ def get_answer(record, data):
             print ('generating feature vector...')
             features = feature_extract(sig)
             ## do PCA in R
-            
+            features = applyPCA(features, False)
             print ('multinomial classifier:')
             answer = multi_model(features)
     except:
