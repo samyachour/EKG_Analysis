@@ -25,7 +25,7 @@ class Signal(object):
 
     Attributes:
         name: A string representing the record name.
-        data : 1-dimensional array with input signal data 
+        data : 1-dimensional array with input signal data
     """
 
     def __init__(self, name, data):
@@ -35,26 +35,26 @@ class Signal(object):
         self.name = name
         self.orignalData = data
         self.sampleFreq = 1/300
-        
+
         self.data = wave.discardNoise(data)
-                
+
         RPeaks = wave.getRPeaks(self.data, 150)
         self.RPeaks = RPeaks[1]
         self.inverted = RPeaks[0]
         if self.inverted: # flip the inverted signal
             self.data = -self.data
-        
+
         PTWaves = wave.getPTWaves(self)
         self.PPintervals = PTWaves[0] * self.sampleFreq
         self.Ppeaks = PTWaves[1]
         self.TTintervals = PTWaves[2] * self.sampleFreq
         self.Tpeaks = PTWaves[3]
-        
+
         self.baseline = wave.getBaseline(self)
-        
+
         self.Pheights = [i[1] - self.baseline for i in self.Ppeaks]
         self.Rheights = [i[1] - self.baseline for i in self.RPeaks]
-        
+
         QSPoints = wave.getQS(self)
         self.QPoints = QSPoints[0]
         self.SPoints = QSPoints[1]
@@ -64,13 +64,13 @@ class Signal(object):
         self.QSdiff = self.QSdiff.tolist()
         self.QSinterval = np.asarray([i[0] for i in self.SPoints]) - np.asarray([i[0] for i in self.QPoints])
         self.QSinterval = self.QSinterval.tolist()
-        
+
         # TODO: Get pr and qt, careful with offset
-        
+
         #RR interval
         self.RRintervals = wave.wave_intervals(self.RPeaks)
-        
-            
+
+
     def plotRPeaks(self):
         fig = plt.figure(figsize=(9.7, 6)) # I used figures to customize size
         ax = fig.add_subplot(111)
@@ -79,7 +79,7 @@ class Signal(object):
         ax.plot(*zip(*self.RPeaks), marker='o', color='r', ls='')
         ax.set_title(self.name)
         # fig.savefig('/Users/samy/Downloads/{0}.png'.format(self.name))
-        plt.show()        
+        plt.show()
 
 
 
@@ -106,7 +106,7 @@ def feat_PCA(feat_mat, components=12):
     pca = PCA(n_components = components)
     pca.fit(feat_mat)
     print('The number of components is: ' + str(components))
-    print('The pca explained variance ratio is:' + str(pca.explained_variance_ratio_)) 
+    print('The pca explained variance ratio is:' + str(pca.explained_variance_ratio_))
     return pca.components_
 
 def generate_name_list(name_tuples):
@@ -116,7 +116,7 @@ def generate_name_list(name_tuples):
         for ne in names:
             name_list.append(ne)
     return name_list
-    
+
 
 def generate_name(name, n):
     name_list = []
@@ -147,49 +147,49 @@ def feature_extract(signal):
         A vector of features
 
     """
-    
+
     #variance for PP, average and variance for P amplitude, Bin PP
-    
+
     PPinterval_stats = wave.cal_stats([],signal.PPintervals)
     PPeak_stats = wave.cal_stats([],signal.Pheights)
-    
+
     #TT invervals
-    TTinterval_stats = wave.cal_stats([],signal.TTintervals)    
-    
+    TTinterval_stats = wave.cal_stats([],signal.TTintervals)
+
     #wavelet decomp coeff
     wtcoeff = pywt.wavedecn(signal.data, 'sym5', level=5, mode='constant')
     wtstats = wave.stats_feat(wtcoeff)
-    
+
     #RR interval
     RRinterval_bin = wave.interval_bin(signal.RRintervals)
     RRinterval_bin_cont = RRinterval_bin[:3]
     RRinterval_bin_dis = RRinterval_bin[3:]
-    
+
     RRinterval_stats = wave.cal_stats([],signal.RRintervals)
     RPeak_stats = wave.cal_stats([],signal.Rheights)
-    
+
     #variances for every other variances, every third, every fourth
 #    RR_var_everyother = wave.diff_var(signal.RRintervals, 2)
 #    RR_var_third = wave.diff_var(signal.RRintervals, 3)
 #    RR_var_fourth = wave.diff_var(signal.RRintervals, 4)
 #    RR_var_next = wave.diff_var(signal.RRintervals, 1)
-    
+
     # total points
     Total_points = signal.data.size
-    
-    
+
+
     # QS stuff
     QPeak_stats = wave.cal_stats([],signal.Qheights)
     SPeak_stats = wave.cal_stats([],signal.Sheights)
     QSDiff_stats = wave.cal_stats([],signal.QSdiff)
     QSInterval_stats = wave.cal_stats([],signal.QSinterval)
-    
+
     #noise features:
     residuals = wave.calculate_residuals(signal.data)
-    
+
     #
     inverted = signal.inverted
-    
+
     features = wtstats + PPinterval_stats + PPeak_stats + TTinterval_stats + \
                 QPeak_stats + SPeak_stats + QSDiff_stats + QSInterval_stats + \
                 RRinterval_stats + RPeak_stats + RRinterval_bin_cont
@@ -199,11 +199,11 @@ def feature_extract(signal):
 #    features.append(RR_var_third)
     features.append(residuals)
     features.append(Total_points)
-    
+
     features = features + RRinterval_bin_dis
-    
+
     features.append(int(inverted))
-    
+
     return features
 
 def F1_score(prediction, target, path='../Physionet_Challenge/training2017/'):
@@ -214,7 +214,7 @@ def F1_score(prediction, target, path='../Physionet_Challenge/training2017/'):
     #   path =  the path to the reference file
     # output:
     #   F1 = the F1 score for the particular class
-    
+
     ref_dict = {}
     Tt = 0
     t = 0
@@ -222,13 +222,13 @@ def F1_score(prediction, target, path='../Physionet_Challenge/training2017/'):
 
     reference = pd.read_csv(path + 'REFERENCE.csv', names= ['file', 'answer'])
     ref_dict = {rows['file']:rows['answer'] for index, rows in reference.iterrows()}
-            
-    
+
+
     predict = pd.read_csv(prediction, names = ['file', 'answer'])
     for index, rows in predict.iterrows():
         if ref_dict[rows['file']]==target:
             T+=1
-        
+
         if rows['answer']==target:
             t += 1
             if ref_dict[rows['file']]==rows['answer']:
@@ -241,7 +241,7 @@ def F1_score(prediction, target, path='../Physionet_Challenge/training2017/'):
         F1 = 2.* Tt / (T + t)
         print('The F1 score for this class is: ' + str(F1))
         return F1
-    
+
 #def all_F1_score(prediction, target=['N', 'A', 'O', '~'], path='../Physionet_Challenge/training2017/'):
 #    output[target]:F1_score(prediction, n, path) }
 #    total = 0
@@ -250,24 +250,25 @@ def F1_score(prediction, target, path='../Physionet_Challenge/training2017/'):
 #    avg = total/4
 #    output['avg'] = avg
 #    return output
-    
-    
-        
-# TODO: run multi model on single rows to return value to answers.txt
-# TODO: Write bash script including pip install for pywavelets
+
+
+
+def all_F1_score(prediction, target=['N', 'A', 'O', '~'], path='../Physionet_Challenge/training2017/'):
+    for n in target:
+        F1 = F1_score(prediction, n, path)
 
 def multi_model(v):
-    
+
     #get important vectors:
     mb1_mb2 = np.asarray(pd.read_csv('mb1_mb2.csv', header=None))
     mb1_mb2_t = mb1_mb2.T
-    
-    
+
+
     B1 = mb1_mb2_t[0] #1 + num of features
     B2 = mb1_mb2_t[1]
     x = np.append(np.asarray([1]), v) #1 + num of features
     print ('x is:' + str(len(x)))
-    t1 = np.transpose(B1) 
+    t1 = np.transpose(B1)
     t2 = np.transpose(B2)
     par1 = math.exp(np.dot(t1,x))
     par2 = math.exp(np.dot(t2,x))
@@ -277,7 +278,7 @@ def multi_model(v):
     probO = (1.0*par2)/cc
     ind = np.argmax([probN, probA, probO])
     arryth_type = ["N","A","O"]
-    
+
     return arryth_type[ind]
 
 def is_noisy(v):
@@ -305,40 +306,40 @@ def applyPCA(testData, isNoise):
     Returns
     -------
         A vector of features 1xN
-        
+
     Notes
     -----
     Code in R:
         ((test.DATA - center.vec)/scale.vec) %*% rotation.matrix
 
     """
-    
+
     if isNoise: # if we're doing noisy data PCA, so the first step in get_answer
         # e.g. 1x4
         #get the vectors and matrixs
         pca_matrix = pd.read_csv('noise_pca_matrix.csv', header=None)
         center_scale = np.asarray(pd.read_csv('center_scale.csv', header=None))
         center_scale_t = center_scale.T
-        
+
         center = center_scale_t[0] # 1xN
         scale = center_scale_t[1] # 1xN
         rotation = np.asarray(pca_matrix) # NxN
-        
+
     else: # if we're doing regular features PCA, so after noisy signals are disqualified
         # e.g. 1x4
         #geting the important matrix
         multi_pca_matrix = pd.read_csv('multi_pca_matrix.csv', header=None)
         center_scale_multi = np.asarray(pd.read_csv('center_scale_multi.csv', header=None))
         center_scale_multi_t = center_scale_multi.T
-        
+
         center = np.asarray(center_scale_multi_t[0]) # 1xN
         scale = np.asarray(center_scale_multi_t[1]) # 1xN
         rotation = np.asarray(multi_pca_matrix) # NxN
-        
-        
+
+
     testData = np.asarray(testData)
-    
-    if center.size == scale.size == testData.size == np.size(rotation,0): 
+
+    if center.size == scale.size == testData.size == np.size(rotation,0):
         result = (testData - center)/scale
         return rotation.dot(result)
 
@@ -347,20 +348,20 @@ def get_answer(record, data):
     answer = ""
     try:
         print ('processing record: ' + record)
-                
+
         print ('noise feature extraction...')
         noise_feature = noise_feature_extract(data)
         ## do PCA here in R
         noise_feature = applyPCA(noise_feature, True)
         PCA_noise_feature = [noise_feature[0], noise_feature[2], noise_feature[4]]
-        
+
         print ('noise ECG classifier:')
         if is_noisy(PCA_noise_feature):
             answer = "~"
         else:
             print ('Not noisy, initalize signal object...')
             sig = Signal(record, data)
-            
+
             print ('generating feature vector...')
             features = feature_extract(sig)
             features_cont = features[0:110]
@@ -373,7 +374,7 @@ def get_answer(record, data):
     except Exception as e:
         print (str(e))
         answer = 'A'
-    
+
     print ('The ECG is: ' + answer)
     return answer
 
