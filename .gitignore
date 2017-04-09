@@ -10,6 +10,9 @@ __pycache__/
 # C extensions
 *.so
 
+# Data
+validation/
+
 # Distribution / packaging
 bin/
 build/
