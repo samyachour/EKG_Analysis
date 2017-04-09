@@ -97,50 +97,6 @@ class Signal(object):
         # fig.savefig('/Users/samy/Downloads/{0}.png'.format(self.name))
         plt.show()        
 
-
-
-data = wave.load('A00022')
-#data = pd.read_csv('../../../../../Downloads/A00001.csv')[[0]].as_matrix()
-#data = np.asarray([i[0] for i in data])
-sig = Signal('A00022', data)
-fig = plt.figure(figsize=(9.7, 6)) # I used figures to customize size
-ax = fig.add_subplot(211)
-ax.plot(sig.data)
-ax.plot(*zip(*sig.Ppeaks), marker='o', color='r', ls='')
-ax.plot(*zip(*sig.Tpeaks), marker='o', color='r', ls='')
-ax.plot(*zip(*sig.RPeaks), marker='o', color='r', ls='')
-ax.plot(*zip(*sig.QPoints), marker='o', color='r', ls='')
-ax.plot(*zip(*sig.SPoints), marker='o', color='r', ls='')
-ax.axhline(sig.baseline)
-ax.set_title(sig.name)
-fig.savefig('/Users/samy/Downloads/{0}.png'.format(sig.name))
-plt.show()
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 def feat_PCA(feat_mat, components=12):
     """
     this function does PCA on a feature matrix
@@ -177,11 +133,11 @@ def generate_name(name, n):
         name_list.append(create_name)
     return name_list
 
-def noise_feature_extract(signal):
-    wtcoeff = pywt.wavedecn(signal.data, 'sym5', level=5, mode='constant')
+def noise_feature_extract(data):
+    wtcoeff = pywt.wavedecn(data, 'sym5', level=5, mode='constant')
     wtstats = wave.stats_feat(wtcoeff)
     #noise features:
-    residuals = wave.calculate_residuals(signal.data)
+    residuals = wave.calculate_residuals(data)
     noise_features = wtstats
     noise_features.append(residuals)
     return noise_features
@@ -341,28 +297,28 @@ def is_noisy(v):
 #QSDiff_stats = wave.cal_stats(signal.QSdiff)
 #QSInterval_stats = wave.cal_stats(signal.QSinterval)
 
-name_tuples = [('Record_name_', 1),('wavelet_coeff_', 42), ('PP_interval_stats_', 7), ('PPeaks_stats_', 7), \
-             ('TTinterval_stats_', 7), ('QPeak_stats_', 7), ('SPeak_Stats_', 7), \
-             ('QSDiff_stats_', 7), ('SQInterval_stats_',7),('RRinterval_stats_', 7), \
-             ('RPeaks_stats_', 7), ('RRinterval_bin_cont_', 3), ('RR_var_', 4), ('Residuals_', 1), \
-             ('Total_points_', 1), ('RRinterval_bin_dis_', 2), ('Inverted_', 1)]
-
-name_list = generate_name_list(name_tuples)
-print(name_list)
-
-records = wave.getRecords('~', _not=True) # N O A ~
-feature_list = []
-weird_list =[]
-for record in records:
-    try:
-        data = wave.load(record)
-        print ('running record: '+ record)
-        sig = Signal(record,data)
-        features = [record] + feature_extract(sig)
-        feature_list.append(features)
-    except Exception as e:
-        print (record)
-        print (str(e))
-        weird_list.append(record)
-        
-feature_matrix = pd.DataFrame(feature_list, columns=name_list)
+#name_tuples = [('Record_name_', 1),('wavelet_coeff_', 42), ('PP_interval_stats_', 7), ('PPeaks_stats_', 7), \
+#             ('TTinterval_stats_', 7), ('QPeak_stats_', 7), ('SPeak_Stats_', 7), \
+#             ('QSDiff_stats_', 7), ('SQInterval_stats_',7),('RRinterval_stats_', 7), \
+#             ('RPeaks_stats_', 7), ('RRinterval_bin_cont_', 3), ('RR_var_', 4), ('Residuals_', 1), \
+#             ('Total_points_', 1), ('RRinterval_bin_dis_', 2), ('Inverted_', 1)]
+#
+#name_list = generate_name_list(name_tuples)
+#print(name_list)
+#
+#records = wave.getRecords('~', _not=True) # N O A ~
+#feature_list = []
+#weird_list =[]
+#for record in records:
+#    try:
+#        data = wave.load(record)
+#        print ('running record: '+ record)
+#        sig = Signal(record,data)
+#        features = [record] + feature_extract(sig)
+#        feature_list.append(features)
+#    except Exception as e:
+#        print (record)
+#        print (str(e))
+#        weird_list.append(record)
+#        
+#feature_matrix = pd.DataFrame(feature_list, columns=name_list)

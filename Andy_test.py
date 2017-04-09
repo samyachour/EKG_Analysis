@@ -15,25 +15,6 @@ records = wave.getRecords('All') # N O A ~
 #print(len(records))
 #print(records)
 
-
-#A00397
-#A00763
-#A01312
-#A01429
-#A01818
-#A02417
-#A02706
-#A02961
-#A03549
-#A04244
-#A04735
-#A06103
-#A07524
-#A07648
-#A07664
-#A08034
-#A08402
-
 wired_list=[]
 
 feat_list=[]
@@ -41,8 +22,7 @@ for record in records:
 #    try:
     data = wave.load(record)
     print ('running record: '+ record)
-    sig = challenge.Signal(record,data)
-    noise_features = challenge.noise_feat_extract(sig)
+    noise_features = challenge.noise_feature_extract(data)
     feat_list.append(noise_features)
     print ('the number of records in the feature list: ' + str(len(feat_list)))
 #    except:
