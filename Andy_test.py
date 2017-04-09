@@ -22,8 +22,9 @@ for record in records:
 #    try:
     data = wave.load(record)
     print ('running record: '+ record)
-    noise_features = challenge.noise_feature_extract(data)
-    feat_list.append(noise_features)
+    sig = challenge.Signal(record, data)
+    features = challenge.feature_extract(sig)
+    feat_list.append(features)
     print ('the number of records in the feature list: ' + str(len(feat_list)))
 #    except:
 #        wired_list.append(record)
