@@ -15,7 +15,6 @@ import math
 from sklearn.decomposition import PCA
 import matplotlib.pyplot as plt
 
-
 #coeff_names = generate_name('wavelet_coeff_', 48)
 #PP_interval_stats_names = generate_name('PP_interval_stats_', 8)
 #PPeaks_stats_names = generate_name('PPeaks_stats_', 8)
@@ -329,6 +328,13 @@ def is_noisy(v):
     result = (1.0*par1) / (1 + par1)
     print(result)
     return (result > thresh)
+
+"""
+((test.DATA - center.vec)/scale.vec) %*% rotation.matrix
+
+((test.DATA (<-vector of data you want to test) - center.vec (<-vector alex is giving us, same length as test.Data))
+/scale.vec<-(element by element division)) %*% rotation.matrix
+"""
 
 #QPeak_stats = wave.cal_stats(signal.Qheights)
 #SPeak_stats = wave.cal_stats(signal.Sheights)

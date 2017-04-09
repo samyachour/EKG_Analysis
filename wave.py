@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 from sklearn import preprocessing
 import pandas as pd
 from detect_peaks import detect_peaks as detect_peaks_orig
+import scipy.io as sio
 
 """ Wave manipulation and feature extraction """
 
