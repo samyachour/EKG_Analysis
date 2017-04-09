@@ -269,7 +269,37 @@ def is_noisy(v):
 """
 
 
+def get_answer(record, data):
+    answer = ""
+    try:
+        print ('processing record: ' + record)
+        
+        print ('noise feature extraction...')
+        noise_feature = noise_feature_extract(data)
+        ## do PCA here in R
+        
+        print ('noise ECG classifier:')
+        if is_noisy(noise_feature):
+            answer = "~"
+        else:
+            print ('Not noisy, initalize signal object...')
+            sig = Signal(record, data)
+            
+            print ('generating feature vector...')
+            features = feature_extract(sig)
+            ## do PCA in R
+            
+            print ('multinomial classifier:')
+            answer = multi_model(features)
+    except:
+        answer = '~'
+    
+    print ('The ECG is: ' + answer)
+    return answer
+    
+    
 
+        
 
 
 
@@ -308,10 +338,7 @@ data = np.divide(mat['val'][0],1000)
 # Set everything to N in the beginning
 # TODO: check if noisy when giving out feature matrix
 
-if data[0] < 0:
-    answer = "N"
-else:
-    answer = "A"
+answer = get_answer(data)
 
 # Write result to answers.txt
 answers_file = open("answers.txt", "a")
