@@ -473,6 +473,7 @@ def get_answer(record, data):
 
 """
 PHYSIONET SUBMISSION CODE
+Add tar.gz files, remove matplotlib, make sure setup.sh includes library, remove/add DRYRUN, leave out test.py and ipnyb
 """
 
 import sys
