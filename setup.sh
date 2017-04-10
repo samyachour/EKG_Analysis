@@ -9,4 +9,6 @@
 set -e
 set -o pipefail
 
+pip install --user PyWavelets-0.5.2.tar.gz
+
 chmod a+x challenge.py
