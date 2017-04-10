@@ -15,6 +15,7 @@ from sklearn.decomposition import PCA
 import matplotlib.pyplot as plt
 
 # TODO: Debug record errors
+# TODO: code cleanup/refactoring, add unit tests
 
 # A03509 RRvar1, RRvar2, RRvar3 NaNs
 # A03863 A03812 too
