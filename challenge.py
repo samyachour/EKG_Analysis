@@ -16,6 +16,7 @@ import matplotlib.pyplot as plt
 
 # TODO: Debug record errors
 # TODO: code cleanup/refactoring, add unit tests
+# TODO: implement bandpass filter, 5-15hz see old paper pan tompkins like https://github.com/fernandoandreotti/qrsdetector/blob/master/pantompkins_qrs.m
 
 # A03509 RRvar1, RRvar2, RRvar3 NaNs
 # A03863 A03812 too
