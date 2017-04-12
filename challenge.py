@@ -11,8 +11,6 @@ import wave
 import numpy as np
 import pandas as pd
 import math
-from sklearn.decomposition import PCA
-import matplotlib.pyplot as plt
 
 # TODO: Debug record errors
 # TODO: code cleanup/refactoring, add unit tests
@@ -71,135 +69,6 @@ class Signal(object):
 
         #RR interval
         self.RRintervals = wave.wave_intervals(self.RPeaks)
-
-
-    def plotRPeaks(self):
-        fig = plt.figure(figsize=(9.7, 6)) # I used figures to customize size
-        ax = fig.add_subplot(111)
-        ax.plot(self.data)
-        # ax.axhline(self.baseline)
-        ax.plot(*zip(*self.RPeaks), marker='o', color='r', ls='')
-        ax.set_title(self.name)
-        # fig.savefig('/Users/samy/Downloads/{0}.png'.format(self.name))
-        plt.show()
-
-
-""" Journal club presentation """
-
-def pointDetection():
-    records = wave.getRecords('N') # N O A ~
-    data = wave.load(records[0])
-    sig = Signal(records[0], data)
-    fig = plt.figure(figsize=(200, 6)) # I used figures to customize size
-    ax = fig.add_subplot(211)
-    ax.plot(sig.data)
-    ax.plot(*zip(*sig.Ppeaks), marker='o', color='r', ls='')
-    ax.plot(*zip(*sig.Tpeaks), marker='o', color='r', ls='')
-    ax.plot(*zip(*sig.RPeaks), marker='o', color='r', ls='')
-    ax.plot(*zip(*sig.QPoints), marker='o', color='r', ls='')
-    ax.plot(*zip(*sig.SPoints), marker='o', color='r', ls='')
-    ax.axhline(sig.baseline)
-    ax.set_title(sig.name)
-    fig.savefig('/Users/samy/Downloads/{0}.png'.format(sig.name))
-    plt.show()
-    
-    records = wave.getRecords('A') # N O A ~
-    data = wave.load(records[0])
-    sig = Signal(records[0], data)
-    fig = plt.figure(figsize=(200, 6)) # I used figures to customize size
-    ax = fig.add_subplot(211)
-    ax.plot(sig.data)
-    ax.plot(*zip(*sig.Ppeaks), marker='o', color='r', ls='')
-    ax.plot(*zip(*sig.Tpeaks), marker='o', color='r', ls='')
-    ax.plot(*zip(*sig.RPeaks), marker='o', color='r', ls='')
-    ax.plot(*zip(*sig.QPoints), marker='o', color='r', ls='')
-    ax.plot(*zip(*sig.SPoints), marker='o', color='r', ls='')
-    ax.axhline(sig.baseline)
-    ax.set_title(sig.name)
-    fig.savefig('/Users/samy/Downloads/{0}.png'.format(sig.name))
-    plt.show()
-    
-    records = wave.getRecords('O') # N O A ~
-    data = wave.load(records[0])
-    sig = Signal(records[0], data)
-    fig = plt.figure(figsize=(200, 6)) # I used figures to customize size
-    ax = fig.add_subplot(211)
-    ax.plot(sig.data)
-    ax.plot(*zip(*sig.Ppeaks), marker='o', color='r', ls='')
-    ax.plot(*zip(*sig.Tpeaks), marker='o', color='r', ls='')
-    ax.plot(*zip(*sig.RPeaks), marker='o', color='r', ls='')
-    ax.plot(*zip(*sig.QPoints), marker='o', color='r', ls='')
-    ax.plot(*zip(*sig.SPoints), marker='o', color='r', ls='')
-    ax.axhline(sig.baseline)
-    ax.set_title(sig.name)
-    fig.savefig('/Users/samy/Downloads/{0}.png'.format(sig.name))
-    plt.show()
-    
-    
-    records = wave.getRecords('~') # N O A ~
-    data = wave.load(records[0])
-    sig = Signal(records[0], data)
-    fig = plt.figure(figsize=(200, 6)) # I used figures to customize size
-    ax = fig.add_subplot(211)
-    ax.plot(sig.data)
-    ax.plot(*zip(*sig.Ppeaks), marker='o', color='r', ls='')
-    ax.plot(*zip(*sig.Tpeaks), marker='o', color='r', ls='')
-    ax.plot(*zip(*sig.RPeaks), marker='o', color='r', ls='')
-    ax.plot(*zip(*sig.QPoints), marker='o', color='r', ls='')
-    ax.plot(*zip(*sig.SPoints), marker='o', color='r', ls='')
-    ax.axhline(sig.baseline)
-    ax.set_title(sig.name)
-    fig.savefig('/Users/samy/Downloads/{0}.png'.format(sig.name))
-    plt.show()
-
-
-def noiseRemoval():
-
-    data = wave.load('A00269')
-    wave.plot(data, title="A00269")
-    data = wave.discardNoise(data)
-    wave.plot(data, title="A00269 - After noise removal")
-    
-    level = 6
-    omission = ([1,2], True) # 5-40 hz
-    rebuilt = wave.decomp(data, 'sym5', level, omissions=omission)
-    wave.plot(rebuilt, title="A00269 - After wavelet decompisition") 
-    
-    data = wave.load('A00420')
-    wave.plot(data, title="A00420")
-    data = wave.discardNoise(data)
-    wave.plot(data, title="A00420 - After noise removal")
-    rebuilt = wave.decomp(data, 'sym5', level, omissions=omission)
-    wave.plot(rebuilt, title="A00420 - After wavelet decompisition") 
-    
-    data = wave.load('A00550')
-    wave.plot(data, title="A00550")
-    data = wave.discardNoise(data)
-    wave.plot(data, title="A00550 - After noise removal")
-    rebuilt = wave.decomp(data, 'sym5', level, omissions=omission)
-    wave.plot(rebuilt, title="A00420 - After wavelet decompisition") 
-    
-
-
-def feat_PCA(feat_mat, components=12):
-    """
-    this function does PCA on a feature matrix
-
-    Parameters
-    ----------
-        feat_mat: the original matrix
-        components: the PCA components we want to keep
-
-    Returns
-    -------
-        1. PCA components
-
-    """
-    pca = PCA(n_components = components)
-    pca.fit(feat_mat)
-    print('The number of components is: ' + str(components))
-    print('The pca explained variance ratio is:' + str(pca.explained_variance_ratio_))
-    return pca.components_
 
 def generate_name_list(name_tuples):
     name_list = []
@@ -334,21 +203,6 @@ def F1_score(prediction, target, path='../Physionet_Challenge/training2017/'):
         print('The F1 score for this class is: ' + str(F1))
         return F1
 
-#def all_F1_score(prediction, target=['N', 'A', 'O', '~'], path='../Physionet_Challenge/training2017/'):
-#    output[target]:F1_score(prediction, n, path) }
-#    total = 0
-#    for i in output:
-#        total += i
-#    avg = total/4
-#    output['avg'] = avg
-#    return output
-
-
-
-def all_F1_score(prediction, target=['N', 'A', 'O', '~'], path='../Physionet_Challenge/training2017/'):
-    for n in target:
-        F1 = F1_score(prediction, n, path)
-
 def multi_model(v):
 
     #get important vectors:
@@ -475,7 +329,8 @@ def get_answer(record, data):
 
 """
 PHYSIONET SUBMISSION CODE
-Add tar.gz files, remove matplotlib, make sure setup.sh includes library, remove/add DRYRUN, leave out test.py and ipnyb
+Add tar.gz files, make sure setup.sh includes libraries, remove/add DRYRUN,
+    leave out test.py, plot.py, and ipnyb
 """
 
 import sys

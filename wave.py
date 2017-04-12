@@ -1,6 +1,5 @@
 import pywt
 import numpy as np
-import matplotlib.pyplot as plt
 import pandas as pd
 from detect_peaks import detect_peaks as detect_peaks_orig
 import scipy.io as sio
@@ -17,22 +16,12 @@ def omit(coeffs, omissions, stationary=False):
         Coefficients list [cAn, {details_level_n}, ... {details_level_1}]
     omissions: tuple(list, bool), optional
         List of DETAIL levels to omit, if bool is true omit cA
-    stationary : bool, optional
-        Bool if true you use stationary wavelet omission, coeffs is [(cAn, cDn), ..., (cA2, cD2), (cA1, cD1)]
-
+    
     Returns
     -------
         nD array of reconstructed data.
 
     """
-    
-    if stationary: # if we want to use stationary wavelets, which you don't, trust me
-        for i in omissions[0]:
-            if omissions[1]:
-                coeffs[-i] = (np.zeros_like(coeffs[-i][0]), np.zeros_like(coeffs[-i][1]))
-            else:
-                coeffs[-i] = (np.zeros_like(coeffs[-i][0]), coeffs[-i][1])
-        return coeffs
     
     for i in omissions[0]:
         coeffs[-i] = {k: np.zeros_like(v) for k, v in coeffs[-i].items()}
@@ -72,30 +61,6 @@ def decomp(cA, wavelet, levels, mode='constant', omissions=([], False)):
     coeffs = omit(coeffs, omissions)
     
     return pywt.waverecn(coeffs, wavelet, mode=mode)
-
-
-# Don't use
-def s_decomp(cA, wavelet, levels, omissions=([], False)): # stationary wavelet transform, AKA maximal overlap
-    """
-    1-dimensional stationary wavelet decompisition and reconstruction
-
-    Parameters
-    ----------
-    ---Same as as decomp, not including mode---
-
-    Returns
-    -------
-        1D array of reconstructed data.
-
-    """
-
-    if omissions[0] and max(omissions[0]) > levels:
-        raise ValueError("Omission level %d is too high.  Maximum allowed is %d." % (max(omissions[0]), levels))
-        
-    coeffs = pywt.swt(cA, wavelet, level=levels, start_level=0)
-    coeffs = omit(coeffs, omissions, stationary=True)
-    
-    return pywt.iswt(coeffs, wavelet)
 
 def detect_peaks(x, plotX=np.array([]), mph=None, mpd=1, threshold=0, edge='rising', 
                  kpsh=False, valley=False, show=False, ax=None):
@@ -252,8 +217,6 @@ def getRPeaks(data, minDistance=150):
         inverted = True
     
     return (inverted, coordinates)
-
-# TODO: Make differnt RPeak detection that uses windowing to ignore noisy sections
 
 def getPTWaves(signal):
     """
@@ -455,26 +418,6 @@ def getRecords(trainingLabel, _not=False): # N O A ~
     else:
         subset = reference.ix[reference['answer']==trainingLabel]
         return subset['file'].tolist()
-
-def plot(y, title="Signal", xLab="Index * 0.003s"):
-    fig = plt.figure(figsize=(9.7, 6)) # I used figures to customize size
-    ax = fig.add_subplot(111)
-    ax.plot(y)
-    ax.set_title(title)
-    # fig.savefig('/Users/samy/Downloads/{0}.png'.format(self.name))
-    ax.set_ylabel("mV")
-    ax.set_xlabel(xLab)
-    plt.show()
-
-def multiplot(data, graph_names):
-    #plot multiple lines in one graph
-    # input:
-    #   data = list of data to plot
-    #   graph_names = list of record names to show in the legend
-    for l in data:
-        plt.plot(l)
-    plt.legend(graph_names)
-    plt.show()
     
 def interval(data):
     """

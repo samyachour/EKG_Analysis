@@ -171,8 +171,146 @@ plt.close()
 
 """
 
+""" Journal club presentation """
+
+def pointDetection():
+    records = wave.getRecords('N') # N O A ~
+    data = wave.load(records[0])
+    sig = Signal(records[0], data)
+    fig = plt.figure(figsize=(200, 6)) # I used figures to customize size
+    ax = fig.add_subplot(211)
+    ax.plot(sig.data)
+    ax.plot(*zip(*sig.Ppeaks), marker='o', color='r', ls='')
+    ax.plot(*zip(*sig.Tpeaks), marker='o', color='r', ls='')
+    ax.plot(*zip(*sig.RPeaks), marker='o', color='r', ls='')
+    ax.plot(*zip(*sig.QPoints), marker='o', color='r', ls='')
+    ax.plot(*zip(*sig.SPoints), marker='o', color='r', ls='')
+    ax.axhline(sig.baseline)
+    ax.set_title(sig.name)
+    fig.savefig('/Users/samy/Downloads/{0}.png'.format(sig.name))
+    plt.show()
+    
+    records = wave.getRecords('A') # N O A ~
+    data = wave.load(records[0])
+    sig = Signal(records[0], data)
+    fig = plt.figure(figsize=(200, 6)) # I used figures to customize size
+    ax = fig.add_subplot(211)
+    ax.plot(sig.data)
+    ax.plot(*zip(*sig.Ppeaks), marker='o', color='r', ls='')
+    ax.plot(*zip(*sig.Tpeaks), marker='o', color='r', ls='')
+    ax.plot(*zip(*sig.RPeaks), marker='o', color='r', ls='')
+    ax.plot(*zip(*sig.QPoints), marker='o', color='r', ls='')
+    ax.plot(*zip(*sig.SPoints), marker='o', color='r', ls='')
+    ax.axhline(sig.baseline)
+    ax.set_title(sig.name)
+    fig.savefig('/Users/samy/Downloads/{0}.png'.format(sig.name))
+    plt.show()
+    
+    records = wave.getRecords('O') # N O A ~
+    data = wave.load(records[0])
+    sig = Signal(records[0], data)
+    fig = plt.figure(figsize=(200, 6)) # I used figures to customize size
+    ax = fig.add_subplot(211)
+    ax.plot(sig.data)
+    ax.plot(*zip(*sig.Ppeaks), marker='o', color='r', ls='')
+    ax.plot(*zip(*sig.Tpeaks), marker='o', color='r', ls='')
+    ax.plot(*zip(*sig.RPeaks), marker='o', color='r', ls='')
+    ax.plot(*zip(*sig.QPoints), marker='o', color='r', ls='')
+    ax.plot(*zip(*sig.SPoints), marker='o', color='r', ls='')
+    ax.axhline(sig.baseline)
+    ax.set_title(sig.name)
+    fig.savefig('/Users/samy/Downloads/{0}.png'.format(sig.name))
+    plt.show()
+    
+    
+    records = wave.getRecords('~') # N O A ~
+    data = wave.load(records[0])
+    sig = Signal(records[0], data)
+    fig = plt.figure(figsize=(200, 6)) # I used figures to customize size
+    ax = fig.add_subplot(211)
+    ax.plot(sig.data)
+    ax.plot(*zip(*sig.Ppeaks), marker='o', color='r', ls='')
+    ax.plot(*zip(*sig.Tpeaks), marker='o', color='r', ls='')
+    ax.plot(*zip(*sig.RPeaks), marker='o', color='r', ls='')
+    ax.plot(*zip(*sig.QPoints), marker='o', color='r', ls='')
+    ax.plot(*zip(*sig.SPoints), marker='o', color='r', ls='')
+    ax.axhline(sig.baseline)
+    ax.set_title(sig.name)
+    fig.savefig('/Users/samy/Downloads/{0}.png'.format(sig.name))
+    plt.show()
+
+# Don't use
+def s_decomp(cA, wavelet, levels, omissions=([], False)): # stationary wavelet transform, AKA maximal overlap
+    """
+    1-dimensional stationary wavelet decompisition and reconstruction
+
+    Parameters
+    ----------
+    ---Same as as decomp, not including mode---
+
+    Returns
+    -------
+        1D array of reconstructed data.
+
+    """
+
+    if omissions[0] and max(omissions[0]) > levels:
+        raise ValueError("Omission level %d is too high.  Maximum allowed is %d." % (max(omissions[0]), levels))
+        
+    coeffs = pywt.swt(cA, wavelet, level=levels, start_level=0)
+    coeffs = omit(coeffs, omissions, stationary=True)
+    
+    return pywt.iswt(coeffs, wavelet)
+
+def noiseRemoval():
+
+    data = wave.load('A00269')
+    wave.plot(data, title="A00269")
+    data = wave.discardNoise(data)
+    wave.plot(data, title="A00269 - After noise removal")
+    
+    level = 6
+    omission = ([1,2], True) # 5-40 hz
+    rebuilt = wave.decomp(data, 'sym5', level, omissions=omission)
+    wave.plot(rebuilt, title="A00269 - After wavelet decompisition") 
+    
+    data = wave.load('A00420')
+    wave.plot(data, title="A00420")
+    data = wave.discardNoise(data)
+    wave.plot(data, title="A00420 - After noise removal")
+    rebuilt = wave.decomp(data, 'sym5', level, omissions=omission)
+    wave.plot(rebuilt, title="A00420 - After wavelet decompisition") 
+    
+    data = wave.load('A00550')
+    wave.plot(data, title="A00550")
+    data = wave.discardNoise(data)
+    wave.plot(data, title="A00550 - After noise removal")
+    rebuilt = wave.decomp(data, 'sym5', level, omissions=omission)
+    wave.plot(rebuilt, title="A00420 - After wavelet decompisition") 
+
 # data = pd.read_csv('../../../../../Downloads/A00001.csv')[[0]]
 # print(data)
+
+
+def feat_PCA(feat_mat, components=12):
+    """
+    this function does PCA on a feature matrix
+
+    Parameters
+    ----------
+        feat_mat: the original matrix
+        components: the PCA components we want to keep
+
+    Returns
+    -------
+        1. PCA components
+
+    """
+    pca = PCA(n_components = components)
+    pca.fit(feat_mat)
+    print('The number of components is: ' + str(components))
+    print('The pca explained variance ratio is:' + str(pca.explained_variance_ratio_))
+    return pca.components_
 
 """
 More testing
@@ -218,6 +356,20 @@ for i in records:
 '''
 """
 
+#def all_F1_score(prediction, target=['N', 'A', 'O', '~'], path='../Physionet_Challenge/training2017/'):
+#    output[target]:F1_score(prediction, n, path) }
+#    total = 0
+#    for i in output:
+#        total += i
+#    avg = total/4
+#    output['avg'] = avg
+#    return output
+
+
+
+def all_F1_score(prediction, target=['N', 'A', 'O', '~'], path='../Physionet_Challenge/training2017/'):
+    for n in target:
+        F1 = F1_score(prediction, n, path)
 
 w = pywt.Wavelet('sym5')
 print(pywt.dwt_max_level(data_len=1000, filter_len=w.dec_len))
