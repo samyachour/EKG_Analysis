@@ -22,7 +22,7 @@ def getRPeaks(data, sampling_rate=300.):
     out = ecg.hamilton_segmenter(data, sampling_rate=sampling_rate)
     # or just use ecg.ecg and make out -> out[2]
 
-    return out
+    return out[0]
 
 
 def discardNoise(data):
@@ -42,7 +42,7 @@ def discardNoise(data):
     """
     
     left_limit = 0
-    right_limit = 200
+    right_limit = 50
     
     dataSize = data.size
     data = data.tolist()
@@ -53,7 +53,7 @@ def discardNoise(data):
         if right_limit > dataSize: window = data[left_limit:]
         else: window = data[left_limit:right_limit]
         
-        if len(window) < 50:
+        if len(window) < 40:
             cleanData += window
             break
                 
@@ -64,8 +64,8 @@ def discardNoise(data):
         if residual <= 0.001 and np.std(window) < 1:
             cleanData += window
                 
-        left_limit += 200
-        right_limit += 200
+        left_limit += 50
+        right_limit += 50
     
     return np.asarray(cleanData)
 

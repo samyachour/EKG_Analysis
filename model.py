@@ -10,7 +10,9 @@ import plot
 # TODO: start calling R from python
 
 # TODO: Optimize noisy section removal, add back in the p wave detection
+# TODO: Derive bins from normal records
 
+# TODO: Deal with weird records....
 # A03509 RRvar1, RRvar2, RRvar3 NaNs
 # A03863 A03812 too
 # A00111, A00269, A00420, A00550, A00692, A01053, A01329 noisy sections
@@ -35,14 +37,24 @@ class Signal(object):
         self.sampling_rate = 300. # 300 hz
         self.sampleFreq = 1/300
 
-        #self.data = wave.discardNoise(data) # optimize this
+        # self.data = wave.discardNoise(data) # optimize this
         self.data = data
 
         self.RPeaks = wave.getRPeaks(self.data, sampling_rate=self.sampling_rate)
-
+        
         self.RRintervals = wave.interval(self.RPeaks)
 
 
+"""
+record = 'A01053'
+data = wave.load(record)
+plot.plot(data)
+sig = Signal(record, data)
+
+coords = [(i, sig.data[i]) for i in np.nditer(sig.RPeaks)]
+plot.plotCoords(sig.data, coords)
+"""
+"""
 records = wave.getRecords('All')
 
 for i in records:
@@ -50,7 +62,7 @@ for i in records:
     sig = Signal(i, data)
     coords = [(i, sig.data[i]) for i in np.nditer(sig.RPeaks)]
     plot.plotCoords(sig.data, coords)
-    
+""" 
     
     
     
