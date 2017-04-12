@@ -348,6 +348,58 @@ def getRPeaksOrig(data, minDistance=150):
     return (inverted, coordinates)
 
 
+class Signal(object):
+    """
+    An ECG/EKG signal
+
+    Attributes:
+        name: A string representing the record name.
+        data : 1-dimensional array with input signal data
+    """
+
+    def __init__(self, name, data):
+        """Return a Signal object whose record name is *name*,
+        signal data is *data*,
+        R peaks array of coordinates [(x1,y1), (x2, y2),..., (xn, yn)]  is *RPeaks*"""
+        self.name = name
+        self.orignalData = data
+        self.sampleFreq = 1/300
+
+        #self.data = wave.discardNoise(data)
+        self.data = data
+
+        RPeaks = wave.getRPeaks(self.data, 150)
+        self.RPeaks = RPeaks[1]
+        self.inverted = RPeaks[0]
+        if self.inverted: # flip the inverted signal
+            self.data = -self.data
+
+        PTWaves = wave.getPTWaves(self)
+        self.PPintervals = PTWaves[0] * self.sampleFreq
+        self.Ppeaks = PTWaves[1]
+        self.TTintervals = PTWaves[2] * self.sampleFreq
+        self.Tpeaks = PTWaves[3]
+
+        self.baseline = wave.getBaseline(self)
+
+        self.Pheights = [i[1] - self.baseline for i in self.Ppeaks]
+        self.Rheights = [i[1] - self.baseline for i in self.RPeaks]
+
+        QSPoints = wave.getQS(self)
+        self.QPoints = QSPoints[0]
+        self.SPoints = QSPoints[1]
+        self.Qheights = [i[1] - self.baseline for i in self.QPoints]
+        self.Sheights = [i[1] - self.baseline for i in self.SPoints]
+        self.QSdiff = np.asarray(self.Qheights) - np.asarray(self.Sheights)
+        self.QSdiff = self.QSdiff.tolist()
+        self.QSinterval = np.asarray([i[0] for i in self.SPoints]) - np.asarray([i[0] for i in self.QPoints])
+        self.QSinterval = self.QSinterval.tolist()
+
+        # TODO: Get pr and qt, careful with offset
+
+        #RR interval
+        self.RRintervals = wave.wave_intervals(self.RPeaks)
+
 def feat_PCA(feat_mat, components=12):
     """
     this function does PCA on a feature matrix

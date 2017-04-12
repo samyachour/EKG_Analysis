@@ -672,3 +672,15 @@ may consider it more useful to permit linking proprietary applications with
 the library.  If this is what you want to do, use the GNU Lesser General
 Public License instead of this License.  But first, please read
 <http://www.gnu.org/philosophy/why-not-lgpl.html>.
+
+(For the research group)
+
+Copyright (c) 2017 CHOC MI3
+
+All rights reserved.
+
+(For Biosppy)
+
+Copyright (c) 2015 Instituto de Telecomunicações. See AUTHORS for more details.
+
+All rights reserved.
