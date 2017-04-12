@@ -3,7 +3,6 @@ import numpy as np
 import pandas as pd
 import scipy.io as sio
 from biosppy.signals import ecg 
-import plot
 
 
 def getRPeaks(data, sampling_rate=300.):
@@ -15,20 +14,14 @@ def getRPeaks(data, sampling_rate=300.):
         1-dimensional array with input signal data
     Returns
     -------
-        tuple consisting of 2 elements:
-        if signal is inverted (bool)
-        list of tuple coordinates of R peaks in original signal data
-        [(x1,y1), (x2, y2),..., (xn, yn)]
+    data : array_like
+        1_dimensional array with the indices of each peak
+    
     """
     
     out = ecg.ecg(data, sampling_rate=sampling_rate)
     
-    coordinates = [(i, data[i]) for i in np.nditer(out[2])]
-    inverted = False
-
-    plot.plotCoords(data, coordinates)
-    
-    return (inverted, coordinates)
+    return out[2]
 
 
 def discardNoise(data):
