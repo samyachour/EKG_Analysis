@@ -20,7 +20,8 @@ def getRPeaks(data, sampling_rate=300.):
     """
     
     out = ecg.hamilton_segmenter(data, sampling_rate=sampling_rate)
-    
+    # or just use ecg.ecg and make out -> out[2]
+
     return out
 
 
