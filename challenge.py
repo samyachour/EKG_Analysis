@@ -11,6 +11,7 @@ import wave
 import numpy as np
 import pandas as pd
 import math
+import plot
 
 # TODO: Debug record errors
 # TODO: code cleanup/refactoring, add unit tests
@@ -18,6 +19,7 @@ import math
 
 # A03509 RRvar1, RRvar2, RRvar3 NaNs
 # A03863 A03812 too
+# A00111, A00269, A00420, A00550, A00692, A01053, A01329
 
 class Signal(object):
     """
@@ -36,7 +38,8 @@ class Signal(object):
         self.orignalData = data
         self.sampleFreq = 1/300
 
-        self.data = wave.discardNoise(data)
+        #self.data = wave.discardNoise(data)
+        self.data = data
 
         RPeaks = wave.getRPeaks(self.data, 150)
         self.RPeaks = RPeaks[1]
@@ -69,6 +72,7 @@ class Signal(object):
 
         #RR interval
         self.RRintervals = wave.wave_intervals(self.RPeaks)
+
 
 def generate_name_list(name_tuples):
     name_list = []

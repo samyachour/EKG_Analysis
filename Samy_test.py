@@ -4,6 +4,7 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import pywt
+import wave
 
 '''
 EKG = pd.read_csv("../MIT-BIH_Arrhythmia/100.csv", header=None)
@@ -291,6 +292,61 @@ def noiseRemoval():
 # data = pd.read_csv('../../../../../Downloads/A00001.csv')[[0]]
 # print(data)
 
+def getRPeaksOrig(data, minDistance=150):
+    """
+    R peak detection in 1 dimensional ECG wave
+
+    Parameters
+    ----------
+    data : array_like
+        1-dimensional array with input signal data
+    minDistance : positive integer
+        minimum distance between R peaks
+
+    Returns
+    -------
+        tuple consisting of 2 elements:
+        if signal is inverted (bool)
+        list of tuple coordinates of R peaks in original signal data
+        [(x1,y1), (x2, y2),..., (xn, yn)]
+
+    """
+    
+    # Standardized best wavelet decompisition choice
+    level = 6
+    omission = ([1,2], True) # 5-40 hz
+    rebuilt = decomp(data, 'sym5', level, omissions=omission)
+    
+    # Get rough draft of R peaks/valleys
+    peaks = detect_peaks(rebuilt, mpd=minDistance, mph=0.05)
+    if peaks.size == 0:
+        positive_R_first = [0]
+    else:
+        positive_R_first = [rebuilt[i] for i in np.nditer(peaks)]
+    pos_mph = np.mean(positive_R_first)
+    
+    valleys = detect_peaks(rebuilt, mpd=minDistance, mph=0.05,valley=True)
+    if valleys.size == 0:
+        negative_R_first = [0]
+    else:
+        negative_R_first = [rebuilt[i] for i in np.nditer(valleys)]
+    neg_mph = abs(np.mean(negative_R_first))
+    
+    # If the wave isn't inverted
+    if pos_mph > neg_mph:
+        positive_R = detect_peaks(rebuilt, mpd=minDistance, mph=pos_mph - pos_mph/3)
+        coordinates = [(int(i), data[i]) for i in np.nditer(positive_R)]
+        inverted = False
+    
+    # If the wave is inverted
+    elif neg_mph >= pos_mph:
+        negative_R = detect_peaks(rebuilt, mpd=minDistance, mph=neg_mph - neg_mph/3,valley=True)
+        # -data[i] because I invert the signal later, and want positive R peak values
+        coordinates = [(int(i), -data[i]) for i in np.nditer(negative_R)]
+        inverted = True
+    
+    return (inverted, coordinates)
+
 
 def feat_PCA(feat_mat, components=12):
     """
@@ -371,8 +427,6 @@ def all_F1_score(prediction, target=['N', 'A', 'O', '~'], path='../Physionet_Cha
     for n in target:
         F1 = F1_score(prediction, n, path)
 
-w = pywt.Wavelet('sym5')
-print(pywt.dwt_max_level(data_len=1000, filter_len=w.dec_len))
-
-
+#w = pywt.Wavelet('sym5')
+#print(pywt.dwt_max_level(data_len=1000, filter_len=w.dec_len))
 

@@ -3,8 +3,39 @@ import numpy as np
 import pandas as pd
 from detect_peaks import detect_peaks as detect_peaks_orig
 import scipy.io as sio
+from biosppy.signals import ecg 
+import plot
+
+
 
 """ Wave manipulation and feature extraction """
+
+def getRPeaks(data, sampling_rate=300.):
+    """
+    R peak detection in 1 dimensional ECG wave
+
+    Parameters
+    ----------
+    data : array_like
+        1-dimensional array with input signal data
+
+    Returns
+    -------
+        tuple consisting of 2 elements:
+        if signal is inverted (bool)
+        list of tuple coordinates of R peaks in original signal data
+        [(x1,y1), (x2, y2),..., (xn, yn)]
+
+    """
+    
+    out = ecg.ecg(data, sampling_rate=sampling_rate)
+    
+    coordinates = [(i, data[i]) for i in np.nditer(out[2])]
+    inverted = False
+
+    plot.plotCoords(data, coordinates)
+    
+    return (inverted, coordinates)
 
 def omit(coeffs, omissions, stationary=False):
     """
@@ -162,61 +193,13 @@ def discardNoise(data):
         right_limit += 200
     
     return np.asarray(cleanData)
-        
-def getRPeaks(data, minDistance=150):
-    """
-    R peak detection in 1 dimensional ECG wave
 
-    Parameters
-    ----------
-    data : array_like
-        1-dimensional array with input signal data
-    minDistance : positive integer
-        minimum distance between R peaks
 
-    Returns
-    -------
-        tuple consisting of 2 elements:
-        if signal is inverted (bool)
-        list of tuple coordinates of R peaks in original signal data
-        [(x1,y1), (x2, y2),..., (xn, yn)]
 
-    """
-    
-    # Standardized best wavelet decompisition choice
-    level = 6
-    omission = ([1,2], True) # 5-40 hz
-    rebuilt = decomp(data, 'sym5', level, omissions=omission)
-    
-    # Get rough draft of R peaks/valleys
-    peaks = detect_peaks(rebuilt, mpd=minDistance, mph=0.05)
-    if peaks.size == 0:
-        positive_R_first = [0]
-    else:
-        positive_R_first = [rebuilt[i] for i in np.nditer(peaks)]
-    pos_mph = np.mean(positive_R_first)
-    
-    valleys = detect_peaks(rebuilt, mpd=minDistance, mph=0.05,valley=True)
-    if valleys.size == 0:
-        negative_R_first = [0]
-    else:
-        negative_R_first = [rebuilt[i] for i in np.nditer(valleys)]
-    neg_mph = abs(np.mean(negative_R_first))
-    
-    # If the wave isn't inverted
-    if pos_mph > neg_mph:
-        positive_R = detect_peaks(rebuilt, mpd=minDistance, mph=pos_mph - pos_mph/3)
-        coordinates = [(int(i), data[i]) for i in np.nditer(positive_R)]
-        inverted = False
-    
-    # If the wave is inverted
-    elif neg_mph >= pos_mph:
-        negative_R = detect_peaks(rebuilt, mpd=minDistance, mph=neg_mph - neg_mph/3,valley=True)
-        # -data[i] because I invert the signal later, and want positive R peak values
-        coordinates = [(int(i), -data[i]) for i in np.nditer(negative_R)]
-        inverted = True
-    
-    return (inverted, coordinates)
+
+""" Feature extraction we need to work on """
+# TODO: perfect these functions
+
 
 def getPTWaves(signal):
     """
@@ -391,6 +374,9 @@ def getBaseline(signal):
         return baselineY/trueBaselines
     else:
         return np.mean(signal.data)
+
+
+
 
 """ Helper functions """
 

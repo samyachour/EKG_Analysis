@@ -29,3 +29,10 @@ def plotRPeaks(signal):
     ax.set_title(signal.name)
     # fig.savefig('/Users/samy/Downloads/{0}.png'.format(self.name))
     plt.show()
+    
+def plotCoords(data, coords):
+    fig = plt.figure(figsize=(9.7, 6)) # I used figures to customize size
+    ax = fig.add_subplot(111)
+    ax.plot(data)
+    ax.plot(*zip(*coords), marker='o', color='r', ls='')
+    plt.show()
