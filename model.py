@@ -5,14 +5,17 @@ import numpy as np
 import math
 import plot
 
-# TODO: Debug record errors
+# NOW
+
 # TODO: code cleanup/refactoring, add unit tests
 # TODO: start calling R from python
 
-# TODO: Optimize noisy section removal, add back in the p wave detection
-
 # TODO: Derive bins from normal records
 
+
+# LATER
+
+# TODO: Optimize noisy section removal, add back in the p wave detection
 # TODO: Deal with weird records....
 # A03509 RRvar1, RRvar2, RRvar3 NaNs
 # A03863 A03812 too
