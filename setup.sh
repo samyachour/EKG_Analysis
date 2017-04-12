@@ -13,5 +13,6 @@ pip install --user PyWavelets-0.5.2.tar.gz
 pip install --user numpy-1.12.1.tar.gz
 pip install --user scipy-0.19.0.tar.gz
 pip install --user pandas-0.19.2.tar.gz
+pip install --user biosppy-0.1.2.zip
 
 chmod a+x challenge.py
