@@ -2,7 +2,7 @@ import pywt
 import numpy as np
 import pandas as pd
 import scipy.io as sio
-from biosppy.signals import ecg 
+from biosppy.signals import ecg
 
 
 def getRPeaks(data, sampling_rate=300.):
@@ -19,9 +19,9 @@ def getRPeaks(data, sampling_rate=300.):
     
     """
     
-    out = ecg.ecg(data, sampling_rate=sampling_rate)
+    out = ecg.hamilton_segmenter(data, sampling_rate=sampling_rate)
     
-    return out[2]
+    return out
 
 
 def discardNoise(data):
