@@ -19,10 +19,10 @@ def getRPeaks(data, sampling_rate=300.):
     
     """
     
-    out = ecg.hamilton_segmenter(data, sampling_rate=sampling_rate)
+    out = ecg.ecg(data, sampling_rate=sampling_rate, show=False)
     # or just use ecg.ecg and make out -> out[2]
 
-    return out[0]
+    return out[2]
 
 
 def discardNoise(data):
@@ -144,17 +144,35 @@ def load(filename, path = '../Physionet_Challenge/training2017/'):
     data = np.divide(mat['val'][0],1000)
     return data
 
-def getRecords(trainingLabel, _not=False): # N O A ~
+def getRecords(trainingLabel, _not=False, path='../Physionet_Challenge/training2017/REFERENCE.csv'): # N O A ~
+    """
+    Get record names from a reference.csv
+
+    Parameters
+    ----------
+    trainingLabel : String
+        The label you want to grab, N O A ~ or All
+    _not : Bool, optional
+        If you want to get everything _except_ the given training label, default False
+    path : String, optional
+        The path to the Reference.csv, default is the training2017 csv   
+
+    Returns
+    -------
+        tuple of equally sized lists:
+            list of record names
+            list of record labels N O A ~
+    """
     
-    reference = pd.read_csv('../Physionet_Challenge/training2017/REFERENCE.csv', names = ["file", "answer"]) # N O A ~
+    reference = pd.read_csv(path, names = ["file", "answer"]) # N O A ~
     if trainingLabel == 'All':
-        return reference['file'].tolist()
+        return (reference['file'].tolist(), reference['answer'].tolist())
     if _not:
         subset = reference.ix[reference['answer']!=trainingLabel]
-        return subset['file'].tolist()
+        return (subset['file'].tolist(), subset['answer'].tolist())
     else:
         subset = reference.ix[reference['answer']==trainingLabel]
-        return subset['file'].tolist()
+        return (subset['file'].tolist(), subset['answer'].tolist())
     
 def interval(data):
     """
