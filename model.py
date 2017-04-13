@@ -10,7 +10,7 @@ import plot
 # TODO: code cleanup/refactoring, add unit tests
 # TODO: start calling R from python
 
-# TODO: Derive bins from normal records
+# TODO: Derive bins from normal records, after low/high/butterworth filter like the polish
 
 
 # LATER
