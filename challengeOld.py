@@ -7,11 +7,12 @@ Created on Mon Apr  3 12:47:16 2017
 """
 
 import pywt
-import wave
+import waveOld as wave
 import numpy as np
 import pandas as pd
 import math
 import plot
+import matplotlib.pyplot as plt
 
 # TODO: Debug record errors
 # TODO: code cleanup/refactoring, add unit tests
@@ -73,6 +74,78 @@ class Signal(object):
         #RR interval
         self.RRintervals = wave.wave_intervals(self.RPeaks)
 
+
+""" Journal club presentation """
+
+def pointDetection():
+    records = wave.getRecords('N') # N O A ~
+    data = wave.load(records[0])
+    sig = Signal(records[0], data)
+    fig = plt.figure(figsize=(200, 6)) # I used figures to customize size
+    ax = fig.add_subplot(211)
+    ax.plot(sig.data)
+    ax.plot(*zip(*sig.Ppeaks), marker='o', color='r', ls='')
+    ax.plot(*zip(*sig.Tpeaks), marker='o', color='r', ls='')
+    ax.plot(*zip(*sig.RPeaks), marker='o', color='r', ls='')
+    ax.plot(*zip(*sig.QPoints), marker='o', color='r', ls='')
+    ax.plot(*zip(*sig.SPoints), marker='o', color='r', ls='')
+    ax.axhline(sig.baseline)
+    ax.set_title(sig.name)
+    fig.savefig('/Users/samy/Downloads/{0}.png'.format(sig.name))
+    plt.show()
+    
+    records = wave.getRecords('A') # N O A ~
+    data = wave.load(records[0])
+    sig = Signal(records[0], data)
+    fig = plt.figure(figsize=(200, 6)) # I used figures to customize size
+    ax = fig.add_subplot(211)
+    ax.plot(sig.data)
+    ax.plot(*zip(*sig.Ppeaks), marker='o', color='r', ls='')
+    ax.plot(*zip(*sig.Tpeaks), marker='o', color='r', ls='')
+    ax.plot(*zip(*sig.RPeaks), marker='o', color='r', ls='')
+    ax.plot(*zip(*sig.QPoints), marker='o', color='r', ls='')
+    ax.plot(*zip(*sig.SPoints), marker='o', color='r', ls='')
+    ax.axhline(sig.baseline)
+    ax.set_title(sig.name)
+    fig.savefig('/Users/samy/Downloads/{0}.png'.format(sig.name))
+    plt.show()
+    
+    records = wave.getRecords('O') # N O A ~
+    data = wave.load(records[0])
+    sig = Signal(records[0], data)
+    fig = plt.figure(figsize=(200, 6)) # I used figures to customize size
+    ax = fig.add_subplot(211)
+    ax.plot(sig.data)
+    ax.plot(*zip(*sig.Ppeaks), marker='o', color='r', ls='')
+    ax.plot(*zip(*sig.Tpeaks), marker='o', color='r', ls='')
+    ax.plot(*zip(*sig.RPeaks), marker='o', color='r', ls='')
+    ax.plot(*zip(*sig.QPoints), marker='o', color='r', ls='')
+    ax.plot(*zip(*sig.SPoints), marker='o', color='r', ls='')
+    ax.axhline(sig.baseline)
+    ax.set_title(sig.name)
+    fig.savefig('/Users/samy/Downloads/{0}.png'.format(sig.name))
+    plt.show()
+    
+    
+    records = wave.getRecords('~') # N O A ~
+    data = wave.load(records[0])
+    sig = Signal(records[0], data)
+    fig = plt.figure(figsize=(200, 6)) # I used figures to customize size
+    ax = fig.add_subplot(211)
+    ax.plot(sig.data)
+    ax.plot(*zip(*sig.Ppeaks), marker='o', color='r', ls='')
+    ax.plot(*zip(*sig.Tpeaks), marker='o', color='r', ls='')
+    ax.plot(*zip(*sig.RPeaks), marker='o', color='r', ls='')
+    ax.plot(*zip(*sig.QPoints), marker='o', color='r', ls='')
+    ax.plot(*zip(*sig.SPoints), marker='o', color='r', ls='')
+    ax.axhline(sig.baseline)
+    ax.set_title(sig.name)
+    fig.savefig('/Users/samy/Downloads/{0}.png'.format(sig.name))
+    plt.show()
+    
+pointDetection()
+    
+    
 
 def generate_name_list(name_tuples):
     name_list = []
