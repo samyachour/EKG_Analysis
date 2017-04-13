@@ -20,7 +20,6 @@ def getRPeaks(data, sampling_rate=300.):
     """
     
     out = ecg.ecg(data, sampling_rate=sampling_rate, show=False)
-    # or just use ecg.ecg and make out -> out[2]
 
     return out[2]
 

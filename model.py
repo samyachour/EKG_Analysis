@@ -10,7 +10,8 @@ import plot
 # TODO: code cleanup/refactoring, add unit tests
 # TODO: start calling R from python
 
-# TODO: Derive bins from normal records, after low/high/butterworth filter like the polish
+# TODO: Implement bandpass filtering (see samy_test.py), talk to andrew
+# TODO: Derive bins from normal records
 
 
 # LATER
@@ -49,7 +50,7 @@ class Signal(object):
         self.RRintervals = wave.interval(self.RPeaks)
 
 
-"""
+
 record = 'A00617'
 data = wave.load(record)
 plot.plot(data)
@@ -57,8 +58,8 @@ sig = Signal(record, data)
 
 coords = [(i, sig.data[i]) for i in np.nditer(sig.RPeaks)]
 plot.plotCoords(sig.data, coords)
-"""
 
+"""
 records = wave.getRecords('All')
 training = records[0][:853]
 exception = records[0][7675:]
@@ -70,8 +71,9 @@ for i in records[0]:
     print("Processing {}".format(i))
     coords = [(i, sig.data[i]) for i in np.nditer(sig.RPeaks)]
     plot.plotCoords(sig.data, coords)
-    
-    
+"""
+
+ 
     
     
 

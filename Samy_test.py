@@ -5,6 +5,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 import pywt
 import wave
+import scipy
+import plot
 
 '''
 EKG = pd.read_csv("../MIT-BIH_Arrhythmia/100.csv", header=None)
@@ -481,4 +483,40 @@ def all_F1_score(prediction, target=['N', 'A', 'O', '~'], path='../Physionet_Cha
 
 #w = pywt.Wavelet('sym5')
 #print(pywt.dwt_max_level(data_len=1000, filter_len=w.dec_len))
+
+def butter_bandpass(lowcut, highcut, fs, order=5):
+    nyq = 0.5 * fs
+    low = lowcut / nyq
+    high = highcut / nyq
+    b, a = scipy.signal.butter(order, [low, high], btype='band')
+    return b, a
+
+
+def butter_bandpass_filter(data, lowcut, highcut, fs, order=5):
+    b, a = butter_bandpass(lowcut, highcut, fs, order=order)
+    y = scipy.signal.filtfilt(b, a, data) # or use b=mexican hat and a=1
+    return y
+
+record = 'A00001'
+data = wave.load(record)
+plot.plot(data[:1000])
+
+level = 6
+omission = ([5,6], True) # 5-40 hz
+rebuilt = wave.decomp(data, 'mexh', level, omissions=omission)
+plot.plot(rebuilt[:1000])
+
+# Sample rate and desired cutoff frequencies (in Hz).
+fs = 300.0
+lowcut = 5
+highcut = 15
+
+#b1 = resample(b1,250)
+#bpfecg = filtfilt(b1,1,ecg)
+
+y = butter_bandpass_filter(data, lowcut, highcut, fs, order=6)
+plot.plot(y[:1000])
+
+
+
 
