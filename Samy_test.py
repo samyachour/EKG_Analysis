@@ -494,7 +494,8 @@ def butter_bandpass(lowcut, highcut, fs, order=5):
 
 def butter_bandpass_filter(data, lowcut, highcut, fs, order=5):
     b, a = butter_bandpass(lowcut, highcut, fs, order=order)
-    y = scipy.signal.filtfilt(b, a, data) # or use b=mexican hat and a=1
+    # y = scipy.signal.lfilter(b, a, data)
+    y = scipy.signal.filtfilt(b, a, data) # or use b=mexican hat and a=1, resample?
     return y
 
 record = 'A00001'
