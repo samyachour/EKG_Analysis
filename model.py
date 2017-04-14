@@ -13,8 +13,9 @@ import plot
 # LATER
 
 # TODO: code cleanup/refactoring, add unit tests
-# TODO: Start using rpy2 to work with alex's code to do regression
-# TODO: Optimize noisy section removal, add back in the p wave detection
+# TODO: Start using rpy2 to work with alex's code to do regression http://rpy.sourceforge.net/rpy2/doc-dev/html/introduction.html
+# TODO: Optimize noisy section removal, add back in the p wave detection if needed
+
 # TODO: Deal with weird records....
 # A03509 RRvar1, RRvar2, RRvar3 NaNs
 # A03863 A03812 too
@@ -56,6 +57,7 @@ sig = Signal(record, data)
 
 coords = [(i, sig.data[i]) for i in np.nditer(sig.RPeaks)]
 plot.plotCoords(sig.data, coords)
+print(sig.RRintervals)
 
 """
 records = wave.getRecords('All')
