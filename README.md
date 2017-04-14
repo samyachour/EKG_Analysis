@@ -11,7 +11,7 @@ We are participating in the PhysioNet 2017 Challenge: [Atrial Fibrillation Class
 3. Other (Arrhythmia)
 4. Noisy
 
-The files you want to look at to understand the logic of our algorithm are wave.py and model.py
+The files you want to look at to understand the logic of our algorithm are [wave.py](https://github.com/samyachour/EKG_Analysis/blob/master/wave.py) and [model.py](https://github.com/samyachour/EKG_Analysis/blob/master/model.py)
 
 ## Dependencies
 Our codebase is all in Python (3+) and makes use of your typical data science libraries: Numpy, Scipy, Pandas, Matplotlib, and Scikit Learn.
