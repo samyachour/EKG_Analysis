@@ -9,7 +9,6 @@ import plot
 
 # TODO: code cleanup/refactoring, add unit tests
 # TODO: start calling R from python
-# TODO: Write shell script for compressing files into entry.zip
 
 # TODO: Implement bandpass filtering (see samy_test.py), talk to andrew
 # TODO: Derive bins from normal records

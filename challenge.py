@@ -5,8 +5,6 @@ import numpy as np
 
 """
 PHYSIONET SUBMISSION CODE
-Add tar.gz files, make sure setup.sh includes libraries, remove/add DRYRUN,
-    leave out test.py, plot.py, and ipnyb
 """
 
 import sys
