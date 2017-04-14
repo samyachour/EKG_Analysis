@@ -4,6 +4,7 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import pywt
+import detect_peaks
 import wave
 import scipy
 import plot
@@ -499,28 +500,47 @@ def butter_bandpass_filter(data, lowcut, highcut, fs, order=5):
     return y
 
 
-record = 'A00001'
+record = 'A00269'
 data = wave.load(record)
-plot.plot(data[:1000])
+plot.plot(data)
 
 level = 6
 omission = ([5,6], True) # 5-40 hz
-rebuilt = wave.decomp(data, 'mexh', level, omissions=omission)
-plot.plot(rebuilt[:1000])
+
+widths = 1
+cwtmatr, freqs = pywt.cwt(data, widths, 'mexh')
+
+#plot.plot(cwtmatr)
 
 # Sample rate and desired cutoff frequencies (in Hz).
 fs = 300.0
 lowcut = 5
 highcut = 15
 
-#b1 = resample(b1,250)
-#bpfecg = filtfilt(b1,1,ecg)
+# from physionet sample
+b1 = np.asarray([-7.757327341237223e-05,  -2.357742589814283e-04, -6.689305101192819e-04, -0.001770119249103,
+                 -0.004364327211358, -0.010013251577232, -0.021344241245400, -0.042182820580118,
+                 -0.077080889653194, -0.129740392318591, -0.200064921294891, -0.280328573340852,
+                 -0.352139052257134, -0.386867664739069, -0.351974030208595, -0.223363323458050,
+                 0, 0.286427448595213, 0.574058766243311, 0.788100265785590, 0.867325070584078,
+                 0.788100265785590, 0.574058766243311, 0.286427448595213, 0, -0.223363323458050,
+                 -0.351974030208595, -0.386867664739069, -0.352139052257134, -0.280328573340852,
+                 -0.200064921294891, -0.129740392318591, -0.077080889653194, -0.042182820580118,
+                 -0.021344241245400, -0.010013251577232, -0.004364327211358, -0.001770119249103,
+                 -6.689305101192819e-04, -2.357742589814283e-04, -7.757327341237223e-05])
+
+secs = len(b1)/300 # Number of seconds in signal X
+samps = secs*250     # Number of samples to downsample
+b1 = scipy.signal.resample(b1,samps)
+bpfecg = scipy.signal.filtfilt(b1,1,data)
+
+plot.plot(bpfecg)
 
 y = butter_bandpass_filter(data, lowcut, highcut, fs, order=6)
-plot.plot(y[:1000])
+plot.plot(y)
 
 
-import rpy2.robjects as robjects
+#import rpy2.robjects as robjects
 
 
 

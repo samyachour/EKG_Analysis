@@ -50,7 +50,7 @@ class Signal(object):
 
 
 
-record = 'A00617'
+record = 'A00269'
 data = wave.load(record)
 plot.plot(data)
 sig = Signal(record, data)
