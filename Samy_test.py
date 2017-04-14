@@ -529,7 +529,7 @@ b1 = np.asarray([-7.757327341237223e-05,  -2.357742589814283e-04, -6.68930510119
                  -0.021344241245400, -0.010013251577232, -0.004364327211358, -0.001770119249103,
                  -6.689305101192819e-04, -2.357742589814283e-04, -7.757327341237223e-05])
 
-secs = len(b1)/300 # Number of seconds in signal X
+secs = b1.size/300 # Number of seconds in signal X
 samps = secs*250     # Number of samples to downsample
 b1 = scipy.signal.resample(b1,samps)
 bpfecg = scipy.signal.filtfilt(b1,1,data)

@@ -4,17 +4,18 @@ import pandas as pd
 import numpy as np
 import math
 import plot
+import scipy
 
 # NOW
 
-# TODO: Implement bandpass filtering (see samy_test.py), talk to andrew
+# TODO: Remove noisy parts of signal
 # TODO: Derive bins from normal records
 
 # LATER
 
 # TODO: code cleanup/refactoring, add unit tests
 # TODO: Start using rpy2 to work with alex's code to do regression http://rpy.sourceforge.net/rpy2/doc-dev/html/introduction.html
-# TODO: Optimize noisy section removal, add back in the p wave detection if needed
+# TODO: Add back in the p wave detection if needed
 
 # TODO: Deal with weird records....
 # A03509 RRvar1, RRvar2, RRvar3 NaNs
@@ -41,23 +42,35 @@ class Signal(object):
         self.sampling_rate = 300. # 300 hz
         self.sampleFreq = 1/300
 
-        # self.data = wave.discardNoise(data) # optimize this
-        self.data = data
+        self.data = wave.discardNoise(data) # optimize this
+        # self.data = data
 
         self.RPeaks = wave.getRPeaks(self.data, sampling_rate=self.sampling_rate)
         
         self.RRintervals = wave.interval(self.RPeaks)
 
 
+record = 'A00001'
+data = wave.load(record)
+plot.plot(data)
+data = wave.filterSignal(data)
+plot.plot(data)
+data = wave.discardNoise(data, 100)
+plot.plot(data)
+data = wave.discardNoise(data, 100)
+plot.plot(data)
 
+
+"""
 record = 'A00269'
 data = wave.load(record)
 plot.plot(data)
+
 sig = Signal(record, data)
 
 coords = [(i, sig.data[i]) for i in np.nditer(sig.RPeaks)]
 plot.plotCoords(sig.data, coords)
-print(sig.RRintervals)
+"""
 
 """
 records = wave.getRecords('All')

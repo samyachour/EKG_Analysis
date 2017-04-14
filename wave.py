@@ -3,6 +3,8 @@ import numpy as np
 import pandas as pd
 import scipy.io as sio
 from biosppy.signals import ecg
+import plot
+import scipy
 
 
 def getRPeaks(data, sampling_rate=300.):
@@ -24,7 +26,7 @@ def getRPeaks(data, sampling_rate=300.):
     return out[2]
 
 
-def discardNoise(data):
+def discardNoise(data, winSize=100):
     """
     Discarding sections of the input signal that are noisy
 
@@ -32,6 +34,8 @@ def discardNoise(data):
     ----------
     data : array_like
         1-dimensional array with input signal data
+    winSize : int
+        size of the windows to keep or discard
 
     Returns
     -------
@@ -41,30 +45,41 @@ def discardNoise(data):
     """
     
     left_limit = 0
-    right_limit = 50
+    right_limit = winSize
     
     dataSize = data.size
     data = data.tolist()
     cleanData = []
+    
+    residuals = []
+    stds = []
     
     while True:
         
         if right_limit > dataSize: window = data[left_limit:]
         else: window = data[left_limit:right_limit]
         
-        if len(window) < 40:
+        w = pywt.Wavelet('sym4')
+        levels = pywt.dwt_max_level(len(window), w)
+        
+        if levels <= 1:
             cleanData += window
             break
                 
-        w = pywt.Wavelet('sym4')
-        residual = calculate_residuals(np.asarray(window), levels=pywt.dwt_max_level(len(window), w))
+        residual = calculate_residuals(np.asarray(window), levels=levels)
+        std = np.std(window)
         
+        residuals.append(residual)
+        stds.append(std)
         
-        if residual <= 0.001 and np.std(window) < 1:
+        if residual < 0.002 and std < 0.5:
             cleanData += window
                 
-        left_limit += 50
-        right_limit += 50
+        left_limit += winSize
+        right_limit += winSize
+    
+    plot.plot(residuals, title="Residuals", yLab="Residual Stat", xLab=str(winSize) + " sized window")
+    plot.plot(stds, title="Standard Deviations", yLab="Standard deviation", xLab=str(winSize) + " sized window")
     
     return np.asarray(cleanData)
 
@@ -127,6 +142,40 @@ def decomp(cA, wavelet, levels, mode='constant', omissions=([], False)):
     return pywt.waverecn(coeffs, wavelet, mode=mode)
 
 
+def filterSignal(data, sampling_rate=300.0):
+    
+    """
+    bandpass filter using mexican hat hardcoded values from physionet
+
+    Parameters
+    ----------
+    data : array_like
+        1-dimensional array with input data.
+
+    Returns
+    -------
+        1D array of filtered signal data.
+
+    """
+    
+    # from physionet sample2017
+    b1 = np.asarray([-7.757327341237223e-05,  -2.357742589814283e-04, -6.689305101192819e-04, -0.001770119249103,
+                     -0.004364327211358, -0.010013251577232, -0.021344241245400, -0.042182820580118,
+                     -0.077080889653194, -0.129740392318591, -0.200064921294891, -0.280328573340852,
+                     -0.352139052257134, -0.386867664739069, -0.351974030208595, -0.223363323458050,
+                     0, 0.286427448595213, 0.574058766243311, 0.788100265785590, 0.867325070584078,
+                     0.788100265785590, 0.574058766243311, 0.286427448595213, 0, -0.223363323458050,
+                     -0.351974030208595, -0.386867664739069, -0.352139052257134, -0.280328573340852,
+                     -0.200064921294891, -0.129740392318591, -0.077080889653194, -0.042182820580118,
+                     -0.021344241245400, -0.010013251577232, -0.004364327211358, -0.001770119249103,
+                     -6.689305101192819e-04, -2.357742589814283e-04, -7.757327341237223e-05])
+    
+    secs = b1.size/sampling_rate # Number of seconds in signal X
+    samps = secs*250     # Number of samples to downsample to
+    b1 = scipy.signal.resample(b1,int(samps))
+    bpfecg = scipy.signal.filtfilt(b1,1,data)
+    
+    return bpfecg
 
 """ Helper functions """
 
@@ -203,3 +252,26 @@ def calculate_residuals(original, levels=5):
     rebuilt = decomp(original, wavelet='sym4', levels=levels, mode='symmetric', omissions=([1],False))
     residual = sum(abs(original-rebuilt[:len(original)]))/len(original)
     return residual
+
+def diff_var(intervals, skip=2):
+    """
+    This function calculate the variances for the differences between each value and the value that
+    is the specified number (skip) of values next to it.
+    eg. skip = 2 means the differences of one value and the value with 2 positions next to it.
+
+    Parameters
+    ----------
+        intervals: the interval that we want to calculate
+        skip: the number of position that we want the differences from
+
+    Returns
+    -------
+        the variances of the differences in the intervals
+    """
+    
+    diff = []
+    for i in range(0, len(intervals)-skip, skip):
+        per_diff= intervals[i]-intervals[i+skip]
+        diff.append(per_diff)
+    diff = np.array(diff)
+    return np.var(diff)   
