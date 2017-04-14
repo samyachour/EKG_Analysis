@@ -4,7 +4,6 @@ import pandas as pd
 import numpy as np
 import math
 import plot
-import scipy
 
 # NOW
 
@@ -41,7 +40,8 @@ class Signal(object):
         self.name = name
         self.sampling_rate = 300. # 300 hz
         self.sampleFreq = 1/300
-
+        
+        self.data = wave.filterSignal(data)
         self.data = wave.discardNoise(data) # optimize this
         # self.data = data
 
@@ -50,15 +50,13 @@ class Signal(object):
         self.RRintervals = wave.interval(self.RPeaks)
 
 
-record = 'A00001'
+record = 'A00269'
 data = wave.load(record)
 plot.plot(data)
-data = wave.filterSignal(data)
-plot.plot(data)
-data = wave.discardNoise(data, 100)
-plot.plot(data)
-data = wave.discardNoise(data, 100)
-plot.plot(data)
+sig = Signal(record, data)
+
+coords = [(i, sig.data[i]) for i in np.nditer(sig.RPeaks)]
+plot.plotCoords(sig.data, coords)
 
 
 """

@@ -49,10 +49,8 @@ def discardNoise(data, winSize=100):
     
     dataSize = data.size
     data = data.tolist()
-    cleanData = []
     
     residuals = []
-    stds = []
     
     while True:
         
@@ -62,24 +60,26 @@ def discardNoise(data, winSize=100):
         w = pywt.Wavelet('sym4')
         levels = pywt.dwt_max_level(len(window), w)
         
-        if levels <= 1:
-            cleanData += window
+        if levels < 1:
             break
                 
-        residual = calculate_residuals(np.asarray(window), levels=levels)
-        std = np.std(window)
-        
-        residuals.append(residual)
-        stds.append(std)
-        
-        if residual < 0.002 and std < 0.5:
-            cleanData += window
+        residual = calculate_residuals(np.asarray(window), levels=levels)        
+        residuals.append(((left_limit, right_limit),residual))
                 
         left_limit += winSize
         right_limit += winSize
     
-    plot.plot(residuals, title="Residuals", yLab="Residual Stat", xLab=str(winSize) + " sized window")
-    plot.plot(stds, title="Standard Deviations", yLab="Standard deviation", xLab=str(winSize) + " sized window")
+    cleanData = []
+    mean = np.mean([i[1] for i in residuals])
+    std = np.std([i[1] for i in residuals])
+    
+    for i in residuals:
+        val = i[1]
+        
+        if val < mean + std and val > mean - std:
+            cleanData += data[i[0][0]:i[0][1]]
+    
+    #plot.plot([i[1] for i in residuals], title="Residuals", yLab="Residual Stat", xLab=str(winSize) + " sized window")
     
     return np.asarray(cleanData)
 
