@@ -7,14 +7,12 @@ import plot
 
 # NOW
 
-# TODO: code cleanup/refactoring, add unit tests
-
 # TODO: Implement bandpass filtering (see samy_test.py), talk to andrew
 # TODO: Derive bins from normal records
 
-
 # LATER
 
+# TODO: code cleanup/refactoring, add unit tests
 # TODO: Start using rpy2 to work with alex's code to do regression
 # TODO: Optimize noisy section removal, add back in the p wave detection
 # TODO: Deal with weird records....
