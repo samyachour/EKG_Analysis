@@ -11,7 +11,6 @@ import sys
 import scipy.io
 
 record = sys.argv[1]
-#record = 'A00001'
 # Read waveform samples (input is in WFDB-MAT format)
 mat = scipy.io.loadmat("validation/" + record + ".mat")
 #samples = mat_data['val']

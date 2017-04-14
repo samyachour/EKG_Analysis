@@ -10,3 +10,4 @@ python3-pandas
 python3-pandas-lib
 python-pywt
 python-matplotlib
+r-base
