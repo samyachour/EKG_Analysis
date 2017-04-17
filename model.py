@@ -1,9 +1,8 @@
-import pywt
 import wave
 import pandas as pd
 import numpy as np
-import math
 import plot
+import pickle
 
 # NOW
 
@@ -143,9 +142,15 @@ def runSVM():
                metric_params=None, n_jobs=1, n_neighbors=5, p=2,
                weights='uniform')
     print(np.sum(knn.predict(data_test) == answer_test))
+    pickle.dump(knn, open("KNN_model", 'wb'))
+
+runSVM()
 
 def get_answer(record, data):
     
-    answer = ""
+    sig = Signal(record, data)
     
-    return answer
+    loaded_model = pickle.load(open("KNN_model", 'rb'))
+    result = loaded_model.predict(np.asarray(sig.RRbins))    
+    
+    return result
