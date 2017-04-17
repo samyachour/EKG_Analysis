@@ -179,13 +179,21 @@ def filterSignal(data, sampling_rate=300.0):
 """ Helper functions """
 
 def load(filename, path = '../Physionet_Challenge/training2017/'):
-    #
-    ### A helper function to load data
-    # input:
-    #   filename = the name of the .mat file
-    #   path = the path to the file
-    # output:
-    #   data = data output
+    """
+    Load signal data in .mat form
+
+    Parameters
+    ----------
+    filename : String
+        The name of the .mat file
+    path : String, optional
+        The path to the file directory, defaults to physionet training data
+
+    Returns
+    -------
+    1D array of signal data.
+    
+    """
     
     mat = sio.loadmat(path + filename + '.mat')
     data = np.divide(mat['val'][0],1000)
@@ -227,11 +235,13 @@ def interval(data):
 
     Parameters
     ----------
-    data : a list of data
+    data : array_like
+        1-dimensional array with input data.
 
     Returns
     -------
-        a list of intervals
+    intervals : array_like
+        an array of interval lengths
     """
     return np.array([data[i+1] - data[i] for i in range(0, len(data)-1)])
 
@@ -242,11 +252,15 @@ def calculate_residuals(original, levels=5):
 
     Parameters
     ----------
-    original: the original signal
+    original : array_like
+        the original signal
+    levels : int, optional
+        the number of wavelet levels you'd like to decompose to
 
     Returns
     -------
-        the residual
+    residual : float
+        the residual value
     """
     rebuilt = decomp(original, wavelet='sym4', levels=levels, mode='symmetric', omissions=([1],False))
     residual = sum(abs(original-rebuilt[:len(original)]))/len(original)
@@ -254,14 +268,17 @@ def calculate_residuals(original, levels=5):
 
 def diff_var(intervals, skip=2):
     """
-    This function calculate the variances for the differences between each value and the value that
-    is the specified number (skip) of values next to it.
-    eg. skip = 2 means the differences of one value and the value with 2 positions next to it.
+    This function calculate the variances for the differences between 
+    each value and the value that is the specified number (skip) 
+    of values next to it. eg. skip = 2 means the differences of one value 
+    and the value with 2 positions next to it.
 
     Parameters
     ----------
-        intervals: the interval that we want to calculate
-        skip: the number of position that we want the differences from
+    intervals : 
+        the interval that we want to calculate
+    skip : int, optional
+        the number of position that we want the differences from
 
     Returns
     -------
@@ -274,3 +291,53 @@ def diff_var(intervals, skip=2):
         diff.append(per_diff)
     diff = np.array(diff)
     return np.var(diff)   
+
+def interval_bin(intervals, mid_bin_range=(0.6, 1)):
+    """
+    This function calculate the percentage of intervals that fall
+    in certain bins
+
+    Parameters
+    ----------
+    intervals : array_like
+        array of interval lengths
+    mid_bin_range: tuple, optional
+        edge values for middle bin, defaults to (0.6, 1) (OR 1 STANDARD DEVIATION?)
+
+    Returns
+    -------
+    feat_list : list
+        list of bin values as well as percentages
+        [percentage intervals below mid_bin_range[0], 
+        percentage intervals between mid_bin_range[0],
+        mid_bin_range[1], percentage intervals above mid_bin_range[1], the index of the bin has 
+        that has the highest percentage, 1 if the third bin is above 0.3]
+    """
+    n_below = 0
+    n_in = 0
+    n_higher = 0
+    
+    for interval in intervals:
+        
+        if interval < mid_bin_range[0]:
+            n_below += 1
+        elif interval <= mid_bin_range[1]:
+            n_in += 1
+        else:
+            n_higher +=1
+            
+    if len(intervals)==0:
+        print('RR interval == 0')
+    feat_list = [n_below/len(intervals), n_in/len(intervals), n_higher/len(intervals)]
+    feat_list.append(feat_list.index(max(feat_list)))
+    if feat_list[2] > 0.3:
+        feat_list.append(1)
+    else:
+        feat_list.append(0)
+    
+    return feat_list
+
+
+
+
+

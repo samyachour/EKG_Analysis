@@ -36,3 +36,8 @@ def plotCoords(data, coords):
     ax.plot(data)
     ax.plot(*zip(*coords), marker='o', color='r', ls='')
     plt.show()
+    
+def plotIntervals(intervals):
+    fig = plt.figure(figsize=(9.7, 6))
+    ax = fig.add_subplot(111)
+    
