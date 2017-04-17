@@ -578,12 +578,7 @@ bin3 = []
 
 residuals = []
 
-for i in records[0]:
-    data = wave.load(i)
-    sig = Signal(i, data)
-    bin1.append(sig.RRbins[0])
-    bin2.append(sig.RRbins[1])
-    bin3.append(sig.RRbins[2])
+as
     residuals.append(wave.calculate_residuals(data))
 
 mean1 = np.mean(bin1)
@@ -600,4 +595,12 @@ noise = (0.56787317225621059, 0.19610460357421383, 0.23602222416957569)
 plot.plot(residuals)
 plot.plotBins((np.mean(bin1), np.mean(bin2), np.mean(bin3)))
 """
+from sklearn import datasets 
+np.set_printoptions(threshold=np.nan)
 
+iris = datasets.load_iris()
+iris_X = iris.data
+iris_Y = iris.target
+
+print(iris_X)
+print(iris_Y)

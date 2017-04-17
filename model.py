@@ -75,11 +75,11 @@ def feature_extract():
 
     Parameters
     ----------
-        signal: the signal object
+        None
 
     Returns
     -------
-        A vector of features
+        A dataframe with features
 
     """
 
@@ -97,13 +97,52 @@ def feature_extract():
         bin2.append(sig.RRbins[1])
         bin3.append(sig.RRbins[2])
     
-    training = pd.DataFrame({'bin 1': bin1, 'bin2': bin2, 'bin3': bin3, 'record': records[0], 'label': records[1]})
-    training.to_csv('training_data')
+    training = pd.DataFrame({'bin 1': bin1, 'bin 2': bin2, 'bin 3': bin3, 'record': records[0], 'label': records[1]})
+    training.to_csv('training_data.csv')
 
     return training
 
-feature_extract()
+def runSVM():
+    """
+    runs an SVM on our training_data with features
 
+    Parameters
+    ----------
+        None
+
+    Returns
+    -------
+        A dataframe with features
+
+    """
+    
+    target = np.asarray(wave.getRecords('All')[1])
+    df = pd.read_csv('training_data.csv')
+    subset = df.loc[:,'bin 1':'bin 3'].as_matrix()
+    
+    # Split iris data in train and test data
+    # A random permutation, to split the data randomly
+    np.random.seed(0)
+    indices = np.random.permutation(len(subset))
+    data_train = subset[indices[:-100]]
+    answer_train = target[indices[:-100]]
+    data_test  = subset[indices[-100:]]
+    answer_test  = target[indices[-100:]]
+    
+    # Create and fit a svm classifier
+    from sklearn import svm
+    clf = svm.SVC()
+    clf.fit(data_train, answer_train)
+    print(np.sum(clf.predict(data_test) == answer_test))
+    
+    # Create and fit a nearest-neighbor classifier
+    from sklearn.neighbors import KNeighborsClassifier
+    knn = KNeighborsClassifier()
+    knn.fit(data_train, answer_train) 
+    KNeighborsClassifier(algorithm='auto', leaf_size=30, metric='minkowski',
+               metric_params=None, n_jobs=1, n_neighbors=5, p=2,
+               weights='uniform')
+    print(np.sum(knn.predict(data_test) == answer_test))
 
 def get_answer(record, data):
     

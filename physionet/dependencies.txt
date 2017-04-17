@@ -11,3 +11,4 @@ python3-pandas-lib
 python-pywt
 python-matplotlib
 r-base
+python-sklearn
