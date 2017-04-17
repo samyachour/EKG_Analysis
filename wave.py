@@ -292,7 +292,7 @@ def diff_var(intervals, skip=2):
     diff = np.array(diff)
     return np.var(diff)   
 
-def interval_bin(intervals, mid_bin_range=(0.6, 1)):
+def interval_bin(intervals, mid_bin_range=()):
     """
     This function calculate the percentage of intervals that fall
     in certain bins
@@ -302,18 +302,24 @@ def interval_bin(intervals, mid_bin_range=(0.6, 1)):
     intervals : array_like
         array of interval lengths
     mid_bin_range: tuple, optional
-        edge values for middle bin, defaults to (0.6, 1) (OR 1 STANDARD DEVIATION?)
+        edge values for middle bin, defaults to 1 standard deviation
 
     Returns
     -------
     feat_list : list
-        list of bin values as well as percentages
+        list of bin values as decimal percentages (i.e. 0.2, 0.6, 0.2)
         [
         percentage intervals below mid_bin_range[0], 
         percentage intervals between mid_bin_range[0] and mid_bin_range[1],
         percentage intervals above mid_bin_range[1]
         ]
     """
+    if mid_bin_range == ():
+        std = np.std(intervals)
+        mean = np.mean(intervals)
+        
+        mid_bin_range = (mean - std, mean + std)
+    
     if len(intervals)==0:
         print('RR interval == 0')
         return [0,0,0]

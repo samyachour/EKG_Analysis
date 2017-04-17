@@ -61,9 +61,6 @@ class Signal(object):
 
         self.RRintervals = wave.interval(self.RPeaks)
         self.RRbins = wave.interval_bin(self.RRintervals)
-        
-        print(self.RRintervals)
-
 
 record = 'A00001'
 data = wave.load(record)
