@@ -484,7 +484,7 @@ def all_F1_score(prediction, target=['N', 'A', 'O', '~'], path='../Physionet_Cha
 
 #w = pywt.Wavelet('sym5')
 #print(pywt.dwt_max_level(data_len=1000, filter_len=w.dec_len))
-
+"""
 def butter_bandpass(lowcut, highcut, fs, order=5):
     nyq = 0.5 * fs
     low = lowcut / nyq
@@ -538,11 +538,34 @@ plot.plot(bpfecg)
 
 y = butter_bandpass_filter(data, lowcut, highcut, fs, order=6)
 plot.plot(y)
-
+"""
 
 #import rpy2.robjects as robjects
 
 
 
 
+"""
+record = 'A00269'
+data = wave.load(record)
+plot.plot(data)
 
+sig = Signal(record, data)
+
+coords = [(i, sig.data[i]) for i in np.nditer(sig.RPeaks)]
+plot.plotCoords(sig.data, coords)
+"""
+
+"""
+records = wave.getRecords('All')
+training = records[0][:853]
+exception = records[0][7675:]
+
+
+for i in records[0]:
+    data = wave.load(i)
+    sig = Signal(i, data)
+    print("Processing {}".format(i))
+    coords = [(i, sig.data[i]) for i in np.nditer(sig.RPeaks)]
+    plot.plotCoords(sig.data, coords)
+"""

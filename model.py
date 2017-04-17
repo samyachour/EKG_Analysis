@@ -72,34 +72,6 @@ plot.plotCoords(sig.data, coords)
 
 
 
-"""
-record = 'A00269'
-data = wave.load(record)
-plot.plot(data)
-
-sig = Signal(record, data)
-
-coords = [(i, sig.data[i]) for i in np.nditer(sig.RPeaks)]
-plot.plotCoords(sig.data, coords)
-"""
-
-"""
-records = wave.getRecords('All')
-training = records[0][:853]
-exception = records[0][7675:]
-
-
-for i in records[0]:
-    data = wave.load(i)
-    sig = Signal(i, data)
-    print("Processing {}".format(i))
-    coords = [(i, sig.data[i]) for i in np.nditer(sig.RPeaks)]
-    plot.plotCoords(sig.data, coords)
-"""
-
-
-
-
 
 def noise_feature_extract(data):
     wtcoeff = pywt.wavedecn(data, 'sym5', level=5, mode='constant')
