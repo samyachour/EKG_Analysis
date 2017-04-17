@@ -569,3 +569,35 @@ for i in records[0]:
     coords = [(i, sig.data[i]) for i in np.nditer(sig.RPeaks)]
     plot.plotCoords(sig.data, coords)
 """
+
+"""
+records = wave.getRecords('~')
+bin1 = []
+bin2 = []
+bin3 = []
+
+residuals = []
+
+for i in records[0]:
+    data = wave.load(i)
+    sig = Signal(i, data)
+    bin1.append(sig.RRbins[0])
+    bin2.append(sig.RRbins[1])
+    bin3.append(sig.RRbins[2])
+    residuals.append(wave.calculate_residuals(data))
+
+mean1 = np.mean(bin1)
+mean2 = np.mean(bin2)
+mean3 = np.mean(bin3)
+
+print((mean1, mean2, mean3))
+
+normal = (0.33221075059030275, 0.35408772380764553, 0.31370152560205167)
+atrial = (0.66443351908331261, 0.15872256611801047, 0.17684391479867692)
+other = (0.39993635966530555, 0.23598168762976104, 0.36408195270493343)
+noise = (0.56787317225621059, 0.19610460357421383, 0.23602222416957569)
+
+plot.plot(residuals)
+plot.plotBins((np.mean(bin1), np.mean(bin2), np.mean(bin3)))
+"""
+
