@@ -7,6 +7,7 @@ import plot
 
 # NOW
 
+# TODO: Try a DRYRUN test submission
 # TODO: Remove noisy parts of signal
 # TODO: Derive bins from normal records
 
@@ -22,6 +23,14 @@ import plot
 # A00111, A00269, A00420, A00550, A00692, A01053, A01329 noisy sections
 # A00123, A00119 single inversion
 
+"""
+Upon submission:
+    -run compress.sh, verify it included the right files
+    -make sure setup.sh includes all the right libs
+    -dependencies.txt has the right packages
+    -the whole thing runs without errors
+    -entry.zip is formatted correctly
+"""
 class Signal(object):
     """
     An ECG/EKG signal
@@ -40,13 +49,13 @@ class Signal(object):
         self.name = name
         self.sampling_rate = 300. # 300 hz
         self.sampleFreq = 1/300
-        
+
         self.data = wave.filterSignal(data)
         self.data = wave.discardNoise(data) # optimize this
         # self.data = data
 
         self.RPeaks = wave.getRPeaks(self.data, sampling_rate=self.sampling_rate)
-        
+
         self.RRintervals = wave.interval(self.RPeaks)
 
 
@@ -84,9 +93,9 @@ for i in records[0]:
     plot.plotCoords(sig.data, coords)
 """
 
- 
-    
-    
+
+
+
 
 def noise_feature_extract(data):
     wtcoeff = pywt.wavedecn(data, 'sym5', level=5, mode='constant')
