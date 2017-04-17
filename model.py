@@ -7,8 +7,6 @@ import plot
 
 # NOW
 
-# TODO: Try a DRYRUN test submission
-# TODO: Remove noisy parts of signal
 # TODO: Derive bins from normal records
 
 # LATER
@@ -52,7 +50,7 @@ class Signal(object):
         self.sampleFreq = 1/300
 
         self.data = wave.filterSignal(data)
-        self.data = wave.discardNoise(data) # optimize this
+        # self.data = wave.discardNoise(self.data) # optimize this
         # self.data = data
 
         self.RPeaks = wave.getRPeaks(self.data, sampling_rate=self.sampling_rate)
@@ -60,7 +58,7 @@ class Signal(object):
         self.RRintervals = wave.interval(self.RPeaks)
 
 
-record = 'A00269'
+record = 'A00001'
 data = wave.load(record)
 plot.plot(data)
 sig = Signal(record, data)
