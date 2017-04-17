@@ -60,6 +60,9 @@ class Signal(object):
         self.RPeaks = wave.getRPeaks(self.data, sampling_rate=self.sampling_rate)
 
         self.RRintervals = wave.interval(self.RPeaks)
+        self.RRbins = wave.interval_bin(self.RRintervals)
+        
+        print(self.RRintervals)
 
 
 record = 'A00001'

@@ -308,14 +308,19 @@ def interval_bin(intervals, mid_bin_range=(0.6, 1)):
     -------
     feat_list : list
         list of bin values as well as percentages
-        [percentage intervals below mid_bin_range[0], 
-        percentage intervals between mid_bin_range[0],
-        mid_bin_range[1], percentage intervals above mid_bin_range[1], the index of the bin has 
-        that has the highest percentage, 1 if the third bin is above 0.3]
+        [
+        percentage intervals below mid_bin_range[0], 
+        percentage intervals between mid_bin_range[0] and mid_bin_range[1],
+        percentage intervals above mid_bin_range[1]
+        ]
     """
-    n_below = 0
-    n_in = 0
-    n_higher = 0
+    if len(intervals)==0:
+        print('RR interval == 0')
+        return [0,0,0]
+    
+    n_below = 0.0
+    n_in = 0.0
+    n_higher = 0.0
     
     for interval in intervals:
         
@@ -325,15 +330,8 @@ def interval_bin(intervals, mid_bin_range=(0.6, 1)):
             n_in += 1
         else:
             n_higher +=1
-            
-    if len(intervals)==0:
-        print('RR interval == 0')
+    
     feat_list = [n_below/len(intervals), n_in/len(intervals), n_higher/len(intervals)]
-    feat_list.append(feat_list.index(max(feat_list)))
-    if feat_list[2] > 0.3:
-        feat_list.append(1)
-    else:
-        feat_list.append(0)
     
     return feat_list
 
