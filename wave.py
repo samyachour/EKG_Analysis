@@ -3,7 +3,6 @@ import numpy as np
 import pandas as pd
 import scipy.io as sio
 from biosppy.signals import ecg
-import plot
 import scipy
 
 

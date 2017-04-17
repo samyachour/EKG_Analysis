@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 import model
 import scipy
 import numpy as np
@@ -8,7 +9,6 @@ PHYSIONET SUBMISSION CODE
 """
 
 import sys
-import scipy.io
 
 record = sys.argv[1]
 # Read waveform samples (input is in WFDB-MAT format)

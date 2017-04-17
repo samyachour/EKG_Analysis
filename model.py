@@ -25,11 +25,12 @@ import plot
 
 """
 Upon submission:
-    -run compress.sh, verify it included the right files
+    -remove import plot from all files
     -make sure setup.sh includes all the right libs
-    -dependencies.txt has the right packages
-    -the whole thing runs without errors
-    -entry.zip is formatted correctly
+    -make sure dependencies.txt has the right packages
+    -run compress.sh, verify it included the right files, Include DRYRUN?
+    -make sure entry.zip is formatted correctly
+    -(empty setup.sh & add validation folder temprarily) make sure the whole thing runs without errors, delete pycache
 """
 class Signal(object):
     """
@@ -248,6 +249,7 @@ def applyPCA(testData, isNoise):
 
 
 def get_answer(record, data):
+    
     answer = ""
     try:
         print ('processing record: ' + record)
