@@ -11,6 +11,7 @@ import plot
 
 # LATER
 
+# TODO: Submit DRYRUN entry
 # TODO: code cleanup/refactoring, add unit tests
 # TODO: Start using rpy2 to work with alex's code to do regression http://rpy.sourceforge.net/rpy2/doc-dev/html/introduction.html
 # TODO: Add back in the p wave detection if needed
@@ -30,6 +31,11 @@ Upon submission:
     -make sure entry.zip is formatted correctly
     -(empty setup.sh & add validation folder temprarily) make sure the whole thing runs without errors, delete pycache
 """
+
+
+
+
+
 class Signal(object):
     """
     An ECG/EKG signal
@@ -62,14 +68,23 @@ class Signal(object):
         self.RRintervals = wave.interval(self.RPeaks)
         self.RRbins = wave.interval_bin(self.RRintervals)
 
-record = 'A00001'
-data = wave.load(record)
-plot.plot(data)
-sig = Signal(record, data)
+records = wave.getRecords('N')
+bin1 = []
+bin2 = []
+bin3 = []
 
-coords = [(i, sig.data[i]) for i in np.nditer(sig.RPeaks)]
-plot.plotCoords(sig.data, coords)
+for i in records[0]:
+    data = wave.load(i)
+    sig = Signal(i, data)
+    bin1.append(sig.RRbins[0])
+    bin2.append(sig.RRbins[1])
+    bin3.append(sig.RRbins[2])
 
+plot.plotBins((np.mean(bin1), np.mean(bin2), np.mean(bin3)))
+
+#plot.plot(data)
+#coords = [(i, sig.data[i]) for i in np.nditer(sig.RPeaks)]
+#plot.plotCoords(sig.data, coords)
 
 
 

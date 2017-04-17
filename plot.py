@@ -37,7 +37,17 @@ def plotCoords(data, coords):
     ax.plot(*zip(*coords), marker='o', color='r', ls='')
     plt.show()
     
-def plotIntervals(intervals):
+def plotBins(bins, recordTitle=""):
     fig = plt.figure(figsize=(9.7, 6))
     ax = fig.add_subplot(111)
+    rects1 = ax.bar(0.5, bins[0], color='r')
+    rects2 = ax.bar(1.5, bins[1], color='b')
+    rects3 = ax.bar(2.5, bins[2], color='g')
+    ax.legend((rects1[0], rects2[0], rects3[0]), ('bin 1', 'bin 2', 'bin 3'))
+    ax.set_ylabel('Bin percent')
+    ax.set_xlabel('Bins')
+    ax.set_title('RR Interval bins' + recordTitle)
+    plt.show()
+    
+     
     
