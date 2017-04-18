@@ -1,7 +1,6 @@
 import wave
 import pandas as pd
 import numpy as np
-import plot
 import pickle
 
 # NOW
@@ -26,9 +25,9 @@ Upon submission:
     -remove import plot from all files
     -make sure setup.sh includes all the right libs
     -make sure dependencies.txt has the right packages
-    -run compress.sh, verify it included the right files, Include DRYRUN?
+    -run compress.sh, verify it included the right files, Include DRYRUN? Include saved Model?
     -make sure entry.zip is formatted correctly
-    -(empty setup.sh & add validation folder temprarily) make sure the whole thing runs without errors, delete pycache
+    -(empty setup.sh & add validation folder+F1_score.py temprarily) make sure the whole thing runs without errors, delete pycache
 """
 
 
@@ -142,13 +141,15 @@ def runSVM():
                metric_params=None, n_jobs=1, n_neighbors=5, p=2,
                weights='uniform')
     print(np.sum(knn.predict(data_test) == answer_test))
-    pickle.dump(knn, open("KNN_model", 'wb'))
+    
+    # Save the model you want to use
+    pickle.dump(knn, open("model", 'wb'))
 
 def get_answer(record, data):
     
     sig = Signal(record, data)
     
-    loaded_model = pickle.load(open("KNN_model", 'rb'))
-    result = loaded_model.predict(np.asarray(sig.RRbins))    
+    loaded_model = pickle.load(open("model", 'rb'))
+    result = loaded_model.predict([np.asarray(sig.RRbins)])    
     
-    return result
+    return result[0]
