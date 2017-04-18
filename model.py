@@ -144,8 +144,6 @@ def runSVM():
     print(np.sum(knn.predict(data_test) == answer_test))
     pickle.dump(knn, open("KNN_model", 'wb'))
 
-runSVM()
-
 def get_answer(record, data):
     
     sig = Signal(record, data)
