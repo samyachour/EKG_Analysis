@@ -595,6 +595,7 @@ noise = (0.56787317225621059, 0.19610460357421383, 0.23602222416957569)
 plot.plot(residuals)
 plot.plotBins((np.mean(bin1), np.mean(bin2), np.mean(bin3)))
 """
+"""
 from sklearn import datasets 
 np.set_printoptions(threshold=np.nan)
 
@@ -604,3 +605,4 @@ iris_Y = iris.target
 
 print(iris_X)
 print(iris_Y)
+"""

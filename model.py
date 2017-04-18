@@ -5,7 +5,9 @@ import pickle
 
 # NOW
 
-# TODO: Derive bins from normal records
+# TODO: Remove 10 % of N O A ~, rederive bins w/ 9/10ths, test on remaining 1/10th
+# TODO: use RR interval variance as a feature, maybe add Andy's features
+# TODO: get statistical significance of certain variables (p values), try PCA (rPY2), stepwise selection?
 
 # LATER
 
@@ -15,10 +17,10 @@ import pickle
 # TODO: Add back in the p wave detection if needed
 
 # TODO: Deal with weird records....
-# A03509 RRvar1, RRvar2, RRvar3 NaNs
-# A03863 A03812 too
-# A00111, A00269, A00420, A00550, A00692, A01053, A01329 noisy sections
-# A00123, A00119 single inversion
+    # A03509 RRvar1, RRvar2, RRvar3 NaNs
+    # A03863 A03812 too
+    # A00111, A00269, A00420, A00550, A00692, A01053, A01329 noisy sections
+    # A00123, A00119 single inversion
 
 """
 Upon submission:
@@ -100,9 +102,9 @@ def feature_extract():
 
     return training
 
-def runSVM():
+def runModel():
     """
-    runs an SVM on our training_data with features
+    runs an machine learning model on our training_data with features
 
     Parameters
     ----------
@@ -110,7 +112,7 @@ def runSVM():
 
     Returns
     -------
-        A dataframe with features
+        A trained model
 
     """
     
@@ -144,6 +146,8 @@ def runSVM():
     
     # Save the model you want to use
     pickle.dump(knn, open("model", 'wb'))
+
+
 
 def get_answer(record, data):
     
