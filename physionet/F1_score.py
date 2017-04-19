@@ -69,13 +69,13 @@ def matlab_f1_score(ref, ans):
     F1n = 2 * AA[0, 0] / (sum(AA[0, :]) + sum(AA[:, 0]))
     F1a = 2 * AA[1, 1] / (sum(AA[1, :]) + sum(AA[:, 1]))
     F1o = 2 * AA[2, 2] / (sum(AA[2, :]) + sum(AA[:, 2]))
-    F1p = 2 * AA[3, 3] / (sum(AA[3, :]) + sum(AA[:, 3]))
-    F1 = (F1n + F1a + F1o + F1p) / 4
+    # F1p = 2 * AA[3, 3] / (sum(AA[3, :]) + sum(AA[:, 3]))
+    F1 = (F1n + F1a + F1o) / 3
     print(AA)
     print('F1 measure for Normal rhythm: ' '%1.4f' % F1n)
     print('F1 measure for AF rhythm: ' '%1.4f' % F1a)
     print('F1 measure for Other rhythm: ' '%1.4f' % F1o)
-    print('F1 measure for Noisy recordings: ' '%1.4f' % F1p)
+    # print('F1 measure for Noisy recordings: ' '%1.4f' % F1p)
     print('Final F1 measure: ' '%1.4f' % F1)
 
 
