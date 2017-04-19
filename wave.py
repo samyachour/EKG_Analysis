@@ -240,6 +240,7 @@ def partition(index, df):
         The partition section you want to grab for testing, 1 is first 1/10th, 2 is the second 1/10th, etc.
     df : pandas dataframe
         The dataframe of records you want to partition, should have 2 columns 'File' and 'Answer'
+        and be all of one class, i.e. all 'Answer's should be 'N'
 
     Returns
     -------
@@ -383,9 +384,10 @@ def diff_var(intervals, skip=2):
         per_diff= intervals[i]-intervals[i+skip]
         diff.append(per_diff)
     diff = np.array(diff)
-    return np.var(diff)   
+    return np.var(diff)
+    
 
-def interval_bin(intervals, mid_bin_range=(234.85, 276.42)):
+def interval_bin(intervals, mid_bin_range):
     """
     This function calculate the percentage of intervals that fall
     in certain bins

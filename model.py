@@ -33,9 +33,6 @@ Upon submission:
 """
 
 
-
-
-
 class Signal(object):
     """
     An ECG/EKG signal
@@ -49,11 +46,11 @@ class Signal(object):
         RRbins : tuple of bin percents
     """
 
-    def __init__(self, name, data):
+    def __init__(self, name, data, mid_bin_range=(234.85, 276.42)):
         """
         Return a Signal object whose record name is *name*,
         signal data is *data*,
-        R peaks array of coordinates [(x1,y1), (x2, y2),..., (xn, yn)]  is *RPeaks*
+        RRInterval bin range is *mid_bin_range*
         """
         self.name = name
         self.sampling_rate = 300. # 300 hz
@@ -66,10 +63,53 @@ class Signal(object):
         self.RPeaks = wave.getRPeaks(self.data, sampling_rate=self.sampling_rate)
 
         self.RRintervals = wave.interval(self.RPeaks)
-        self.RRbins = wave.interval_bin(self.RRintervals)
+        self.RRbins = wave.interval_bin(self.RRintervals, mid_bin_range)
 
 
-print(wave.getPartitionedRecords(0))
+
+
+
+
+
+def deriveBinEdges(training):
+    """
+    This function derives bin edges from the normal EKG signals
+
+    Parameters
+    ----------
+    training : tuple
+        tuple of lists of training data record names and labels, first element from wave.getPartitionedRecords()
+
+    Returns
+    -------
+    edges : tuple
+        tuple of bin edge values, i.e. (230,270) to use as mid_bin_range in wave.interval_bin()
+    """
+    
+    lower = 0
+    upper = 0
+    normals = []
+    
+    for idx, val in enumerate(training[0]):
+        
+        if training[1][idx] == 'N':
+            normals.append(val)
+
+    for i in normals:
+        
+        sig = Signal(i, wave.load(i))
+        print("processing " + i)
+        tempMean = np.mean(sig.RRintervals)
+        tempStd = np.std(sig.RRintervals)
+        
+        lower += tempMean - tempStd
+        upper += tempMean + tempStd
+    
+    lower = lower/len(normals)
+    upper = upper/len(normals)
+    
+    return (lower,upper)
+
 
 def feature_extract():
     """
@@ -85,51 +125,64 @@ def feature_extract():
 
     """
 
-    records = wave.getRecords('All')
+    records_labels = wave.getRecords('All')
+    partitioned = wave.getPartitionedRecords(0) # partition first 10th
+    testing = partitioned[0]
+    training = partitioned[1]
 
-    labels = records[0]
+    binEdges = deriveBinEdges(training)
     bin1 = []
     bin2 = []
     bin3 = []
+    variances = []
     
-    for i in labels:
+    for i in records_labels[0]:
         data = wave.load(i)
-        sig = Signal(i, data)
+        sig = Signal(i, data, mid_bin_range=binEdges)
+        print("extracting " + i)
         bin1.append(sig.RRbins[0])
         bin2.append(sig.RRbins[1])
         bin3.append(sig.RRbins[2])
+        variances.append(np.var(sig.RRintervals))
     
-    training = pd.DataFrame({'bin 1': bin1, 'bin 2': bin2, 'bin 3': bin3, 'record': records[0], 'label': records[1]})
-    training.to_csv('training_data.csv')
-
-    return training
-
+    feature_data = pd.DataFrame({'bin 1': bin1, 'bin 2': bin2, 'bin 3': bin3, 'variance' : variances, 'record': records_labels[0], 'label': records_labels[1]})
+    pickle.dump(feature_data, open("feature_data", 'wb'))
+    pickle.dump(testing, open("testing_records", 'wb'))
+    pickle.dump(training, open("training_records", 'wb'))
+    
+# feature_extract()
+    
 def runModel():
     """
     runs an machine learning model on our training_data with features bin1, bin2, bin3, and variance
 
     Parameters
     ----------
-        None
-
+    None    
+    
     Returns
     -------
         A trained model
 
     """
     
-    target = np.asarray(wave.getRecords('All')[1])
-    df = pd.read_csv('training_data.csv')
-    subset = df.loc[:,'bin 1':'bin 3'].as_matrix()
+    df = pickle.load(open("feature_data", 'rb'))
+    testing = pickle.load(open("testing_records", 'rb'))
+    training = pickle.load(open("training_records", 'rb')) 
     
-    # Split iris data in train and test data
-    # A random permutation, to split the data randomly
-    np.random.seed(0)
-    indices = np.random.permutation(len(subset))
-    data_train = subset[indices[:-100]]
-    answer_train = target[indices[:-100]]
-    data_test  = subset[indices[-100:]]
-    answer_test  = target[indices[-100:]]
+    testing_df = df.loc[df['record'].isin(testing[0])]
+    testing_target = np.asarray(testing[1])
+    training_df = df.loc[df['record'].isin(training[0])]
+    training_target = np.asarray(training[1])
+    
+    testing_subset = testing_df[['bin 1','bin 2','bin 3','variance']].copy().as_matrix()
+    training_subset = training_df[['bin 1','bin 2','bin 3','variance']].copy().as_matrix()
+    
+    # Split data in train and test data
+    data_test  = testing_subset
+    answer_test  = testing_target
+    data_train = training_subset
+    answer_train = training_target
     
     # Create and fit a svm classifier
     from sklearn import svm
@@ -147,7 +200,7 @@ def runModel():
     # Save the model you want to use
     pickle.dump(knn, open("model", 'wb'))
 
-
+runModel()
 
 def get_answer(record, data):
     

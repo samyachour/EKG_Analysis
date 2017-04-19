@@ -8,6 +8,7 @@ import detect_peaks
 import wave
 import scipy
 import plot
+import pickle
 
 '''
 EKG = pd.read_csv("../MIT-BIH_Arrhythmia/100.csv", header=None)
@@ -606,3 +607,20 @@ iris_Y = iris.target
 print(iris_X)
 print(iris_Y)
 """
+
+df = pickle.load(open("feature_data", 'rb'))
+testing = pickle.load(open("testing_records", 'rb'))
+training = pickle.load(open("training_records", 'rb')) 
+
+testing_df = df.loc[df['record'].isin(testing[0])]
+testing_target = np.asarray(testing[1])
+training_df = df.loc[df['record'].isin(training[0])]
+training_target = np.asarray(training[1])
+
+testing_subset = testing_df[['bin 1','bin 2','bin 3','variance']].copy().as_matrix()
+training_subset = training_df[['bin 1','bin 2','bin 3','variance']].copy().as_matrix()
+
+print(testing_target)
+
+
+
