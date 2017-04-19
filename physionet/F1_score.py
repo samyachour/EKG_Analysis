@@ -69,6 +69,7 @@ def matlab_f1_score(ref, ans):
     F1n = 2 * AA[0, 0] / (sum(AA[0, :]) + sum(AA[:, 0]))
     F1a = 2 * AA[1, 1] / (sum(AA[1, :]) + sum(AA[:, 1]))
     F1o = 2 * AA[2, 2] / (sum(AA[2, :]) + sum(AA[:, 2]))
+    # See new formula here: https://groups.google.com/forum/#!topic/physionet-challenges/64O7nhp430Q
     # F1p = 2 * AA[3, 3] / (sum(AA[3, :]) + sum(AA[:, 3]))
     F1 = (F1n + F1a + F1o) / 3
     print(AA)

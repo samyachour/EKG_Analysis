@@ -25,11 +25,11 @@ import pickle
 """
 Upon submission:
     -remove import plot from all files
+    -run compress.sh, verify it included the right files, Include DRYRUN? Include saved Model?
     -make sure setup.sh includes all the right libs
     -make sure dependencies.txt has the right packages
-    -run compress.sh, verify it included the right files, Include DRYRUN? Include saved Model?
     -make sure entry.zip is formatted correctly
-    -(empty setup.sh & add validation folder+F1_score.py temprarily) make sure the whole thing runs without errors, delete pycache
+    -(empty setup.sh & add validation folder+F1_score.py temporarily) make sure the whole thing runs without errors, delete pycache/vailidation/F1_score        
 """
 
 
@@ -139,9 +139,7 @@ def runModel():
     from sklearn.neighbors import KNeighborsClassifier
     knn = KNeighborsClassifier()
     knn.fit(data_train, answer_train) 
-    KNeighborsClassifier(algorithm='auto', leaf_size=30, metric='minkowski',
-               metric_params=None, n_jobs=1, n_neighbors=5, p=2,
-               weights='uniform')
+    KNeighborsClassifier(algorithm='auto',n_neighbors=5,weights='uniform') # try different n_neighbors
     print(np.sum(knn.predict(data_test) == answer_test))
     
     # Save the model you want to use
