@@ -11,7 +11,7 @@ import pickle
 
 # LATER
 
-# TODO: Submit DRYRUN entry
+# TODO: Submit DRYRUN entry, entry.zip in folder is ready
 # TODO: code cleanup/refactoring, add unit tests
 # TODO: Start using rpy2 to work with alex's code to do regression http://rpy.sourceforge.net/rpy2/doc-dev/html/introduction.html
 # TODO: Add back in the p wave detection if needed
@@ -69,6 +69,8 @@ class Signal(object):
         self.RRbins = wave.interval_bin(self.RRintervals)
 
 
+print(wave.getPartitionedRecords(0))
+
 def feature_extract():
     """
     this function extract the features from the attributes of a signal
@@ -104,7 +106,7 @@ def feature_extract():
 
 def runModel():
     """
-    runs an machine learning model on our training_data with features
+    runs an machine learning model on our training_data with features bin1, bin2, bin3, and variance
 
     Parameters
     ----------

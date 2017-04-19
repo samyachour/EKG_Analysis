@@ -229,6 +229,99 @@ def getRecords(trainingLabel, _not=False, path='../Physionet_Challenge/training2
         subset = reference.ix[reference['answer']==trainingLabel]
         return (subset['file'].tolist(), subset['answer'].tolist())
     
+def partition(index, df):
+    """
+    Helper function for getPartitionedRecords() function
+    Partitions a (subsetted) dataframe into training and testing
+
+    Parameters
+    ----------
+    index : int 0-9
+        The partition section you want to grab for testing, 1 is first 1/10th, 2 is the second 1/10th, etc.
+    df : pandas dataframe
+        The dataframe of records you want to partition, should have 2 columns 'File' and 'Answer'
+
+    Returns
+    -------
+        tuple of tuples:
+            tuple of equally sized lists:
+                list of record names for 10% testing data
+                list of record labels N O A ~ for 10% testing data
+            tuple of equally sized lists:
+                list of record names for 90% training data
+                list of record labels N O A ~ for 90% training data
+    """
+    
+    size = df.shape[0]
+    tenth = int(size * 0.1) # this is a 1/10th of the rows in the dataframe of records
+    section = index * tenth
+    
+    # Grab the section index to 1/10th plus the seciton index
+    testing = (df['file'].tolist()[section:section + tenth], 
+               df['answer'].tolist()[section:section + tenth])
+    
+    # Grab the everything but the section->section + 1/10th subset
+    training = (df['file'].tolist()[0:section] + df['file'].tolist()[section + tenth:],
+                df['answer'].tolist()[0:section] + df['answer'].tolist()[section + tenth:])
+    
+    return (testing, training)
+
+def getPartitionedRecords(index, path='../Physionet_Challenge/training2017/REFERENCE.csv'): # N O A ~
+    """
+    Partition all the training data while maintaining the ratios of each class
+
+    Parameters
+    ----------
+    index : int 0-9
+        The partition section you want to grab for testing, 1 is first 1/10th, 2 is the second 1/10th, etc.
+    path : String, optional
+        The path to the Reference.csv, default is the training2017 csv   
+
+    Returns
+    -------
+        tuple of tuples:
+            tuple of equally sized lists:
+                list of record names for 10% testing data
+                list of record labels N O A ~ for 10% testing data
+            tuple of equally sized lists:
+                list of record names for 90% training data
+                list of record labels N O A ~ for 90% training data
+    """
+    
+    if index < 0 or index > 9:
+        raise ValueError("Index %d is not available, can only partition 10 different ways. Index must be 0-9." % (index))
+    
+    reference = pd.read_csv(path, names = ["file", "answer"]) # N O A ~
+    
+    n = reference.ix[reference['answer'] == 'N']
+    n = partition(index, n)
+    
+    o = reference.ix[reference['answer'] == 'O']
+    o = partition(index, o)
+    
+    a = reference.ix[reference['answer'] == 'A']
+    a = partition(index, a)
+    
+    p = reference.ix[reference['answer'] == '~']
+    p = partition(index, p)
+    
+    tempTestRec = []
+    tempTestLab = []
+    
+    tempTrainRec = []
+    tempTrainLab = []
+    
+    for i in [n,o,a,p]:
+        
+        tempTestRec += i[0][0]
+        tempTestLab += i[0][1]
+        
+        tempTrainRec += i[1][0]
+        tempTrainLab += i[1][1]
+    
+    return ((tempTestRec, tempTestLab),(tempTrainRec, tempTrainLab))
+    
+    
 def interval(data):
     """
     Calculate the intervals from a list
