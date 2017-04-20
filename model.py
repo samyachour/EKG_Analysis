@@ -5,9 +5,9 @@ import pickle
 
 # NOW
 
-# TODO: Testing different feature selections, doing PCA
+# TODO: Filtering the signal downsamples it, so maybe change the sampling frequency passed into biosspy r peak detection?
+# TODO: Testing different feature selections, do PCA
 # TODO: Saving signal features to make it faster
-# TODO: get statistical significance of certain variables (p values), try PCA (rPY2), stepwise selection?
 
 # LATER
 
