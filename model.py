@@ -5,8 +5,6 @@ import pickle
 
 # NOW
 
-# TODO: Remove 10 % of N O A ~, rederive bins w/ 9/10ths, test on remaining 1/10th
-# TODO: use RR interval variance as a feature, maybe add Andy's features
 # TODO: get statistical significance of certain variables (p values), try PCA (rPY2), stepwise selection?
 
 # LATER
@@ -14,7 +12,7 @@ import pickle
 # TODO: Submit DRYRUN entry, entry.zip in folder is ready
 # TODO: code cleanup/refactoring, add unit tests
 # TODO: Start using rpy2 to work with alex's code to do regression http://rpy.sourceforge.net/rpy2/doc-dev/html/introduction.html
-# TODO: Add back in the p wave detection if needed
+# TODO: Add back in the p wave detection if needed, or other features
 
 # TODO: Deal with weird records....
     # A03509 RRvar1, RRvar2, RRvar3 NaNs
@@ -121,7 +119,7 @@ def feature_extract():
 
     Returns
     -------
-        A dataframe with features
+        A pickle dump of the feature matrix, training records (9/10th), and testing records (1/10thsvaaa)
 
     """
 
@@ -150,7 +148,6 @@ def feature_extract():
     pickle.dump(testing, open("testing_records", 'wb'))
     pickle.dump(training, open("training_records", 'wb'))
     
-# feature_extract()
     
 def runModel():
     """
@@ -162,7 +159,7 @@ def runModel():
     
     Returns
     -------
-        A trained model
+        A trained model pickle serialized object
 
     """
     
@@ -198,15 +195,15 @@ def runModel():
     print(np.sum(knn.predict(data_test) == answer_test))
     
     # Save the model you want to use
-    pickle.dump(knn, open("model", 'wb'))
+    pickle.dump(clf, open("model", 'wb'))
 
-runModel()
 
 def get_answer(record, data):
     
     sig = Signal(record, data)
     
     loaded_model = pickle.load(open("model", 'rb'))
-    result = loaded_model.predict([np.asarray(sig.RRbins)])    
+    features = np.append(np.asarray(sig.RRbins), np.var(sig.RRintervals))
+    result = loaded_model.predict([features])    
     
     return result[0]
