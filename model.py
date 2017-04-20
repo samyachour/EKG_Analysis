@@ -5,6 +5,8 @@ import pickle
 
 # NOW
 
+# TODO: Testing different feature selections, doing PCA
+# TODO: Saving signal features to make it faster
 # TODO: get statistical significance of certain variables (p values), try PCA (rPY2), stepwise selection?
 
 # LATER
@@ -96,7 +98,7 @@ def deriveBinEdges(training):
     for i in normals:
         
         sig = Signal(i, wave.load(i))
-        print("processing " + i)
+        # print("processing " + i)
         tempMean = np.mean(sig.RRintervals)
         tempStd = np.std(sig.RRintervals)
         
@@ -137,7 +139,7 @@ def feature_extract():
     for i in records_labels[0]:
         data = wave.load(i)
         sig = Signal(i, data, mid_bin_range=binEdges)
-        print("extracting " + i)
+        # print("extracting " + i)
         bin1.append(sig.RRbins[0])
         bin2.append(sig.RRbins[1])
         bin3.append(sig.RRbins[2])
@@ -148,7 +150,7 @@ def feature_extract():
     pickle.dump(testing, open("testing_records", 'wb'))
     pickle.dump(training, open("training_records", 'wb'))
     
-#feature_extract()
+# feature_extract()
 
 def runModel():
     """
@@ -173,8 +175,8 @@ def runModel():
     training_df = df.loc[df['record'].isin(training[0])]
     training_target = np.asarray(training[1])
     
-    testing_subset = testing_df[['bin 1','bin 2','bin 3','variance']].copy().as_matrix()
-    training_subset = training_df[['bin 1','bin 2','bin 3','variance']].copy().as_matrix()
+    testing_subset = testing_df[['bin 1','bin 2','bin 3', 'variance']].copy().as_matrix()
+    training_subset = training_df[['bin 1','bin 2','bin 3', 'variance']].copy().as_matrix()
     
     # Split data in train and test data
     data_test  = testing_subset
@@ -198,14 +200,14 @@ def runModel():
     # Save the model you want to use
     pickle.dump(clf, open("model", 'wb'))
 
-#runModel()
+# runModel()
 
 def get_answer(record, data):
     
     sig = Signal(record, data)
     
     loaded_model = pickle.load(open("model", 'rb'))
-    features = np.append(np.asarray(sig.RRbins), np.var(sig.RRintervals))
+    features = np.append(np.asarray(sig.RRbins), np.var(sig.RRintervals)) # leave out variance?
     result = loaded_model.predict([features])    
     
     return result[0]
