@@ -119,12 +119,12 @@ def feature_extract():
 
     Returns
     -------
-        A pickle dump of the feature matrix, training records (9/10th), and testing records (1/10thsvaaa)
+        A pickle dump of the feature matrix, training records (9/10th), and testing records (1/10th)
 
     """
 
     records_labels = wave.getRecords('All')
-    partitioned = wave.getPartitionedRecords(0) # partition first 10th
+    partitioned = wave.getPartitionedRecords(1) # partition first 10th
     testing = partitioned[0]
     training = partitioned[1]
 
@@ -148,7 +148,8 @@ def feature_extract():
     pickle.dump(testing, open("testing_records", 'wb'))
     pickle.dump(training, open("training_records", 'wb'))
     
-    
+#feature_extract()
+
 def runModel():
     """
     runs an machine learning model on our training_data with features bin1, bin2, bin3, and variance
@@ -159,7 +160,7 @@ def runModel():
     
     Returns
     -------
-        A trained model pickle serialized object
+        A pickle dump of the trained machine learning model (svm)
 
     """
     
@@ -197,6 +198,7 @@ def runModel():
     # Save the model you want to use
     pickle.dump(clf, open("model", 'wb'))
 
+#runModel()
 
 def get_answer(record, data):
     
