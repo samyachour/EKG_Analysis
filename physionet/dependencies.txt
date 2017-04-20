@@ -1,4 +1,5 @@
 # file: dependencies.txt
+# Debian sandbox options: https://physionet.org/physiotools/debian/
 #
 # This file lists additional Debian packages that must be installed
 # prior to running your entry's 'setup.sh' and 'next.sh' scripts.
@@ -6,9 +7,4 @@
 
 python3-numpy
 python3-scipy
-python3-pandas
-python3-pandas-lib
-python-pywt
-python-matplotlib
-r-base
-python-sklearn
+python3-sklearn
