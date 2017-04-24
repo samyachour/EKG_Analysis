@@ -9,17 +9,17 @@ SCORING
 
 types = {'N': 0, 'A': 1, 'O': 2, '~': 3}
 
-testing = pickle.load(open("testing_records", 'rb'))
+testing = pickle.load(open("feature_matrices", 'rb'))[0]
 ans = []
 
-for i in testing[0]:
+for i in testing[2]:
     mat = scipy.io.loadmat("../Physionet_Challenge/training2017/" + i + ".mat")
     data = np.divide(mat['val'][0],1000) # convert to millivolts
 
     answer = model.get_answer(i, data)
     ans.append(types[answer])
 
-ref = np.asarray([types[i] for i in testing[1]])
+ref = np.asarray([types[i] for i in testing[0][1]])
 ans = np.asarray(ans)
 
 assert (ref.shape[0] == ans.shape[0])

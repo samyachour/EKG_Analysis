@@ -112,7 +112,7 @@ def deriveBinEdges(training):
 """
 Adding features:
     -add a new features = append() line with new feature
-    -add a 0 to test and trainmatrix
+    -add a 0 to test and trainmatrix in feature_extract()
 """
 
 def getFeatures(sig):
@@ -149,12 +149,13 @@ def feature_extract():
     -------
         A pickle dump of the following:
             tuple of tuples:
-            test tuple:
+            test (1/10th of data) tuple:
                 testing subset feature matrix, 2D array
-                list of record labels N O A ~ for 10% testing data
-            training tuple:
+                list of record labels N O A ~
+                list of record names
+            training (9/10th of data) tuple:
                 training subset feature matrix, 2D array
-                list of record labels N O A ~ for 90% training data
+                list of record labels N O A ~ 
 
     """
 
@@ -178,7 +179,7 @@ def feature_extract():
     testMatrix = np.delete(testMatrix, (0), axis=0) # get rid of zeros array we started with
     trainMatrix = np.delete(trainMatrix, (0), axis=0)
     
-    featureMatrix = ((testMatrix, testing[1]), (trainMatrix, training[1]))
+    featureMatrix = ((testMatrix, testing[1], testing[0]), (trainMatrix, training[1]))
     
     pickle.dump(featureMatrix, open("feature_matrices", 'wb'))
     
