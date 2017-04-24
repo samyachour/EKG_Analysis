@@ -5,7 +5,6 @@ import pickle
 
 # NOW
 
-# TODO: Testing different feature selections, do PCA, grab the components w/ variance that add up to more than 0.9
 # TODO: Saving signal features to make it faster
 
 # LATER
@@ -190,6 +189,7 @@ def runModel():
     pca.fit(data_train)
     data_train = pca.transform(data_train)
     print(pca.explained_variance_ratio_)
+    # TODO: find the components in the explained variance ratio that add up to 0.9 first (see binder notes)
     
     # Create and fit a svm classifier
     from sklearn import svm
@@ -209,7 +209,7 @@ def runModel():
     pickle.dump(clf, open("model", 'wb'))
     pickle.dump(pca, open("pca", 'wb'))
 
-#runModel()
+runModel()
 
 def get_answer(record, data):
     
