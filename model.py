@@ -5,6 +5,7 @@ import pickle
 
 # NOW
 
+# TODO: Add noise classification
 # TODO: Saving signal features to make it faster
 
 # LATER
@@ -108,10 +109,37 @@ def deriveBinEdges(training):
     
     return (lower,upper)
 
+"""
+Adding features:
+    -add a new features = append() line with new feature
+    -add a 0 to test and trainmatrix
+"""
+
+def getFeatures(sig):
+    """
+    this function extract the features from the attributes of a signal
+
+    Parameters
+    ----------
+    sig : Signal object
+        instantiated signal object of class Signal
+
+    Returns
+    -------
+    features : array_like
+        a feature array for the given signal
+
+    """
+    
+    features = np.append(np.asarray(sig.RRbins), np.var(sig.RRintervals))
+    features = np.append(features, wave.calculate_residuals(sig.data))
+    
+    return features
+
 
 def feature_extract():
     """
-    this function extract the features from the attributes of a signal
+    this function creates a feature matrix from patitioned data
 
     Parameters
     ----------
@@ -119,36 +147,42 @@ def feature_extract():
 
     Returns
     -------
-        A pickle dump of the feature matrix, training records (9/10th), and testing records (1/10th)
+        A pickle dump of the following:
+            tuple of tuples:
+            test tuple:
+                testing subset feature matrix, 2D array
+                list of record labels N O A ~ for 10% testing data
+            training tuple:
+                training subset feature matrix, 2D array
+                list of record labels N O A ~ for 90% training data
 
     """
 
     records_labels = wave.getRecords('All')
-    partitioned = wave.getPartitionedRecords(1) # partition first 10th
+    partitioned = wave.getPartitionedRecords(1) # partition nth 10th
     testing = partitioned[0]
     training = partitioned[1]
 
     binEdges = deriveBinEdges(training)
-    bin1 = []
-    bin2 = []
-    bin3 = []
-    variances = []
-    
+    testMatrix = np.array([[0,0,0,0,0]])
+    trainMatrix = np.array([[0,0,0,0,0]])
+
     for i in records_labels[0]:
         data = wave.load(i)
         sig = Signal(i, data, mid_bin_range=binEdges)
-        # print("extracting " + i)
-        bin1.append(sig.RRbins[0])
-        bin2.append(sig.RRbins[1])
-        bin3.append(sig.RRbins[2])
-        variances.append(np.var(sig.RRintervals))
+        if i in testing[0]:
+            testMatrix = np.concatenate((testMatrix, [getFeatures(sig)]))
+        elif i in training[0]:
+            trainMatrix = np.concatenate((trainMatrix, [getFeatures(sig)]))
+            
+    testMatrix = np.delete(testMatrix, (0), axis=0) # get rid of zeros array we started with
+    trainMatrix = np.delete(trainMatrix, (0), axis=0)
     
-    feature_data = pd.DataFrame({'bin 1': bin1, 'bin 2': bin2, 'bin 3': bin3, 'variance' : variances, 'record': records_labels[0], 'label': records_labels[1]})
-    pickle.dump(feature_data, open("feature_data", 'wb'))
-    pickle.dump(testing, open("testing_records", 'wb'))
-    pickle.dump(training, open("training_records", 'wb'))
+    featureMatrix = ((testMatrix, testing[1]), (trainMatrix, training[1]))
     
-#feature_extract()
+    pickle.dump(featureMatrix, open("feature_matrices", 'wb'))
+    
+feature_extract()
 
 def runModel():
     """
@@ -160,32 +194,22 @@ def runModel():
     
     Returns
     -------
-        A pickle dump of the trained machine learning model (svm)
+        A pickle dump of the trained machine learning model (svm) and pca model
 
     """
     
-    df = pickle.load(open("feature_data", 'rb'))
-    testing = pickle.load(open("testing_records", 'rb'))
-    training = pickle.load(open("training_records", 'rb')) 
-    
-    testing_df = df.loc[df['record'].isin(testing[0])]
-    testing_target = np.asarray(testing[1])
-    training_df = df.loc[df['record'].isin(training[0])]
-    training_target = np.asarray(training[1])
-    
-    testing_subset = testing_df[['bin 1','bin 2','bin 3', 'variance']].copy().as_matrix()
-    training_subset = training_df[['bin 1','bin 2','bin 3', 'variance']].copy().as_matrix()
-    
+    featureMatrix = pickle.load(open("feature_matrices", 'rb'))
+        
     # Split data in train and test data
-    data_test  = testing_subset
-    answer_test  = testing_target
+    data_test  = featureMatrix[0][0]
+    answer_test  = np.asarray(featureMatrix[0][1])
     
-    data_train = training_subset
-    answer_train = training_target
+    data_train = featureMatrix[1][0]
+    answer_train = np.asarray(featureMatrix[1][1])
     
     # Creating a PCA model
     from sklearn.decomposition import PCA
-    pca = PCA(n_components=2)
+    pca = PCA()
     pca.fit(data_train)
     data_train = pca.transform(data_train)
     print(pca.explained_variance_ratio_)
@@ -209,7 +233,7 @@ def runModel():
     pickle.dump(clf, open("model", 'wb'))
     pickle.dump(pca, open("pca", 'wb'))
 
-runModel()
+#runModel()
 
 def get_answer(record, data):
     
@@ -217,8 +241,7 @@ def get_answer(record, data):
     
     loaded_model = pickle.load(open("model", 'rb'))
     loaded_pca = pickle.load(open("pca", 'rb'))
-    features = np.append(np.asarray(sig.RRbins), np.var(sig.RRintervals)) # leave out variance?
-    features = loaded_pca.transform([features])
+    features = loaded_pca.transform([getFeatures(sig)])
     result = loaded_model.predict(features)    
     
     return result[0]
