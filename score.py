@@ -19,7 +19,7 @@ for i in testing[2]:
     answer = model.get_answer(i, data)
     ans.append(types[answer])
 
-ref = np.asarray([types[i] for i in testing[0][1]])
+ref = np.asarray([types[i] for i in testing[1]])
 ans = np.asarray(ans)
 
 assert (ref.shape[0] == ans.shape[0])

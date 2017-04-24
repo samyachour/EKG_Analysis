@@ -115,6 +115,13 @@ Adding features:
     -add a 0 to test and trainmatrix in feature_extract()
 """
 
+"""
+Testing:
+    -run feature_extract() (uncomment the line below it)
+    -run runModel()  (uncomment the line below it)
+    -go to score.py and just run the whole file
+"""
+
 def getFeatures(sig):
     """
     this function extract the features from the attributes of a signal
@@ -160,7 +167,7 @@ def feature_extract():
     """
 
     records_labels = wave.getRecords('All')
-    partitioned = wave.getPartitionedRecords(1) # partition nth 10th
+    partitioned = wave.getPartitionedRecords(2) # partition nth 10th
     testing = partitioned[0]
     training = partitioned[1]
 
@@ -183,7 +190,7 @@ def feature_extract():
     
     pickle.dump(featureMatrix, open("feature_matrices", 'wb'))
     
-feature_extract()
+#feature_extract()
 
 def runModel():
     """
@@ -210,7 +217,7 @@ def runModel():
     
     # Creating a PCA model
     from sklearn.decomposition import PCA
-    pca = PCA()
+    pca = PCA(n_components=2)
     pca.fit(data_train)
     data_train = pca.transform(data_train)
     print(pca.explained_variance_ratio_)
