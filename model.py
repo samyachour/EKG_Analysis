@@ -1,11 +1,10 @@
 import wave
-import pandas as pd
 import numpy as np
 import pickle
 
 # NOW
 
-# TODO: Add noise classification
+# TODO: Add noise classification?
 # TODO: Saving signal features to make it faster
 
 # LATER
@@ -22,13 +21,25 @@ import pickle
     # A00123, A00119 single inversion
 
 """
-Upon submission:
+When submitting:
     -remove import plot from all files
     -run compress.sh, verify it included the right files, Include DRYRUN? Include saved Model?
     -make sure setup.sh includes all the right libs
     -make sure dependencies.txt has the right packages
     -make sure entry.zip is formatted correctly
     -(empty setup.sh & add validation folder+F1_score.py temporarily) make sure the whole thing runs without errors, delete pycache/vailidation/F1_score        
+"""
+"""
+When adding features:
+    -add a new features = append() line with new feature
+    -add a 0 to test and trainmatrix in feature_extract()
+"""
+
+"""
+When testing:
+    -run feature_extract() (uncomment the line below it)
+    -run runModel()  (uncomment the line below it)
+    -go to score.py and just run the whole file
 """
 
 
@@ -109,18 +120,6 @@ def deriveBinEdges(training):
     
     return (lower,upper)
 
-"""
-Adding features:
-    -add a new features = append() line with new feature
-    -add a 0 to test and trainmatrix in feature_extract()
-"""
-
-"""
-Testing:
-    -run feature_extract() (uncomment the line below it)
-    -run runModel()  (uncomment the line below it)
-    -go to score.py and just run the whole file
-"""
 
 def getFeatures(sig):
     """
@@ -167,7 +166,7 @@ def feature_extract():
     """
 
     records_labels = wave.getRecords('All')
-    partitioned = wave.getPartitionedRecords(2) # partition nth 10th
+    partitioned = wave.getPartitionedRecords(3) # partition nth 10th
     testing = partitioned[0]
     training = partitioned[1]
 
@@ -217,7 +216,7 @@ def runModel():
     
     # Creating a PCA model
     from sklearn.decomposition import PCA
-    pca = PCA(n_components=2)
+    pca = PCA(n_components=1)
     pca.fit(data_train)
     data_train = pca.transform(data_train)
     print(pca.explained_variance_ratio_)
