@@ -5,8 +5,7 @@ import pickle
 
 # NOW
 
-# TODO: Filtering the signal downsamples it, so maybe change the sampling frequency passed into biosspy r peak detection?
-# TODO: Testing different feature selections, do PCA
+# TODO: Testing different feature selections, do PCA, grab the components w/ variance that add up to more than 0.9
 # TODO: Saving signal features to make it faster
 
 # LATER
@@ -150,7 +149,7 @@ def feature_extract():
     pickle.dump(testing, open("testing_records", 'wb'))
     pickle.dump(training, open("training_records", 'wb'))
     
-# feature_extract()
+#feature_extract()
 
 def runModel():
     """
@@ -181,13 +180,22 @@ def runModel():
     # Split data in train and test data
     data_test  = testing_subset
     answer_test  = testing_target
+    
     data_train = training_subset
     answer_train = training_target
+    
+    # Creating a PCA model
+    from sklearn.decomposition import PCA
+    pca = PCA(n_components=2)
+    pca.fit(data_train)
+    data_train = pca.transform(data_train)
+    print(pca.explained_variance_ratio_)
     
     # Create and fit a svm classifier
     from sklearn import svm
     clf = svm.SVC()
     clf.fit(data_train, answer_train)
+    data_test = pca.transform(data_test)
     print(np.sum(clf.predict(data_test) == answer_test))
     
     # Create and fit a nearest-neighbor classifier
@@ -199,15 +207,18 @@ def runModel():
     
     # Save the model you want to use
     pickle.dump(clf, open("model", 'wb'))
+    pickle.dump(pca, open("pca", 'wb'))
 
-# runModel()
+#runModel()
 
 def get_answer(record, data):
     
     sig = Signal(record, data)
     
     loaded_model = pickle.load(open("model", 'rb'))
+    loaded_pca = pickle.load(open("pca", 'rb'))
     features = np.append(np.asarray(sig.RRbins), np.var(sig.RRintervals)) # leave out variance?
-    result = loaded_model.predict([features])    
+    features = loaded_pca.transform([features])
+    result = loaded_model.predict(features)    
     
     return result[0]
