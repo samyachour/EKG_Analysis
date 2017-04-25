@@ -433,5 +433,58 @@ def interval_bin(intervals, mid_bin_range):
 
 
 
+def cal_stats(data):
+    """
+     Generate statistics for the data given
+
+    Parameters
+    ----------
+        data : array_like
+            1-dimensional array with input data.
+        
+    Returns
+    -------
+        Array of summary statistics
+
+    """
+    
+    power = np.square(data)
+    return np.asarray([
+                        np.amin(data),
+                        np.amax(data),
+                        np.mean(data),
+                        np.std(data),
+                        np.var(data),
+                        np.average(power),
+                        np.mean(np.absolute(data))
+                      ])
+    
+
+
+def stats_feat(coeffs):
+    """
+     Generate stats for wavelet coeffcients
+
+    Parameters
+    ----------
+        coeffs: list
+            the wavelet coeffcients with the format [cA, {d:cDn},...,{d:cD1}]
+            usually returned from pywt.wavedecn
+        
+    Returns
+    -------
+        Array of summary statistics for all coefficients
+
+    """
+    #calculate the stats from the coefficients
+    features = np.array([])
+    features = np.append(features, cal_stats(coeffs[0]))
+    
+    for i in range(1,len(coeffs)):
+        features = np.append(features, cal_stats(coeffs[i]['d']))
+        
+    return features
+
+
 
 

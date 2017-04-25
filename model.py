@@ -1,6 +1,7 @@
 import wave
 import numpy as np
 import pickle
+import pywt
 
 # NOW
 
@@ -137,8 +138,12 @@ def getFeatures(sig):
 
     """
     
-    features = np.append(np.asarray(sig.RRbins), np.var(sig.RRintervals))
-    features = np.append(features, wave.calculate_residuals(sig.data))
+    features = np.append(np.asarray(sig.RRbins), np.var(sig.RRintervals)) # RR bins and RR variance +4 = 4
+    features = np.append(features, wave.calculate_residuals(sig.data)) # Residuals +1 = 5
+    
+    wtcoeff = pywt.wavedecn(sig.data, 'sym5', level=5, mode='constant')
+    wtstats = wave.stats_feat(wtcoeff)
+    features = np.append(features, wtstats) # Wavelet coefficient stats  +42 = 47
     
     return features
 
@@ -171,8 +176,8 @@ def feature_extract():
     training = partitioned[1]
 
     binEdges = deriveBinEdges(training)
-    testMatrix = np.array([[0,0,0,0,0]])
-    trainMatrix = np.array([[0,0,0,0,0]])
+    testMatrix = np.array([np.zeros(47)])
+    trainMatrix = np.array([np.zeros(47)])
 
     for i in records_labels[0]:
         data = wave.load(i)
@@ -189,7 +194,7 @@ def feature_extract():
     
     pickle.dump(featureMatrix, open("feature_matrices", 'wb'))
     
-#feature_extract()
+feature_extract()
 
 def runModel():
     """
