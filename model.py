@@ -5,15 +5,15 @@ import pywt
 
 # NOW
 
+# TODO: Hardcode all signal objects for all records, speed it all up
 # TODO: Add noise classification?
-# TODO: Saving signal features to make it faster
+# TODO: Keep adding features 
 
 # LATER
 
 # TODO: Submit DRYRUN entry, entry.zip in folder is ready
 # TODO: code cleanup/refactoring, add unit tests
 # TODO: Start using rpy2 to work with alex's code to do regression http://rpy.sourceforge.net/rpy2/doc-dev/html/introduction.html
-# TODO: Add back in the p wave detection if needed, or other features
 
 # TODO: Deal with weird records....
     # A03509 RRvar1, RRvar2, RRvar3 NaNs
@@ -67,8 +67,8 @@ class Signal(object):
         self.sampling_rate = 300. # 300 hz
         self.sampleFreq = 1/300
 
+        #self.data = wave.discardNoise(data) # optimize this
         self.data = wave.filterSignal(data)
-        # self.data = wave.discardNoise(self.data) # optimize this
         # self.data = data
 
         self.RPeaks = wave.getRPeaks(self.data, sampling_rate=self.sampling_rate)
@@ -143,7 +143,7 @@ def getFeatures(sig):
     
     wtcoeff = pywt.wavedecn(sig.data, 'sym5', level=5, mode='constant')
     wtstats = wave.stats_feat(wtcoeff)
-    features = np.append(features, wtstats) # Wavelet coefficient stats  +42 = 47
+    #features = np.append(features, wtstats) # Wavelet coefficient stats  +42 = 47
     
     return features
 
@@ -176,8 +176,8 @@ def feature_extract():
     training = partitioned[1]
 
     binEdges = deriveBinEdges(training)
-    testMatrix = np.array([np.zeros(47)])
-    trainMatrix = np.array([np.zeros(47)])
+    testMatrix = np.array([np.zeros(5)])
+    trainMatrix = np.array([np.zeros(5)])
 
     for i in records_labels[0]:
         data = wave.load(i)
