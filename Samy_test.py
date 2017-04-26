@@ -622,5 +622,10 @@ testing_subset = testing_df[['bin 1','bin 2','bin 3','variance']].copy().as_matr
 training_subset = training_df[['bin 1','bin 2','bin 3','variance']].copy().as_matrix()
 """
 
+"""
+Saving all the signals in a giant csv
+"""
+
+
 
 

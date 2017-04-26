@@ -1,5 +1,6 @@
 import wave
 import numpy as np
+import pandas as pd
 import pickle
 import pywt
 
@@ -8,12 +9,11 @@ import pywt
 # TODO: Hardcode all signal objects for all records, speed it all up
 # TODO: Add noise classification?
 # TODO: Keep adding features 
+# TODO: Start using rpy2 to work with alex's code to do regression http://rpy.sourceforge.net/rpy2/doc-dev/html/introduction.html
 
 # LATER
 
 # TODO: Submit DRYRUN entry, entry.zip in folder is ready
-# TODO: code cleanup/refactoring, add unit tests
-# TODO: Start using rpy2 to work with alex's code to do regression http://rpy.sourceforge.net/rpy2/doc-dev/html/introduction.html
 
 # TODO: Deal with weird records....
     # A03509 RRvar1, RRvar2, RRvar3 NaNs
@@ -67,7 +67,7 @@ class Signal(object):
         self.sampling_rate = 300. # 300 hz
         self.sampleFreq = 1/300
 
-        #self.data = wave.discardNoise(data) # optimize this
+        # self.data = wave.discardNoise(data) # optimize this
         self.data = wave.filterSignal(data)
         # self.data = data
 
@@ -79,8 +79,48 @@ class Signal(object):
 
 
 
+def saveSignalFeatures():
+    """
+    This function saves all the features for each signal into a giant dataframe
+    This is so we don't have to re-derive the peaks, intervals, etc. for each signal
 
+    Parameters
+    ----------
+    None
 
+    Returns
+    -------
+    Saves dataframe as hardcoded_features.csv where each row is a filtered signal with the following features:
+        RRbins 3
+        RRintervals 1
+        Residuals 1
+        Wavelet coeff 42
+    """
+    
+    records = wave.getRecords('All')[0]
+    returnMatrix = np.array([np.zeros(48)])
+    
+    for i in records:
+        sig = Signal(i, wave.load(i))
+        
+        features = np.asarray([i]) # record name and data +1 = 1
+        
+        features = np.append(features, np.asarray(sig.RRbins)) # RR bins +3 = 4
+        features = np.append(features, np.var(sig.RRintervals)) # RR interval variance +1 = 5
+        features = np.append(features, wave.calculate_residuals(sig.data)) # Residuals +1 = 6
+        
+        wtcoeff = pywt.wavedecn(sig.data, 'sym5', level=5, mode='constant')
+        wtstats = wave.stats_feat(wtcoeff)
+        features = np.append(features, wtstats) # Wavelet coefficient stats  +42 = 48
+        
+        returnMatrix = np.concatenate((returnMatrix, np.asarray([features])))
+    
+    returnMatrix = np.delete(returnMatrix, (0), axis=0) # get rid of initial np.zeros array
+    
+    df = pd.DataFrame(returnMatrix)
+    df.to_csv('hardcoded_features.csv')
+
+saveSignalFeatures()
 
 def deriveBinEdges(training):
     """
@@ -121,6 +161,33 @@ def deriveBinEdges(training):
     
     return (lower,upper)
 
+hardcoded_features = pd.read_csv("harcoded_features.csv")
+
+def getFeaturesHarcoded(name):
+    """
+    this function extract the features from the attributes of a signal
+    it uses the hardcoded csv data for each signal that we saved earlier using saveSignalFeatures()
+
+    Parameters
+    ----------
+    name : String
+        record name
+
+    Returns
+    -------
+    features : array_like
+        a feature array for the given signal
+
+    """
+    
+    features = np.append(np.asarray(sig.RRbins), np.var(sig.RRintervals)) # RR bins and RR variance +4 = 4
+    features = np.append(features, wave.calculate_residuals(sig.data)) # Residuals +1 = 5
+    
+    wtcoeff = pywt.wavedecn(sig.data, 'sym5', level=5, mode='constant')
+    wtstats = wave.stats_feat(wtcoeff)
+    #features = np.append(features, wtstats) # Wavelet coefficient stats  +42 = 47
+    
+    return features
 
 def getFeatures(sig):
     """
@@ -194,7 +261,7 @@ def feature_extract():
     
     pickle.dump(featureMatrix, open("feature_matrices", 'wb'))
     
-feature_extract()
+#feature_extract()
 
 def runModel():
     """
@@ -226,6 +293,7 @@ def runModel():
     data_train = pca.transform(data_train)
     print(pca.explained_variance_ratio_)
     # TODO: find the components in the explained variance ratio that add up to 0.9 first (see binder notes)
+    #       do pca once, get the explained variance ratios, find how many it takes to add up to 0.9, redo PCA
     
     # Create and fit a svm classifier
     from sklearn import svm
