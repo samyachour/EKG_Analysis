@@ -6,7 +6,9 @@ import pywt
 
 # NOW
 
-# TODO: Hardcode all signal objects for all records, speed it all up
+# TODO: getFeatures() is outputting a numpy array of all strings cause of the record name
+# TODO: consolidate code
+# TODO: edit bin edge function, consolidate code
 # TODO: Add noise classification?
 # TODO: Keep adding features 
 # TODO: Start using rpy2 to work with alex's code to do regression http://rpy.sourceforge.net/rpy2/doc-dev/html/introduction.html
@@ -32,8 +34,8 @@ When submitting:
 """
 """
 When adding features:
-    -add a new features = append() line with new feature
-    -add a 0 to test and trainmatrix in feature_extract()
+    -add a new features = append() line with new feature to getFeatures()
+    -add a 1 to np.zeros(n) test and trainmatrix initialization in feature_extract()
 """
 
 """
@@ -79,48 +81,6 @@ class Signal(object):
 
 
 
-def saveSignalFeatures():
-    """
-    This function saves all the features for each signal into a giant dataframe
-    This is so we don't have to re-derive the peaks, intervals, etc. for each signal
-
-    Parameters
-    ----------
-    None
-
-    Returns
-    -------
-    Saves dataframe as hardcoded_features.csv where each row is a filtered signal with the following features:
-        RRbins 3
-        RRintervals 1
-        Residuals 1
-        Wavelet coeff 42
-    """
-    
-    records = wave.getRecords('All')[0]
-    returnMatrix = np.array([np.zeros(48)])
-    
-    for i in records:
-        sig = Signal(i, wave.load(i))
-        
-        features = np.asarray([i]) # record name and data +1 = 1
-        
-        features = np.append(features, np.asarray(sig.RRbins)) # RR bins +3 = 4
-        features = np.append(features, np.var(sig.RRintervals)) # RR interval variance +1 = 5
-        features = np.append(features, wave.calculate_residuals(sig.data)) # Residuals +1 = 6
-        
-        wtcoeff = pywt.wavedecn(sig.data, 'sym5', level=5, mode='constant')
-        wtstats = wave.stats_feat(wtcoeff)
-        features = np.append(features, wtstats) # Wavelet coefficient stats  +42 = 48
-        
-        returnMatrix = np.concatenate((returnMatrix, np.asarray([features])))
-    
-    returnMatrix = np.delete(returnMatrix, (0), axis=0) # get rid of initial np.zeros array
-    
-    df = pd.DataFrame(returnMatrix)
-    df.to_csv('hardcoded_features.csv')
-
-saveSignalFeatures()
 
 def deriveBinEdges(training):
     """
@@ -148,10 +108,10 @@ def deriveBinEdges(training):
 
     for i in normals:
         
-        sig = Signal(i, wave.load(i))
+        signal = getFeaturesHardcoded(i)
         # print("processing " + i)
-        tempMean = np.mean(sig.RRintervals)
-        tempStd = np.std(sig.RRintervals)
+        tempMean = signal[4]
+        tempStd = np.sqrt(signal[3])
         
         lower += tempMean - tempStd
         upper += tempMean + tempStd
@@ -161,9 +121,9 @@ def deriveBinEdges(training):
     
     return (lower,upper)
 
-hardcoded_features = pd.read_csv("harcoded_features.csv")
+hardcoded_features = pd.read_csv("hardcoded_features.csv")
 
-def getFeaturesHarcoded(name):
+def getFeaturesHardcoded(name):
     """
     this function extract the features from the attributes of a signal
     it uses the hardcoded csv data for each signal that we saved earlier using saveSignalFeatures()
@@ -180,14 +140,9 @@ def getFeaturesHarcoded(name):
 
     """
     
-    features = np.append(np.asarray(sig.RRbins), np.var(sig.RRintervals)) # RR bins and RR variance +4 = 4
-    features = np.append(features, wave.calculate_residuals(sig.data)) # Residuals +1 = 5
-    
-    wtcoeff = pywt.wavedecn(sig.data, 'sym5', level=5, mode='constant')
-    wtstats = wave.stats_feat(wtcoeff)
-    #features = np.append(features, wtstats) # Wavelet coefficient stats  +42 = 47
-    
-    return features
+    signal = np.asarray(hardcoded_features.loc[hardcoded_features['0'] == name])[0]
+        
+    return signal[2:]
 
 def getFeatures(sig):
     """
@@ -205,15 +160,54 @@ def getFeatures(sig):
 
     """
     
-    features = np.append(np.asarray(sig.RRbins), np.var(sig.RRintervals)) # RR bins and RR variance +4 = 4
-    features = np.append(features, wave.calculate_residuals(sig.data)) # Residuals +1 = 5
+    features = np.asarray([sig.name]) # Record name +1 = 1
+    
+    features = np.append(features, np.asarray(sig.RRbins)) # RR bins +3 = 4
+    features = np.append(features, np.var(sig.RRintervals)) # RR interval variance +1 = 5
+    features = np.append(features, np.mean(sig.RRintervals)) # RR interval mean +1 = 6
+    features = np.append(features, wave.calculate_residuals(sig.data)) # Residuals +1 = 7
     
     wtcoeff = pywt.wavedecn(sig.data, 'sym5', level=5, mode='constant')
     wtstats = wave.stats_feat(wtcoeff)
-    #features = np.append(features, wtstats) # Wavelet coefficient stats  +42 = 47
+    features = np.append(features, wtstats) # Wavelet coefficient stats  +42 = 49
     
     return features
 
+def saveSignalFeatures():
+    """
+    This function saves all the features for each signal into a giant dataframe
+    This is so we don't have to re-derive the peaks, intervals, etc. for each signal
+
+    Parameters
+    ----------
+    None
+
+    Returns
+    -------
+    Saves dataframe as hardcoded_features.csv where each row is a filtered signal with the following features:
+        RRbins 3
+        RRintervals variance 1
+        RRintervals mean 1
+        Residuals 1
+        Wavelet coeff 42
+    """
+    
+    records = wave.getRecords('All')[0]
+    returnMatrix = np.array([np.zeros(49)])
+    
+    for i in records:
+        sig = Signal(i, wave.load(i))
+        
+        features = getFeatures(sig)
+        
+        returnMatrix = np.concatenate((returnMatrix, np.asarray([features])))
+    
+    returnMatrix = np.delete(returnMatrix, (0), axis=0) # get rid of initial np.zeros array
+    
+    df = pd.DataFrame(returnMatrix)
+    df.to_csv('hardcoded_features.csv')
+
+#saveSignalFeatures()
 
 def feature_extract():
     """
@@ -238,21 +232,19 @@ def feature_extract():
     """
 
     records_labels = wave.getRecords('All')
-    partitioned = wave.getPartitionedRecords(3) # partition nth 10th
+    partitioned = wave.getPartitionedRecords(4) # partition nth 10th
     testing = partitioned[0]
     training = partitioned[1]
 
-    binEdges = deriveBinEdges(training)
-    testMatrix = np.array([np.zeros(5)])
-    trainMatrix = np.array([np.zeros(5)])
+    # binEdges = deriveBinEdges(training)
+    testMatrix = np.array([np.zeros(48)])
+    trainMatrix = np.array([np.zeros(48)])
 
     for i in records_labels[0]:
-        data = wave.load(i)
-        sig = Signal(i, data, mid_bin_range=binEdges)
         if i in testing[0]:
-            testMatrix = np.concatenate((testMatrix, [getFeatures(sig)]))
+            testMatrix = np.concatenate((testMatrix, [getFeaturesHardcoded(i)]))
         elif i in training[0]:
-            trainMatrix = np.concatenate((trainMatrix, [getFeatures(sig)]))
+            trainMatrix = np.concatenate((trainMatrix, [getFeaturesHardcoded(i)]))
             
     testMatrix = np.delete(testMatrix, (0), axis=0) # get rid of zeros array we started with
     trainMatrix = np.delete(trainMatrix, (0), axis=0)
@@ -321,7 +313,8 @@ def get_answer(record, data):
     
     loaded_model = pickle.load(open("model", 'rb'))
     loaded_pca = pickle.load(open("pca", 'rb'))
-    features = loaded_pca.transform([getFeatures(sig)])
+    print(getFeatures(sig)[1:])
+    features = loaded_pca.transform([getFeatures(sig)[1:]])
     result = loaded_model.predict(features)    
     
     return result[0]
