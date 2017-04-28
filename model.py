@@ -3,7 +3,6 @@ import numpy as np
 import pandas as pd
 import pickle
 import pywt
-import plot
 
 # NOW
 
@@ -79,11 +78,6 @@ class Signal(object):
         
         # TODO: Use biosppy filtered signal data to do p wave detection
 
-
-#sig = Signal("A00001", wave.load("A00001"))
-#plot.plot(wave.load('A00001'), size=(25,20))
-#plot.plot(sig.data, size=(25,20))
-#plot.plot(wave.getRPeaks(wave.load('A00001')), size=(25,20))
 
 
 
@@ -215,7 +209,7 @@ def saveSignalFeatures():
 
 def feature_extract():
     """
-    this function creates a feature matrix from patitioned data
+    this function creates a feature matrix from partitioned data
 
     Parameters
     ----------
@@ -287,9 +281,16 @@ def runModel():
     pca = PCA(n_components=1)
     pca.fit(data_train)
     data_train = pca.transform(data_train)
-    print(pca.explained_variance_ratio_)
-    # TODO: find the components in the explained variance ratio that add up to 0.9 first (see binder notes)
-    #       do pca once, get the explained variance ratios, find how many it takes to add up to 0.9, redo PCA
+    total = [0,0]
+    for i in np.nditer(pca.explained_variance_ratio_):
+        total[0] += i
+        total[1] += 1
+        if total[0] > 0.9:
+            pca = PCA(n_components=total[1])
+            break
+    pca.fit(data_train)
+    data_train = pca.transform(data_train)    
+    
     
     # Create and fit a svm classifier
     from sklearn import svm
