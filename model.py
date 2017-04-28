@@ -7,8 +7,6 @@ import plot
 
 # NOW
 
-# TODO: getFeatures() is outputting a numpy array of all strings cause of the record name
-# TODO: edit bin edge function, consolidate code
 # TODO: Add noise classification?
 # TODO: Keep adding features 
 # TODO: Start using rpy2 to work with alex's code to do regression http://rpy.sourceforge.net/rpy2/doc-dev/html/introduction.html
@@ -60,7 +58,7 @@ class Signal(object):
         RRbins : tuple of bin percents
     """
 
-    def __init__(self, name, data, mid_bin_range=(234.85, 276.42)):
+    def __init__(self, name, data, mid_bin_range=(234.85163198115271, 276.41687146297062)):
         """
         Return a Signal object whose record name is *name*,
         signal data is *data*,
@@ -116,7 +114,7 @@ def deriveBinEdges(training):
     for i in normals:
         
         signal = getFeaturesHardcoded(i)
-        # print("processing " + i)
+
         tempMean = signal[4]
         tempStd = np.sqrt(signal[3])
         
@@ -238,11 +236,11 @@ def feature_extract():
     """
 
     records_labels = wave.getRecords('All')
-    partitioned = wave.getPartitionedRecords(4) # partition nth 10th
+    partitioned = wave.getPartitionedRecords(9) # partition nth 10th
     testing = partitioned[0]
     training = partitioned[1]
 
-    # binEdges = deriveBinEdges(training)
+    print(deriveBinEdges(training))
     testMatrix = np.array([np.zeros(48)])
     trainMatrix = np.array([np.zeros(48)])
 
@@ -259,7 +257,7 @@ def feature_extract():
     
     pickle.dump(featureMatrix, open("feature_matrices", 'wb'))
     
-#feature_extract()
+feature_extract()
 
 def runModel():
     """
