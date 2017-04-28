@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 
-def plot(y, title="Signal", xLab="Index * 0.003s", yLab="mV"):
-    fig = plt.figure(figsize=(9.7, 6)) # I used figures to customize size
+def plot(y, title="Signal", xLab="Index * 0.003s", yLab="mV", size=(9.7,6)):
+    fig = plt.figure(figsize=size) # I used figures to customize size
     ax = fig.add_subplot(111)
     ax.plot(y)
     ax.set_title(title)

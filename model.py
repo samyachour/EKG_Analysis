@@ -3,11 +3,11 @@ import numpy as np
 import pandas as pd
 import pickle
 import pywt
+import plot
 
 # NOW
 
 # TODO: getFeatures() is outputting a numpy array of all strings cause of the record name
-# TODO: consolidate code
 # TODO: edit bin edge function, consolidate code
 # TODO: Add noise classification?
 # TODO: Keep adding features 
@@ -16,6 +16,7 @@ import pywt
 # LATER
 
 # TODO: Submit DRYRUN entry, entry.zip in folder is ready
+# TODO: Make sure code is nice and formatted
 
 # TODO: Deal with weird records....
     # A03509 RRvar1, RRvar2, RRvar3 NaNs
@@ -77,8 +78,14 @@ class Signal(object):
 
         self.RRintervals = wave.interval(self.RPeaks)
         self.RRbins = wave.interval_bin(self.RRintervals, mid_bin_range)
+        
+        # TODO: Use biosppy filtered signal data to do p wave detection
 
 
+#sig = Signal("A00001", wave.load("A00001"))
+#plot.plot(wave.load('A00001'), size=(25,20))
+#plot.plot(sig.data, size=(25,20))
+#plot.plot(wave.getRPeaks(wave.load('A00001')), size=(25,20))
 
 
 
@@ -144,6 +151,7 @@ def getFeaturesHardcoded(name):
         
     return signal[2:]
 
+
 def getFeatures(sig):
     """
     this function extract the features from the attributes of a signal
@@ -155,21 +163,21 @@ def getFeatures(sig):
 
     Returns
     -------
-    features : array_like
-        a feature array for the given signal
+    features : list (not numpy array)
+        a feature list for the given signal
 
     """
     
-    features = np.asarray([sig.name]) # Record name +1 = 1
+    features = [sig.name] # Record name +1 = 1
     
-    features = np.append(features, np.asarray(sig.RRbins)) # RR bins +3 = 4
-    features = np.append(features, np.var(sig.RRintervals)) # RR interval variance +1 = 5
-    features = np.append(features, np.mean(sig.RRintervals)) # RR interval mean +1 = 6
-    features = np.append(features, wave.calculate_residuals(sig.data)) # Residuals +1 = 7
+    features += list(sig.RRbins) # RR bins +3 = 4
+    features.append(np.var(sig.RRintervals)) # RR interval variance +1 = 5
+    features.append(np.mean(sig.RRintervals)) # RR interval mean +1 = 6
+    features.append(wave.calculate_residuals(sig.data)) # Residuals +1 = 7
     
     wtcoeff = pywt.wavedecn(sig.data, 'sym5', level=5, mode='constant')
     wtstats = wave.stats_feat(wtcoeff)
-    features = np.append(features, wtstats) # Wavelet coefficient stats  +42 = 49
+    features += wtstats.tolist() # Wavelet coefficient stats  +42 = 49
     
     return features
 
@@ -193,17 +201,15 @@ def saveSignalFeatures():
     """
     
     records = wave.getRecords('All')[0]
-    returnMatrix = np.array([np.zeros(49)])
+    returnMatrix = []
     
     for i in records:
         sig = Signal(i, wave.load(i))
         
         features = getFeatures(sig)
         
-        returnMatrix = np.concatenate((returnMatrix, np.asarray([features])))
-    
-    returnMatrix = np.delete(returnMatrix, (0), axis=0) # get rid of initial np.zeros array
-    
+        returnMatrix.append(features)
+        
     df = pd.DataFrame(returnMatrix)
     df.to_csv('hardcoded_features.csv')
 
@@ -313,7 +319,6 @@ def get_answer(record, data):
     
     loaded_model = pickle.load(open("model", 'rb'))
     loaded_pca = pickle.load(open("pca", 'rb'))
-    print(getFeatures(sig)[1:])
     features = loaded_pca.transform([getFeatures(sig)[1:]])
     result = loaded_model.predict(features)    
     
