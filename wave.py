@@ -141,7 +141,7 @@ def decomp(cA, wavelet, levels, mode='constant', omissions=([], False)):
     return pywt.waverecn(coeffs, wavelet, mode=mode)
 
 
-def filterSignal(data, sampling_rate=300.0):
+def filterSignalMexh(data, sampling_rate=300.0):
     
     """
     bandpass filter using mexican hat hardcoded values from physionet
@@ -175,6 +175,28 @@ def filterSignal(data, sampling_rate=300.0):
     bpfecg = scipy.signal.filtfilt(b1,1,data)
     
     return bpfecg
+
+def filterSignalBios(data, sampling_rate=300.0):
+    
+    """
+    filter signal using biosppy
+
+    Parameters
+    ----------
+    data : array_like
+        1-dimensional array with input data.
+    sampling_rate : float, optional
+        discrete sampling rate for the signal, physionet training is 300. (hz)
+
+    Returns
+    -------
+        1D array of filtered signal data.
+
+    """
+    
+    out = ecg.ecg(data, sampling_rate=sampling_rate, show=False)
+    
+    return out[1]
 
 """ Helper functions """
 

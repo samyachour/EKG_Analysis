@@ -6,9 +6,9 @@ import pywt
 
 # NOW
 
-# TODO: Add noise classification?
-# TODO: Keep adding features 
 # TODO: Start using rpy2 to work with alex's code to do regression http://rpy.sourceforge.net/rpy2/doc-dev/html/introduction.html
+# TODO: Add noise classification?
+# TODO: Use biosppy not mexh filtered signal, then add more features back in i.e. p wave, heights, etc.
 
 # LATER
 
@@ -57,7 +57,11 @@ class Signal(object):
         RRbins : tuple of bin percents
     """
 
-    def __init__(self, name, data, mid_bin_range=(234.85163198115271, 276.41687146297062)):
+    def __init__(self, 
+                 name, 
+                 data, 
+                 mid_bin_range=(234.85163198115271, 276.41687146297062)
+                ):
         """
         Return a Signal object whose record name is *name*,
         signal data is *data*,
@@ -74,11 +78,7 @@ class Signal(object):
         self.RPeaks = wave.getRPeaks(self.data, sampling_rate=self.sampling_rate)
 
         self.RRintervals = wave.interval(self.RPeaks)
-        self.RRbins = wave.interval_bin(self.RRintervals, mid_bin_range)
-        
-        # TODO: Use biosppy filtered signal data to do p wave detection
-
-
+        self.RRbinsN = wave.interval_bin(self.RRintervals, mid_bin_range)
 
 
 def deriveBinEdges(training):
@@ -88,7 +88,7 @@ def deriveBinEdges(training):
     Parameters
     ----------
     training : tuple
-        tuple of lists of training data record names and labels, first element from wave.getPartitionedRecords()
+        tuple of lists of training data record names and labels, 2nd tuple from wave.getPartitionedRecords()
 
     Returns
     -------
@@ -102,7 +102,7 @@ def deriveBinEdges(training):
     
     for idx, val in enumerate(training[0]):
         
-        if training[1][idx] == 'N':
+        if training[1][idx] == 'A':
             normals.append(val)
 
     for i in normals:
@@ -162,7 +162,7 @@ def getFeatures(sig):
     
     features = [sig.name] # Record name +1 = 1
     
-    features += list(sig.RRbins) # RR bins +3 = 4
+    features += list(sig.RRbinsN) # RR bins normal bounds +3 = 4
     features.append(np.var(sig.RRintervals)) # RR interval variance +1 = 5
     features.append(np.mean(sig.RRintervals)) # RR interval mean +1 = 6
     features.append(wave.calculate_residuals(sig.data)) # Residuals +1 = 7
@@ -170,6 +170,7 @@ def getFeatures(sig):
     wtcoeff = pywt.wavedecn(sig.data, 'sym5', level=5, mode='constant')
     wtstats = wave.stats_feat(wtcoeff)
     features += wtstats.tolist() # Wavelet coefficient stats  +42 = 49
+        #number of features getFeaturesHardcoded() will be returning^^, -1 for sig.name
     
     return features
 
@@ -230,11 +231,10 @@ def feature_extract():
     """
 
     records_labels = wave.getRecords('All')
-    partitioned = wave.getPartitionedRecords(9) # partition nth 10th
+    partitioned = wave.getPartitionedRecords(0) # partition nth 10th
     testing = partitioned[0]
     training = partitioned[1]
 
-    print(deriveBinEdges(training))
     testMatrix = np.array([np.zeros(48)])
     trainMatrix = np.array([np.zeros(48)])
 
@@ -251,7 +251,7 @@ def feature_extract():
     
     pickle.dump(featureMatrix, open("feature_matrices", 'wb'))
     
-feature_extract()
+#feature_extract()
 
 def runModel():
     """
@@ -278,9 +278,8 @@ def runModel():
     
     # Creating a PCA model
     from sklearn.decomposition import PCA
-    pca = PCA(n_components=1)
+    pca = PCA()
     pca.fit(data_train)
-    data_train = pca.transform(data_train)
     total = [0,0]
     for i in np.nditer(pca.explained_variance_ratio_):
         total[0] += i
