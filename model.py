@@ -32,6 +32,7 @@ When submitting:
     -comment out all 'pip install' lines setup.sh, add validation folder, 
         run ./prepare-entry.sh
     -delete new pycache & vailidation folder, undo commenting in setup.sh
+    -compress and submit!
 """
 """
 When adding features:
