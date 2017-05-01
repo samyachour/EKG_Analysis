@@ -23,17 +23,18 @@ import pywt
 
 """
 When submitting:
-    -remove import plot from all files
+    -remove import plot from all files, delete line that reads in hardcoded_features.csv
     -run compress.sh, verify it included the right files, Include DRYRUN? Include saved Model?
     -make sure setup.sh includes all the right libs
     -make sure dependencies.txt has the right packages
     -make sure entry.zip is formatted correctly
-    -(empty setup.sh & add validation folder+F1_score.py temporarily) make sure the whole thing runs without errors, delete pycache/vailidation/F1_score        
+    -(empty setup.sh & add validation folder+F1_score.py* temporarily) make sure the whole thing runs without errors, delete pycache+vailidation+F1_score        
 """
 """
 When adding features:
-    -add a new features = append() line with new feature to getFeatures()
-    -add a 1 to np.zeros(n) test and trainmatrix initialization in feature_extract()
+    -add a new 'features.append(newFeature)' to getFeatures()
+    -add a 1 to 'n' in np.zeros(n) testMatrix and trainMatrix initialization in feature_extract()
+    -re run saveSignalFeatures() to make a new harcoded_features.csv
 """
 
 """
@@ -72,7 +73,7 @@ class Signal(object):
         self.sampleFreq = 1/300
 
         # self.data = wave.discardNoise(data) # optimize this
-        self.data = wave.filterSignal(data)
+        self.data = wave.filterSignalBios(data)
         # self.data = data
 
         self.RPeaks = wave.getRPeaks(self.data, sampling_rate=self.sampling_rate)
@@ -317,7 +318,10 @@ def get_answer(record, data):
     
     loaded_model = pickle.load(open("model", 'rb'))
     loaded_pca = pickle.load(open("pca", 'rb'))
-    features = loaded_pca.transform([getFeatures(sig)[1:]])
-    result = loaded_model.predict(features)    
-    
-    return result[0]
+    try:
+        features = loaded_pca.transform([getFeatures(sig)[1:]])
+        result = loaded_model.predict(features)    
+        
+        return result[0]
+    except:
+        return 'N' # return noise if we get an error in detection
