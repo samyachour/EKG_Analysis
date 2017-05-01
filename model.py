@@ -28,9 +28,10 @@ When submitting:
     -run compress.sh, verify it included the right files,
         Include DRYRUN? Include saved pickle Model?
     -make sure setup.sh + dependencies.txt includes all the right libs
-    -make sure entry.zip is formatted correctly
-    -empty setup.sh & add validation folder temporarily, run ./prepare-entry.sh
-    -delete pycache & vailidation/, undo emptying setup.sh
+    -make sure entry.zip is formatted correctly, move files out of physionet folder
+    -comment out all 'pip install' lines setup.sh, add validation folder, 
+        run ./prepare-entry.sh
+    -delete new pycache & vailidation folder, undo commenting in setup.sh
 """
 """
 When adding features:
