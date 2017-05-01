@@ -230,9 +230,8 @@ def feature_extract():
     testing = partitioned[0]
     training = partitioned[1]
 
-    length = getFeaturesHardcoded("A00001").size
-    testMatrix = np.array([np.zeros(length)])
-    trainMatrix = np.array([np.zeros(length)])
+    testMatrix = np.array([getFeaturesHardcoded("A00001")])
+    trainMatrix = np.array([getFeaturesHardcoded("A00001")])
 
     for i in records_labels[0]:
         if i in testing[0]:
@@ -240,7 +239,7 @@ def feature_extract():
         elif i in training[0]:
             trainMatrix = np.concatenate((trainMatrix, [getFeaturesHardcoded(i)]))
             
-    testMatrix = np.delete(testMatrix, (0), axis=0) # get rid of zeros array we started with
+    testMatrix = np.delete(testMatrix, (0), axis=0) # get rid of A00001 initialization array
     trainMatrix = np.delete(trainMatrix, (0), axis=0)
     
     featureMatrix = ((testMatrix, testing[1], testing[0]), (trainMatrix, training[1]))
