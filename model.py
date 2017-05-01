@@ -6,9 +6,9 @@ import pywt
 
 # NOW
 
+# TODO: add p waves in
 # TODO: Start using rpy2 to work with alex's code to do regression http://rpy.sourceforge.net/rpy2/doc-dev/html/introduction.html
 # TODO: Add noise classification?
-# TODO: Use biosppy not mexh filtered signal, then add more features back in i.e. p wave, heights, etc.
 
 # LATER
 
@@ -23,17 +23,18 @@ import pywt
 
 """
 When submitting:
-    -remove import plot from all files, delete line that reads in hardcoded_features.csv
-    -run compress.sh, verify it included the right files, Include DRYRUN? Include saved Model?
-    -make sure setup.sh includes all the right libs
-    -make sure dependencies.txt has the right packages
+    -remove import plot from all files,
+        delete line >>>'hardcoded_features = pd.read_csv("hardcoded_features.csv")'
+    -run compress.sh, verify it included the right files,
+        Include DRYRUN? Include saved pickle Model?
+    -make sure setup.sh + dependencies.txt includes all the right libs
     -make sure entry.zip is formatted correctly
-    -(empty setup.sh & add validation folder+F1_score.py* temporarily) make sure the whole thing runs without errors, delete pycache+vailidation+F1_score        
+    -empty setup.sh & add validation folder temporarily, run ./prepare-entry.sh
+    -delete pycache & vailidation/, undo emptying setup.sh
 """
 """
 When adding features:
-    -add a new 'features.append(newFeature)' to getFeatures()
-    -add a 1 to 'n' in np.zeros(n) testMatrix and trainMatrix initialization in feature_extract()
+    -add a new 'features.append(newFeature)' line to getFeatures()
     -re run saveSignalFeatures() to make a new harcoded_features.csv
 """
 
@@ -80,7 +81,6 @@ class Signal(object):
 
         self.RRintervals = wave.interval(self.RPeaks)
         self.RRbinsN = wave.interval_bin(self.RRintervals, mid_bin_range)
-
 
 def deriveBinEdges(training):
     """
@@ -144,7 +144,6 @@ def getFeaturesHardcoded(name):
         
     return signal[2:]
 
-
 def getFeatures(sig):
     """
     this function extract the features from the attributes of a signal
@@ -186,12 +185,7 @@ def saveSignalFeatures():
 
     Returns
     -------
-    Saves dataframe as hardcoded_features.csv where each row is a filtered signal with the following features:
-        RRbins 3
-        RRintervals variance 1
-        RRintervals mean 1
-        Residuals 1
-        Wavelet coeff 42
+    Saves dataframe as hardcoded_features.csv where each row is a filtered signal with the getFeatures() features
     """
     
     records = wave.getRecords('All')[0]
@@ -207,7 +201,7 @@ def saveSignalFeatures():
     df = pd.DataFrame(returnMatrix)
     df.to_csv('hardcoded_features.csv')
 
-#saveSignalFeatures()
+saveSignalFeatures()
 
 def feature_extract():
     """
@@ -236,8 +230,9 @@ def feature_extract():
     testing = partitioned[0]
     training = partitioned[1]
 
-    testMatrix = np.array([np.zeros(48)])
-    trainMatrix = np.array([np.zeros(48)])
+    length = getFeaturesHardcoded("A00001").size
+    testMatrix = np.array([np.zeros(length)])
+    trainMatrix = np.array([np.zeros(length)])
 
     for i in records_labels[0]:
         if i in testing[0]:
