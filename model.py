@@ -201,7 +201,7 @@ def saveSignalFeatures():
     df = pd.DataFrame(returnMatrix)
     df.to_csv('hardcoded_features.csv')
 
-saveSignalFeatures()
+#saveSignalFeatures()
 
 def feature_extract():
     """
