@@ -172,6 +172,11 @@ def getFeatures(sig):
     features += wtstats.tolist() # Wavelet coefficient stats  +42 = 49
         #number of features getFeaturesHardcoded() will be returning^^, -1 for sig.name
     
+    #add differences in variances
+    features.append(wave.diff_var(sig.RRintervals, skip=2))
+    features.append(wave.diff_var(sig.RRintervals, skip=3))
+    features.append(wave.diff_var(sig.RRintervals, skip=4))
+
     return features
 
 def saveSignalFeatures():
