@@ -6,7 +6,9 @@ import pywt
 
 # NOW
 
-# TODO: add p waves in
+# TODO: add p waves back in
+# TODO: submit entry with pip installed correctly
+
 # TODO: Andy will do this: 
     #Start using rpy2 to work with alex's code to do regression http://rpy.sourceforge.net/rpy2/doc-dev/html/introduction.html
     #Or just port the r code to python, if so remove rpy2 binaries and the pip line in setup.sh
@@ -14,7 +16,6 @@ import pywt
 
 # LATER
 
-# TODO: Submit DRYRUN entry, entry.zip in folder is ready
 # TODO: Make sure code is nice and formatted
 
 # TODO: Deal with weird records....
@@ -24,16 +25,17 @@ import pywt
     # A00123, A00119 single inversion
 
 """
-When submitting:
+When submitting (use chrome):
     -remove import plot from all files,
         delete line >>>'hardcoded_features = pd.read_csv("hardcoded_features.csv")'
+        comment out all code outside functions (might be runModel() and feature_extract())
     -run compress.sh, verify it included the right files,
         Include DRYRUN? Include saved pickle Model?
     -make sure setup.sh + dependencies.txt includes all the right libs
     -make sure entry.zip is formatted correctly, move files out of physionet folder
     -comment out all 'pip install' lines setup.sh, add validation folder, 
         run ./prepare-entry.sh
-    -delete new pycache & vailidation folder, undo commenting in setup.sh
+    -delete new pycache, KNN_model, & vailidation folder, undo commenting in setup.sh
     -compress and submit!
 """
 """
