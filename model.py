@@ -7,7 +7,9 @@ import pywt
 # NOW
 
 # TODO: add p waves in
-# TODO: Start using rpy2 to work with alex's code to do regression http://rpy.sourceforge.net/rpy2/doc-dev/html/introduction.html
+# TODO: Andy will do this: 
+    #Start using rpy2 to work with alex's code to do regression http://rpy.sourceforge.net/rpy2/doc-dev/html/introduction.html
+    #Or just port the r code to python, if so remove rpy2 binaries and the pip line in setup.sh
 # TODO: Add noise classification?
 
 # LATER
@@ -162,12 +164,12 @@ def getFeatures(sig):
 
     """
     
-    features = [sig.name] # Record name +1 = 1
+    features = [sig.name]
     
-    features += list(sig.RRbinsN) # RR bins normal bounds +3 = 4
-    features.append(np.var(sig.RRintervals)) # RR interval variance +1 = 5
-    features.append(np.mean(sig.RRintervals)) # RR interval mean +1 = 6
-    features.append(wave.calculate_residuals(sig.data)) # Residuals +1 = 7
+    features += list(sig.RRbinsN)
+    features.append(np.var(sig.RRintervals))
+    features.append(np.mean(sig.RRintervals))
+    features.append(wave.calculate_residuals(sig.data))
     
     wtcoeff = pywt.wavedecn(sig.data, 'sym5', level=5, mode='constant')
     wtstats = wave.stats_feat(wtcoeff)
@@ -175,7 +177,7 @@ def getFeatures(sig):
         #number of features getFeaturesHardcoded() will be returning^^, -1 for sig.name
     
     #add differences in variances
-    features.append(wave.diff_var(sig.RRintervals, skip=2))
+    features.append(wave.diff_var(sig.RRintervals, skip=2)) # these 3 decrease the score
     features.append(wave.diff_var(sig.RRintervals, skip=3))
     features.append(wave.diff_var(sig.RRintervals, skip=4))
 
@@ -253,7 +255,7 @@ def feature_extract():
     
     pickle.dump(featureMatrix, open("feature_matrices", 'wb'))
     
-#feature_extract()
+feature_extract()
 
 def runModel():
     """
@@ -311,7 +313,7 @@ def runModel():
     pickle.dump(clf, open("model", 'wb'))
     pickle.dump(pca, open("pca", 'wb'))
 
-#runModel()
+runModel()
 
 def get_answer(record, data):
     
