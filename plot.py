@@ -9,6 +9,17 @@ def plot(y, title="Signal", xLab="Index * 0.003s", yLab="mV", size=(9.7,6)):
     ax.set_ylabel(yLab)
     ax.set_xlabel(xLab)
     plt.show()
+    
+def plotBaseline(y, baseline=0, title="Signal", xLab="Index * 0.003s", yLab="mV", size=(9.7,6)):
+    fig = plt.figure(figsize=size) # I used figures to customize size
+    ax = fig.add_subplot(111)
+    ax.plot(y)
+    ax.set_title(title)
+    # fig.savefig('/Users/samy/Downloads/{0}.png'.format(self.name))
+    plt.axhline(y=baseline)
+    ax.set_ylabel(yLab)
+    ax.set_xlabel(xLab)
+    plt.show()
 
 def multiplot(data, graph_names):
     #plot multiple lines in one graph

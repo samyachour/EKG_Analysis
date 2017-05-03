@@ -6,7 +6,7 @@ import pywt
 
 # NOW
 
-# TODO: add p waves (pr interval, pp interval, p height) and baseline
+# TODO: add p waves (pr interval, pp interval, p height)
 # TODO: submit entry with pip installed correctly
 
 # TODO: Andy will do this: 
@@ -82,14 +82,18 @@ class Signal(object):
         # self.data = wave.discardNoise(data) # optimize this
         self.data = wave.filterSignalBios(data)
         # self.data = data
-
+        
         self.RPeaks = wave.getRPeaks(self.data, sampling_rate=self.sampling_rate)
+        if np.mean([self.data[i] for i in self.RPeaks]) < 0: # signal is inverted
+            self.data = -self.data
+            
+        self.baseline = wave.getBaseline(self)
 
         self.RRintervals = wave.interval(self.RPeaks)
         self.RRbinsN = wave.interval_bin(self.RRintervals, mid_bin_range)
         
-#sig = Signal("A00001", wave.load("A00001"))
-#wave.getPWaves(sig)
+        self.PWaves = wave.getPWaves(self)
+        
 
 def deriveBinEdges(training):
     """
@@ -174,6 +178,8 @@ def getFeatures(sig):
     features += list(sig.RRbinsN)
     features.append(np.var(sig.RRintervals))
     features.append(wave.calculate_residuals(sig.data))
+    
+    
         
     return features
 
@@ -249,7 +255,7 @@ def feature_extract():
     
     pickle.dump(featureMatrix, open("feature_matrices", 'wb'))
     
-feature_extract()
+#feature_extract()
 
 def runModel():
     """
@@ -307,7 +313,7 @@ def runModel():
     pickle.dump(clf, open("model", 'wb'))
     pickle.dump(pca, open("pca", 'wb'))
 
-runModel()
+#runModel()
 
 def get_answer(record, data):
     

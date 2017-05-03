@@ -4,7 +4,7 @@ import pandas as pd
 import scipy.io as sio
 from biosppy.signals import ecg
 import scipy
-from detect_peaks import detect_peaks
+from detect_peaks import detect_peaks as detect_peaks_orig
 
 
 def getRPeaks(data, sampling_rate=300.):
@@ -199,6 +199,63 @@ def filterSignalBios(data, sampling_rate=300.0):
     
     return out[1]
 
+def detect_peaks(x, plotX=np.array([]), mph=None, mpd=1, threshold=0, edge='rising', 
+                 kpsh=False, valley=False, show=False, ax=None):
+    
+    """
+    Wrapper function for detect_peaks function in detect_peaks.py
+    Detect peaks in data based on their amplitude and other features.
+
+    Parameters
+    ----------
+    x : 1D array_like
+        data.
+    plotX : 1D array_like optional (default = x)
+        original signal you might want to plot detected peaks on, if you used wavelets or the like
+    mph : {None, number}, optional (default = None)
+        detect peaks that are greater than minimum peak height.
+    mpd : positive integer, optional (default = 1)
+        detect peaks that are at least separated by minimum peak distance (in
+        number of data).
+    threshold : positive number, optional (default = 0)
+        detect peaks (valleys) that are greater (smaller) than `threshold`
+        in relation to their immediate neighbors.
+    edge : {None, 'rising', 'falling', 'both'}, optional (default = 'rising')
+        for a flat peak, keep only the rising edge ('rising'), only the
+        falling edge ('falling'), both edges ('both'), or don't detect a
+        flat peak (None).
+    kpsh : bool, optional (default = False)
+        keep peaks with same height even if they are closer than `mpd`.
+    valley : bool, optional (default = False)
+        if True (1), detect valleys (local minima) instead of peaks.
+    show : bool, optional (default = False)
+        if True (1), plot data in matplotlib figure.
+    ax : a matplotlib.axes.Axes instance, optional (default = None).
+
+    Returns
+    -------
+    ind : 1D array_like
+        indices of the peaks in `x`.
+
+    Notes
+    -----
+    The detection of valleys instead of peaks is performed internally by simply
+    negating the data: `ind_valleys = detect_peaks(-x)`
+    
+    The function can handle NaN's 
+
+    See this IPython Notebook [1]_.
+
+    References
+    ----------
+    .. [1] http://nbviewer.ipython.org/github/demotu/BMC/blob/master/notebooks/DetectPeaks.ipynb
+    """
+    
+    if plotX.size == 0:
+        plotX = x # couldn't do in function declaration
+    return detect_peaks_orig(x, plotX=plotX, mph=mph, mpd=mpd, threshold=threshold, edge=edge, 
+                             kpsh=kpsh, valley=valley, show=show, ax=ax)
+
 def getPWaves(signal):
     """
     P Wave detection
@@ -222,13 +279,64 @@ def getPWaves(signal):
         left_limit = right_limit - (right_limit-left_limit)//3
         
         plotData = signal.data[left_limit:right_limit]
-        peaks = detect_peaks(plotData, show=True)
-        peakYs = [plotData[i] for i in peaks] # to get max peak
-        
+        peaks = detect_peaks(plotData, show=True, mpd=160)
+                        
         if peaks.size != 0:
-            maxesP.append(left_limit + peaks[np.argmax(peakYs)]) # need to convert to original signal coordinates
+            maxesP.append(left_limit + peaks[0]) # need to convert to original signal coordinates
         
     return np.asarray(maxesP)
+
+def getBaseline(signal):
+    """
+    Baseline estimation
+
+    Parameters
+    ----------
+    signal : Signal object
+        signal object from Signal class in signal.py
+
+    Returns
+    -------
+        Y value in mV of baseline, float
+    """
+    
+    baselineY = 0
+    trueBaselines = 0
+    
+    for i in range(0, len(signal.RPeaks) - 1):
+        left_limit = signal.RPeaks[i]
+        right_limit = signal.RPeaks[i+1]
+
+        RRinterval = signal.data[left_limit:right_limit] # the indices for one rrinterval
+        innerPeaks = detect_peaks(RRinterval, edge='both', mpd=30) # peaks in between
+                
+        for i in range(0, len(innerPeaks) - 1):
+            # between the first set of peaks
+            left_limit = innerPeaks[i]
+            right_limit = innerPeaks[i+1]
+            
+            plotData = RRinterval[left_limit:right_limit]
+            
+            mean = np.mean(plotData)
+            
+            bottom_limit = mean - 0.04
+            top_limit = mean + 0.04
+            
+            baseline = True
+            
+            # if any points in the subinterval are out of the range 'mean +/- 0.04'
+            for i in plotData:
+                if i < bottom_limit or i > top_limit:
+                    baseline = False
+            
+            if baseline:
+                baselineY += mean
+                trueBaselines += 1
+    
+    if trueBaselines > 0:
+        return baselineY/trueBaselines
+    else:
+        return np.mean(signal.data)
 
 
 """ Helper functions """
