@@ -34,7 +34,7 @@ When submitting (use chrome):
     -make sure setup.sh + dependencies.txt includes all the right libs
     -make sure entry.zip is formatted correctly, move files out of physionet folder
     -comment out all 'pip install' lines setup.sh, add validation folder, 
-        run ./prepare-entry.sh
+        run ./prepare-entry.sh, copy in full answers.txt
     -delete new pycache, KNN_model, & vailidation folder, undo commenting in setup.sh
     -compress and submit!
 """
@@ -178,11 +178,6 @@ def getFeatures(sig):
     features += wtstats.tolist() # Wavelet coefficient stats  +42 = 49
         #number of features getFeaturesHardcoded() will be returning^^, -1 for sig.name
     
-    #add differences in variances
-    features.append(wave.diff_var(sig.RRintervals, skip=2)) # these 3 decrease the score
-    features.append(wave.diff_var(sig.RRintervals, skip=3))
-    features.append(wave.diff_var(sig.RRintervals, skip=4))
-
     return features
 
 def saveSignalFeatures():
