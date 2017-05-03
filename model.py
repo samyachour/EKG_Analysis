@@ -6,7 +6,7 @@ import pywt
 
 # NOW
 
-# TODO: add p waves back in
+# TODO: add p waves (pr interval, pp interval, p height) and baseline
 # TODO: submit entry with pip installed correctly
 
 # TODO: Andy will do this: 
@@ -87,6 +87,9 @@ class Signal(object):
 
         self.RRintervals = wave.interval(self.RPeaks)
         self.RRbinsN = wave.interval_bin(self.RRintervals, mid_bin_range)
+        
+#sig = Signal("A00001", wave.load("A00001"))
+#wave.getPWaves(sig)
 
 def deriveBinEdges(training):
     """
@@ -170,14 +173,8 @@ def getFeatures(sig):
     
     features += list(sig.RRbinsN)
     features.append(np.var(sig.RRintervals))
-    features.append(np.mean(sig.RRintervals))
     features.append(wave.calculate_residuals(sig.data))
-    
-    wtcoeff = pywt.wavedecn(sig.data, 'sym5', level=5, mode='constant')
-    wtstats = wave.stats_feat(wtcoeff)
-    features += wtstats.tolist() # Wavelet coefficient stats  +42 = 49
-        #number of features getFeaturesHardcoded() will be returning^^, -1 for sig.name
-    
+        
     return features
 
 def saveSignalFeatures():
@@ -324,4 +321,4 @@ def get_answer(record, data):
         
         return result[0]
     except:
-        return 'N' # return noise if we get an error in detection
+        return '~' # return noise if we get an error in detection

@@ -4,6 +4,7 @@ import pandas as pd
 import scipy.io as sio
 from biosppy.signals import ecg
 import scipy
+from detect_peaks import detect_peaks
 
 
 def getRPeaks(data, sampling_rate=300.):
@@ -197,6 +198,38 @@ def filterSignalBios(data, sampling_rate=300.0):
     out = ecg.ecg(data, sampling_rate=sampling_rate, show=False)
     
     return out[1]
+
+def getPWaves(signal):
+    """
+    P Wave detection
+
+    Parameters
+    ----------
+    signal : Signal object
+        signal object from Signal class in signal.py
+
+    Returns
+    -------
+    data : array_like
+        1_dimensional array with the indices of each p peak
+    """
+    
+    maxesP = []
+    
+    for i in range(0, len(signal.RPeaks) - 1):
+        left_limit = signal.RPeaks[i]
+        right_limit = signal.RPeaks[i+1]
+        left_limit = right_limit - (right_limit-left_limit)//3
+        
+        plotData = signal.data[left_limit:right_limit]
+        peaks = detect_peaks(plotData, show=True)
+        peakYs = [plotData[i] for i in peaks] # to get max peak
+        
+        if peaks.size != 0:
+            maxesP.append(left_limit + peaks[np.argmax(peakYs)]) # need to convert to original signal coordinates
+        
+    return np.asarray(maxesP)
+
 
 """ Helper functions """
 
