@@ -2,7 +2,6 @@ import wave
 import numpy as np
 import pandas as pd
 import pickle
-import pywt
 
 # NOW
 
@@ -68,7 +67,8 @@ class Signal(object):
     def __init__(self, 
                  name, 
                  data, 
-                 mid_bin_range=(234.85163198115271, 276.41687146297062)
+                 rr_bin_range=(234.85163198115271, 276.41687146297062),
+                 p_height_range=(1.4044214049249117, 1.6578494444983445)
                 ):
         """
         Return a Signal object whose record name is *name*,
@@ -90,10 +90,14 @@ class Signal(object):
         self.baseline = wave.getBaseline(self)
 
         self.RRintervals = wave.interval(self.RPeaks)
-        self.RRbinsN = wave.interval_bin(self.RRintervals, mid_bin_range)
+        self.RRbinsN = wave.interval_bin(self.RRintervals, rr_bin_range)
         
         self.PWaves = wave.getPWaves(self)
-        
+        self.PHeights = np.asarray([self.data[i] - self.baseline for i in self.PWaves])
+        minPHeight = 1.17975561806
+        self.PHeights = np.add(self.PHeights, minPHeight)
+        self.PHeights = np.square(self.PHeights)
+        self.PHeightbinsN = wave.interval_bin(self.PHeights, p_height_range)
 
 def deriveBinEdges(training):
     """
@@ -116,15 +120,15 @@ def deriveBinEdges(training):
     
     for idx, val in enumerate(training[0]):
         
-        if training[1][idx] == 'A':
+        if training[1][idx] == 'N':
             normals.append(val)
 
     for i in normals:
         
         signal = getFeaturesHardcoded(i)
 
-        tempMean = signal[4]
-        tempStd = np.sqrt(signal[3])
+        tempMean = signal[5]
+        tempStd = signal[6]
         
         lower += tempMean - tempStd
         upper += tempMean + tempStd
@@ -179,7 +183,9 @@ def getFeatures(sig):
     features.append(np.var(sig.RRintervals))
     features.append(wave.calculate_residuals(sig.data))
     
-    
+    features.append(np.mean(sig.PHeights))
+    features.append(np.var(sig.PHeights))
+    features += list(sig.PHeightbinsN)
         
     return features
 
@@ -238,7 +244,7 @@ def feature_extract():
     partitioned = wave.getPartitionedRecords(0) # partition nth 10th
     testing = partitioned[0]
     training = partitioned[1]
-
+    
     testMatrix = np.array([getFeaturesHardcoded("A00001")])
     trainMatrix = np.array([getFeaturesHardcoded("A00001")])
 

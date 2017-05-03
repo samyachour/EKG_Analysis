@@ -279,7 +279,7 @@ def getPWaves(signal):
         left_limit = right_limit - (right_limit-left_limit)//3
         
         plotData = signal.data[left_limit:right_limit]
-        peaks = detect_peaks(plotData, show=True, mpd=160)
+        peaks = detect_peaks(plotData, mpd=160) # super high mpd so it only gets the best peak
                         
         if peaks.size != 0:
             maxesP.append(left_limit + peaks[0]) # need to convert to original signal coordinates
