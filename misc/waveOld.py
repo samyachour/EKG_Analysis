@@ -4,7 +4,6 @@ import pandas as pd
 from detect_peaks import detect_peaks as detect_peaks_orig
 import scipy.io as sio
 from biosppy.signals import ecg 
-import plot
 
 
 
@@ -408,7 +407,7 @@ def getBaseline(signal):
 
 """ Helper functions """
 
-def load(filename, path = '../Physionet_Challenge/training2017/'):
+def load(filename, path = '../../Physionet_Challenge/training2017/'):
     #
     ### A helper function to load data
     # input:
@@ -423,7 +422,7 @@ def load(filename, path = '../Physionet_Challenge/training2017/'):
 
 def getRecords(trainingLabel, _not=False): # N O A ~
     
-    reference = pd.read_csv('../Physionet_Challenge/training2017/REFERENCE.csv', names = ["file", "answer"]) # N O A ~
+    reference = pd.read_csv('../../Physionet_Challenge/training2017/REFERENCE.csv', names = ["file", "answer"]) # N O A ~
     if trainingLabel == 'All':
         return reference['file'].tolist()
     if _not:

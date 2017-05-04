@@ -11,7 +11,6 @@ import waveOld as wave
 import numpy as np
 import pandas as pd
 import math
-import plot
 import matplotlib.pyplot as plt
 
 # TODO: Debug record errors
