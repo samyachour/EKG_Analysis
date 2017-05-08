@@ -6,7 +6,6 @@ import pickle
 # NOW
 
 # TODO: add p waves (pr interval, pp interval, p height)
-# TODO: submit entry with pip installed correctly
 
 # TODO: Andy will do this: 
     #Start using rpy2 to work with alex's code to do regression http://rpy.sourceforge.net/rpy2/doc-dev/html/introduction.html
@@ -25,11 +24,11 @@ import pickle
 
 """
 When submitting (use chrome):
+    -run compress.sh, verify it included the right files,
+        Include DRYRUN? Include saved pickle Model?
     -remove import plot from all files,
         delete line >>>'hardcoded_features = pd.read_csv("hardcoded_features.csv")'
         comment out all code outside functions (might be runModel() and feature_extract())
-    -run compress.sh, verify it included the right files,
-        Include DRYRUN? Include saved pickle Model?
     -make sure setup.sh + dependencies.txt includes all the right libs
     -make sure entry.zip is formatted correctly, move files out of physionet folder
     -comment out all 'pip install' lines setup.sh, add validation folder, 
