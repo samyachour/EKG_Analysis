@@ -283,6 +283,10 @@ def getPWaves(signal):
                         
         if peaks.size != 0:
             maxesP.append(left_limit + peaks[0]) # need to convert to original signal coordinates
+        else:
+            maxesP.append(left_limit) # if we can't find a p wave peak,
+                                      # just grab the leftmost point in the window
+                                      # TODO: better default case?
         
     return np.asarray(maxesP)
 

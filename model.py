@@ -2,19 +2,20 @@ import wave
 import numpy as np
 import pandas as pd
 import pickle
+import pywt
 
 # NOW
-
-# TODO: add p waves (pr interval, pp interval, p height)
 
 # TODO: Andy will do this: 
     #Start using rpy2 to work with alex's code to do regression http://rpy.sourceforge.net/rpy2/doc-dev/html/introduction.html
     #Or just port the r code to python, if so remove rpy2 binaries and the pip line in setup.sh
+    
 # TODO: Add noise classification?
 
 # LATER
 
 # TODO: Make sure code is nice and formatted
+# TODO: Do writeup
 
 # TODO: Deal with weird records....
     # A03509 RRvar1, RRvar2, RRvar3 NaNs
@@ -67,7 +68,9 @@ class Signal(object):
                  name, 
                  data, 
                  rr_bin_range=(234.85163198115271, 276.41687146297062),
-                 p_height_range=(1.4044214049249117, 1.6578494444983445)
+                 p_height_range=(1.4044214049249117, 1.6578494444983445),
+                 pp_bin_range=(231.13977553262845, 280.31128124840563),
+                 pr_bin_range=(33.895661115441065, 52.440635275728425)
                 ):
         """
         Return a Signal object whose record name is *name*,
@@ -97,6 +100,12 @@ class Signal(object):
         self.PHeights = np.add(self.PHeights, minPHeight)
         self.PHeights = np.square(self.PHeights)
         self.PHeightbinsN = wave.interval_bin(self.PHeights, p_height_range)
+        
+        self.PPintervals = wave.interval(self.PWaves)
+        self.PPbinsN = wave.interval_bin(self.PPintervals, pp_bin_range)
+        
+        self.PRintervals = self.RPeaks[1:] - self.PWaves
+        self.PRbinsN = wave.interval_bin(self.PRintervals, pr_bin_range)
 
 def deriveBinEdges(training):
     """
@@ -126,8 +135,8 @@ def deriveBinEdges(training):
         
         signal = getFeaturesHardcoded(i)
 
-        tempMean = signal[5]
-        tempStd = signal[6]
+        tempMean = signal[56]
+        tempStd = signal[57]
         
         lower += tempMean - tempStd
         upper += tempMean + tempStd
@@ -180,11 +189,30 @@ def getFeatures(sig):
     
     features += list(sig.RRbinsN)
     features.append(np.var(sig.RRintervals))
+    
     features.append(wave.calculate_residuals(sig.data))
+    
+    wtcoeff = pywt.wavedecn(sig.data, 'sym5', level=5, mode='constant')
+    wtstats = wave.stats_feat(wtcoeff)
+    features += wtstats.tolist()
+    
+    features.append(wave.diff_var(sig.RRintervals.tolist()))
+    features.append(wave.diff_var(sig.RRintervals.tolist(), skip=3))
+    
+    #TODO: do cal_stats for all these features?
     
     features.append(np.mean(sig.PHeights))
     features.append(np.var(sig.PHeights))
     features += list(sig.PHeightbinsN)
+    
+    features.append(np.mean(sig.PPintervals))
+    features.append(np.var(sig.PPintervals))
+    features += list(sig.PPbinsN)
+    
+    features.append(np.mean(sig.PPintervals))
+    features.append(np.var(sig.PRintervals))
+    features += list(sig.PRbinsN)
+
         
     return features
 
@@ -240,7 +268,7 @@ def feature_extract():
     """
 
     records_labels = wave.getRecords('All')
-    partitioned = wave.getPartitionedRecords(0) # partition nth 10th
+    partitioned = wave.getPartitionedRecords(0) # partition nth 10th, 0-9
     testing = partitioned[0]
     training = partitioned[1]
     
