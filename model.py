@@ -15,9 +15,6 @@ import pywt
 
 # LATER
 
-# TODO: Make sure code is nice and formatted
-# TODO: Do writeup
-
 # TODO: Deal with weird records....
     # A03509 RRvar1, RRvar2, RRvar3 NaNs
     # A03863 A03812 too
@@ -53,18 +50,7 @@ When testing:
 
 
 class Signal(object):
-    """
-    An ECG/EKG signal
-
-    Attributes:
-        name: A string representing the record name.
-        sampling rate/freq: the sampling rate Hz and frequency (float)
-        data : 1-dimensional array with input signal data
-        RPeaks : array of R Peak indices
-        RRintervals : array of RR interval lengths
-        RRbins : tuple of bin percents
-    """
-
+    
     def __init__(self,
                  name,
                  data,
