@@ -185,12 +185,19 @@ def getFeatures(sig, names = False):
     ----------
     sig : Signal object
         instantiated signal object of class Signal
+    names: boolean 
+        a parameter to choose whether to output the columns or not
+        if set to true, will return a list of column names. 
+        However, the column names are all hardcoded. Any changes to 
+        the features will not automatically change the output column names
 
     Returns
     -------
     features : list (not numpy array)
         a feature list for the given signal
 
+    feature names :  list
+        feature list
     """
 
     features = [sig.name]
