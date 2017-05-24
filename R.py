@@ -2,7 +2,6 @@ import rpy2.robjects as robjects
 import numpy as np
 import rpy2
 
-
 def source(R_file):
     '''
         This function read in the R source file
@@ -58,6 +57,15 @@ def functionSource(function):
     '''
     print (function.r_repr())
 
-
-
-
+#def r2py(r_list, new_list):
+    #class_func = getFunction('class')
+    #_class = class_func(r_list)
+    
+    #if _class[0] != 'list':
+        #_list = np.asarray(r_list)
+        #return _list
+    #else:
+        #record = []
+        #for i in r_list:
+            #_list = r2py(i)
+            #record.append(_list)
