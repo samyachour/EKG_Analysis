@@ -156,7 +156,28 @@ def getFeaturesHardcoded(name):
 
     return signal[2:]
 
-def getFeatures(sig):
+
+def createcolnames(n_features, feature_name):
+    feature_list = []
+    counter = 1
+    if n_features == 1:
+        return [feature_name]
+    else:
+        for i in range(n_features):
+            feature_list.append(feature_name+str(counter))
+            counter+=1
+        return feature_list
+
+def getFeaturesNames():
+    records = wave.getRecords('All')[0]
+    returnMatrix = []
+
+    sig = Signal(records[0], wave.load(records[0]))
+
+    features_names = getFeatures(sig, names=True)
+    return features_names
+
+def getFeatures(sig, names = False):
     """
     this function extract the features from the attributes of a signal
 
@@ -173,11 +194,13 @@ def getFeatures(sig):
     """
 
     features = [sig.name]
+    
 
     features += list(sig.RRbinsN)
     features.append(np.var(sig.RRintervals))
 
     features.append(wave.calculate_residuals(sig.data))
+    
 
     wtcoeff = pywt.wavedecn(sig.data, 'sym5', level=5, mode='constant')
     wtstats = wave.stats_feat(wtcoeff)
@@ -196,9 +219,37 @@ def getFeatures(sig):
     features.append(np.var(sig.PPintervals))
     features += list(sig.PPbinsN)
 
-    features.append(np.mean(sig.PPintervals))
+    features.append(np.mean(sig.PRintervals))
     features.append(np.var(sig.PRintervals))
     features += list(sig.PRbinsN)
+
+    
+
+    if names == True: 
+         
+        feature_names = createcolnames(len([sig.name]), 'Name')
+        feature_names += createcolnames(len(list(sig.RRbinsN)), 'RR_bins_')
+
+        feature_names += createcolnames(len([np.var(sig.RRintervals)]), 'Var_RR_intervals')
+
+        feature_names += createcolnames(len([wave.calculate_residuals(sig.data)]), 'Residuals')    
+
+        feature_names += createcolnames(len(list(wtstats.tolist())), 'wavelet_coeff_')
+        feature_names += createcolnames(len([wave.diff_var(sig.RRintervals.tolist())]), 'RRintervals_every_2nd')
+        feature_names += createcolnames(len([wave.diff_var(sig.RRintervals.tolist())]), 'RRintervals_every_3rd')
+
+        feature_names += createcolnames(len([np.mean(sig.PHeights)]), 'Mean_PHeights')
+        feature_names += createcolnames(len([np.var(sig.PHeights)]), 'Var_PHeights')
+        feature_names += createcolnames(len(list(sig.PHeightbinsN)), 'PheightBins_')
+
+        feature_names += createcolnames(len([np.mean(sig.PPintervals)]), 'Mean_PPintervals')
+        feature_names += createcolnames(len([np.var(sig.PPintervals)]), 'Var_PPintervals')
+        feature_names += createcolnames(len(list(sig.PPbinsN)), 'PPBinsN_')
+
+        feature_names += createcolnames(len([np.mean(sig.PRintervals)]), 'Mean_PRintervals')
+        feature_names += createcolnames(len([np.var(sig.PRintervals)]), 'Var_PRintervals')
+        feature_names += createcolnames(len(list(sig.PRbinsN)), 'PRBinsN_')
+        return feature_names
 
 
     return features
@@ -227,7 +278,7 @@ def saveSignalFeatures():
 
         returnMatrix.append(features)
 
-    df = pd.DataFrame(returnMatrix)
+    df = pd.DataFrame(returnMatrix, )
     df.to_csv('hardcoded_features.csv')
 
 #saveSignalFeatures()
