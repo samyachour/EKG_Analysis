@@ -43,8 +43,8 @@ When adding features:
 
 """
 When testing:
-    -run feature_extract() (uncomment the line below it)
-    -run runModel()  (uncomment the line below it)
+    -run feature_extract() (by uncommenting line 336)
+    -run runModel()  (by uncommenting line 394)
     -go to score.py and just run the whole file
 """
 
